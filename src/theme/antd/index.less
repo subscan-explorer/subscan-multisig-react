@@ -1,0 +1,82 @@
+@import './vars.less';
+
+/* btn rest */
+.ant-btn-primary {
+  border: none !important;
+
+  &:hover,
+  &:focus {
+    background: @dvm-main-bg;
+    opacity: 0.9;
+  }
+}
+
+.ant-btn:hover,
+.ant-btn:focus,
+.ant-btn:active {
+  opacity: 0.9;
+}
+
+/* Modal reset */
+.ant-modal-content {
+  border-radius: 0.75rem;
+}
+
+.ant-modal-header {
+  border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.ant-modal-close-x {
+  color: #595959;
+  font-weight: bold;
+}
+
+/* checkbox */
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: transparent;
+  background: @dvm-main-bg;
+}
+
+/* alert */
+.ant-alert {
+  min-width: 200px;
+  border-radius: @border-radius-base;
+}
+
+/* tag */
+.ant-tag {
+  border-radius: 6px;
+}
+
+/* checkbox group */
+.ant-checkbox-group {
+  .ant-checkbox-wrapper:not(:last-child) {
+    margin-bottom: 1em;
+  }
+
+  .ant-checkbox-inner {
+    border-radius: 2px;
+  }
+}
+
+/* card */
+.ant-card-bordered {
+  border-color: #eaeaea;
+  border-radius: @shadow-2;
+  box-shadow: 0 0 24px 0 rgba(191, 194, 234, 0.41);
+}
+
+/* dropdown menu */
+.ant-dropdown-menu {
+  padding: 20px;
+
+  .ant-dropdown-menu-item {
+    line-height: 32px;
+  }
+}
+
+/* ant-message */
+.ant-message .anticon {
+  top: 0;
+  vertical-align: 0;
+}

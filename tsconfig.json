@@ -1,0 +1,4 @@
+{
+  "extends": "@darwinia/lints/tsconfig",
+  "include": ["src", "src/global.d.ts"]
+}
