@@ -17,6 +17,10 @@ type TokenRecord = { [key in Token]: string };
 
 type Api = { [key: string]: string };
 
+interface Donate {
+  address: string;
+}
+
 export interface NetConfig {
   dvmWithdrawAddress: TokenRecord;
   facade: Facade;
@@ -26,6 +30,7 @@ export interface NetConfig {
   token: TokenRecord;
   erc20: TokenRecord;
   api: Api;
+  donate: Donate;
 }
 
 export type NetworkConfig<T = NetConfig> = Config<NetworkType, T>;

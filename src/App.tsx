@@ -2,11 +2,11 @@ import { DownOutlined } from '@ant-design/icons';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import { Affix, Button, Dropdown, Layout, Menu, Spin } from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
+import { getYear } from 'date-fns';
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Route, Switch } from 'react-router-dom';
-import './App.scss';
-import { DownIcon } from './components/icons';
+import { DonateIcon, DownIcon } from './components/icons';
 import { Language } from './components/Language';
 import { NETWORK_CONFIG } from './config';
 import { Path, routes } from './config/routes';
@@ -30,6 +30,19 @@ function App() {
     [networkStatus]
   );
   const networks = useMemo(() => Object.entries(NETWORK_CONFIG).map(([key, value]) => ({ name: key, ...value })), []);
+  const contactIcons = useMemo(
+    () => [
+      { href: 'https://twitter.com/subscan_io/', icon: 'twitter-grey' },
+      {
+        href: 'https://riot.im/app/#/room/!uaYUrKBueiKUurHliJ:matrix.org?via=matrix.org&via=matrix.parity.io&via=web3.foundation',
+        icon: 'riot-grey',
+      },
+      { href: 'https://github.com/itering/subscan-essentials', icon: 'github-grey' },
+      { href: 'https://medium.com/subscan', icon: 'medium-grey' },
+      { href: 'mailto:hello@subscan.io', icon: 'email' },
+    ],
+    []
+  );
 
   useEffect(() => {
     window.less
@@ -78,6 +91,8 @@ function App() {
                   ))}
                 </Menu>
               }
+              placement="bottomCenter"
+              arrow
             >
               <a onClick={(e) => e.preventDefault()} className="text-white">
                 {t('accounts')} <DownOutlined />
@@ -117,9 +132,63 @@ function App() {
               <Route key={index} {...item}></Route>
             ))}
           </Switch>
-          <Language className="text-2xl cursor-pointer ml-16 fixed bottom-8 right-8 text-purple-700" />
         </Spin>
       </Content>
+
+      <Layout.Footer
+        className="flex items-center justify-between sm:px-80 px-1 text-gray-400"
+        style={{ background: '#2d2d2d' }}
+      >
+        <div className="flex gap-4 text-gray-400">
+          <span>{t('copy_right', { year: getYear(new Date()) })}</span>
+          <a href="https://www.subscan.io/privacy" className="text-gray-400 hover:text-gray-100">
+            {t('privacy_policy')}
+          </a>
+          <a href="https://www.subscan.io/term" className="text-gray-400 hover:text-gray-100">
+            {t('term_of_use')}
+          </a>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <Dropdown
+            arrow
+            placement="topCenter"
+            overlay={
+              <Menu>
+                <Menu.Item>
+                  <div className="flex flex-col items-center text-blue-400 hover:text-blue-600">
+                    <span>{t('donate_unit', { unit: networkConfig.token.ring })}</span>
+                    <span>{networkConfig.donate.address}</span>
+                  </div>
+                </Menu.Item>
+
+                <Menu.Item className="text-center text-blue-400 hover:text-blue-600">
+                  <a href="https://www.subscan.io/donate" target="__blank">
+                    {t('donate_other')}
+                  </a>
+                </Menu.Item>
+              </Menu>
+            }
+          >
+            <DonateIcon />
+          </Dropdown>
+
+          {contactIcons.map(({ href, icon }) => (
+            <a
+              target="__blank"
+              rel="noopener"
+              href={href}
+              key={icon}
+              className="bg-white flex items-center justify-center rounded"
+              style={{ width: 26, height: 26 }}
+            >
+              <img src={`/icons/${icon}.svg`} className="w-4 h-4" />
+            </a>
+          ))}
+
+          <Language className="text-2xl cursor-pointer text-gray-400" />
+        </div>
+      </Layout.Footer>
     </Layout>
   );
 }

@@ -39,7 +39,7 @@ export function Language({ className = '' }: LanguageProps) {
     >
       <div className="rounded bg-purple-200 flex items-center px-2 py-1 cursor-pointer">
         <EarthIcon />
-        <span className="ml-2 text-xs uppercase">{current}</span>
+        <span className="ml-2 text-xs uppercase">{t(current)}</span>
       </div>
     </Dropdown>
   );

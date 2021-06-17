@@ -26,6 +26,9 @@ export const NETWORK_CONFIG: NetworkConfig = {
     api: {
       subql: 'https://api.subquery.network/sq/darwinia-network/darwinia',
     },
+    donate: {
+      address: '2rbREPAhkptwCtdvU5eSGnHgFiyPcehdkXuGqFF916oYCJ7s',
+    },
   },
   pangolin: {
     facade: {
@@ -48,6 +51,9 @@ export const NETWORK_CONFIG: NetworkConfig = {
     api: {
       subql: 'http://t3.hkg.itering.com:3000',
     },
+    donate: {
+      address: '2rbREPAhkptwCtdvU5eSGnHgFiyPcehdkXuGqFF916oYCJ7s',
+    },
   },
   crab: {
     facade: {
@@ -69,6 +75,9 @@ export const NETWORK_CONFIG: NetworkConfig = {
     rpc: 'wss://crab-rpc.darwinia.network',
     api: {
       subql: 'https://api.subquery.network/sq/wuminzhe/crab',
+    },
+    donate: {
+      address: '5FVFSCANyotNxJM4Crm1LQfsmNQSw3p8H7CRbegN7d5Ex91y',
     },
   },
 };

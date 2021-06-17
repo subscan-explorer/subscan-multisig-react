@@ -17,7 +17,7 @@
   "call_hash": "Call Hash",
   "cancel": "Cancel",
   "contact_us": "Contact Us",
-  "copy_right": "Subscan © {year} - Developed by Subscan Team",
+  "copy_right": "Subscan © {{year}} - Developed by Subscan Team",
   "copy_success": "Copy Succeeded",
   "create": "Create",
   "delete": "Delete",
@@ -25,8 +25,9 @@
   "destination": "Destination",
   "donate": "Donate",
   "donate_other": "Donate Other Tokens",
-  "donate_unit": "Donate ({unit}) :",
+  "donate_unit": "Donate ({{unit}}) :",
   "empty": "Empty",
+  "en": "en",
   "encoded call data": "encoded call data",
   "encoded call hash": "encoded call hash",
   "error": {
@@ -43,7 +44,7 @@
   "extrinsic": "Extrinsic",
   "extrinsic_index": "Extrinsic Index",
   "false_label": "No",
-  "fee": "*Fee: {num}",
+  "fee": "*Fee: {{num}}",
   "id": "ID",
   "include option": "include option",
   "injected": "Injected",
@@ -68,7 +69,7 @@
     "from_chain": "Call Data (scanned from the chain storage)",
     "index": "Multi-sig",
     "intro": "Subscan Multi-sig is the most easy-to-use and secure way to manage Multi-sig wallets and extrinsics",
-    "sending_transaction": "Sending transaction {transaction}"
+    "sending_transaction": "Sending transaction {{transaction}}"
   },
   "name": "Name",
   "network": "Network",
@@ -77,10 +78,10 @@
   "parameters": "Parameters",
   "pending_hash": "Pending Hash",
   "polkadot": {
-    "connect": "Connect to polkadot{.js} extension",
-    "connected": "Polkadot{.js} is connected",
-    "download": "Download polkadot{.js} extension",
-    "download_tip": "polkadot{.js} extension not installed, please download and install first",
+    "connect": "Connect to polkadot{{.js}} extension",
+    "connected": "Polkadot{{.js}} is connected",
+    "download": "Download polkadot{{.js}} extension",
+    "download_tip": "polkadot{{.js}} extension not installed, please download and install first",
     "none": "No accounts",
     "waiting": "Waiting for authorization from the extension. Please open the installed extension and approve access."
   },
@@ -116,7 +117,7 @@
   "wallet": {
     "add": "Create Wallet",
     "delete": "Delete Wallet",
-    "delete_confirm": "Are you sure to delete “{name}” ？",
+    "delete_confirm": "Are you sure to delete “{{name}}” ？",
     "deploy": "Create Wallet",
     "empty": "Please create a Multi-sig wallet first",
     "index": "Wallet",
@@ -128,5 +129,6 @@
       "name": "Arbitrary wallet name to help yourself remember",
       "threshold": "Minimum approvals required to validate the multi-sig transaction"
     }
-  }
+  },
+  "zh": "中文"
 }
