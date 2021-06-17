@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 56.2 (81672) - https://sketch.com -->
+    <title>icon/blocks</title>
+    <desc>Created with Sketch.</desc>
+    <g id="icon/blocks" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="编组-7" transform="translate(8.000000, 7.000000)">
+            <rect id="矩形" stroke="#302B3C" fill="#FFFFFF" stroke-linejoin="round" x="0" y="0" width="14" height="17"></rect>
+            <rect id="矩形" fill="#302B3C" x="2" y="9" width="10" height="1.5"></rect>
+            <rect id="矩形" fill="#302B3C" x="2" y="6" width="10" height="1.5"></rect>
+            <rect id="矩形" fill="#302B3C" x="2" y="3" width="10" height="3.5"></rect>
+            <rect id="矩形" fill="#302B3C" x="2" y="12" width="5" height="1.5"></rect>
+            <g id="编组" transform="translate(14.000000, 10.500000) rotate(45.000000) translate(-14.000000, -10.500000) translate(13.000000, 4.000000)" stroke="#302B3C" stroke-linejoin="round">
+                <path d="M2,11 L1,13 L0,11 L0,0 L2,0 L2,11 Z" id="形状结合" fill="#302B3C"></path>
+                <rect id="矩形" fill="#FFFFFF" x="0" y="0" width="2" height="2"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

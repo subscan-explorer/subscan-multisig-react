@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const typescriptTransform = require('i18next-scanner-typescript');
 
 module.exports = {
@@ -19,7 +20,7 @@ module.exports = {
     },
     trans: {
       extensions: ['.ts', '.tsx'],
-      fallbackKey: function (ns, value) {
+      fallbackKey(_, value) {
         return value;
       },
     },
@@ -27,7 +28,7 @@ module.exports = {
     ns: ['translation'],
     defaultLng: 'en',
     defaultNs: 'translation',
-    defaultValue: function (lng, ns, key) {
+    defaultValue(lng, ns, key) {
       if (lng === 'en') {
         // Return key as the default value for English language
         return key;

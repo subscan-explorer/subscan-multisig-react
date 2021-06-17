@@ -1,0 +1,10 @@
+{
+  "@dvm-main-bg": "#ec3783",
+  "@dvm-radius-base": "12px",
+  "@btn-border-radius-base": "@dvm-radius-base",
+  "@btn-primary-bg": "@dvm-main-bg",
+  "@btn-default-border": "@dvm-main-bg",
+  "@btn-default-bg": "#ffffff",
+  "@layout-header-background": "#fff",
+  "@card-radius": "@dvm-radius-base"
+}

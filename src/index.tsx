@@ -1,14 +1,28 @@
-import React from 'react';
+import { ClientContext, GraphQLClient } from 'graphql-hooks';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
-import './index.scss';
-import './theme/antd/index.less';
+import { BrowserRouter as Router } from 'react-router-dom';
 import App from './App';
+import './config/i18n';
+import { ApiProvider } from './hooks';
+import './index.scss';
 import reportWebVitals from './reportWebVitals';
+import './theme/antd/index.less';
+
+const client = new GraphQLClient({
+  url: 'http://localhost:3000/',
+});
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <Suspense fallback="loading">
+    <Router>
+      <ClientContext.Provider value={client}>
+        <ApiProvider>
+          <App />
+        </ApiProvider>
+      </ClientContext.Provider>
+    </Router>
+  </Suspense>,
   document.getElementById('root')
 );
 

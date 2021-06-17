@@ -1,3 +1,65 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import '~@fontsource/ibm-plex-sans/index.css';
+
+$accent: #ec3783;
+$primary: #5745de;
+
+$bg-darwinia: linear-gradient(-45deg, #fe3876 0%, #7c30dd 71%, #3a30dd 100%);
+
+$radius-base: 10px;
+
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+@mixin main-border {
+  border: 2px solid transparent;
+  border-radius: $radius-base;
+  background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(to right, $primary, $accent) border-box;
+}
+
+@mixin divider($color) {
+  content: '';
+  position: absolute;
+  left: 10%;
+  right: 0;
+  bottom: 0;
+  width: 80%;
+  height: 1px;
+  background: $color;
+}
+
+.dream-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 10px;
+  cursor: pointer;
+  @include main-border();
+}
+
+.dream-btn:hover,
+.dream-btn:focus {
+  color: $primary;
+  box-shadow: 0 0 2px 0 $primary;
+  outline: none;
+}
+
+.header-account-list {
+  position: relative;
+  padding-bottom: 10px;
+
+  .ant-dropdown-menu-title-content {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  &::after {
+    @include divider(#f1f1f1);
+  }
+}

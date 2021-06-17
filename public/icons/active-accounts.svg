@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 60 (88103) - https://sketch.com -->
+    <title>icon/blocks</title>
+    <desc>Created with Sketch.</desc>
+    <g id="icon/blocks" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="编组-2" transform="translate(7.000000, 7.000000)">
+            <g id="编组">
+                <circle id="椭圆形" fill="#302B3C" cx="8" cy="8" r="2.18181818"></circle>
+                <circle id="椭圆形" stroke="#302B3C" cx="2.18181818" cy="2.18181818" r="1.68181818"></circle>
+                <circle id="椭圆形" fill="#302B3C" cx="8" cy="2.18181818" r="2.18181818"></circle>
+                <circle id="椭圆形" stroke="#302B3C" cx="2.18181818" cy="8" r="1.68181818"></circle>
+                <circle id="椭圆形" fill="#302B3C" cx="2.18181818" cy="13.8181818" r="2.18181818"></circle>
+                <circle id="椭圆形" fill="#302B3C" cx="8" cy="13.8181818" r="2.18181818"></circle>
+                <circle id="椭圆形" fill="#302B3C" cx="13.8181818" cy="2.18181818" r="2.18181818"></circle>
+                <circle id="椭圆形" stroke="#302B3C" cx="13.8181818" cy="8" r="1.68181818"></circle>
+                <circle id="椭圆形" fill="#302B3C" cx="13.8181818" cy="13.8181818" r="2.18181818"></circle>
+            </g>
+        </g>
+    </g>
+</svg>

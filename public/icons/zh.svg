@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="26px" height="26px" viewBox="0 0 26 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon/语言</title>
+    <g id="icon/语言" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M22.0999822,0 L3.90001777,0 C1.69002209,0 0,1.6899967 0,3.90001777 L0,22.0999822 C0,24.3099779 1.6899967,26 3.90001777,26 L22.0999822,26 C24.3099779,26 26,24.3100033 26,22.0999822 L26,3.90001777 C26,1.69002209 24.3100033,0 22.0999822,0 Z" id="路径" fill="#FFFFFF" fill-rule="nonzero"></path>
+        <text id="中" font-family="PingFangSC-Semibold, PingFang SC" font-size="14" font-weight="500" fill="#302B3C">
+            <tspan x="6" y="18">中</tspan>
+        </text>
+    </g>
+</svg>

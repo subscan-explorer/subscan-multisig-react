@@ -1,0 +1,10 @@
+{
+  "@dvm-main-bg": "linear-gradient(-45deg, #fe3876 0%, #7c30dd 71%, #3a30dd 100%)",
+  "@dvm-radius-base": "12px",
+  "@btn-border-radius-base": "@dvm-radius-base",
+  "@btn-primary-bg": "@dvm-main-bg",
+  "@btn-default-border": "2px solid transparent",
+  "@btn-default-bg": "linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(to right, #5745de, #ec3783) border-box",
+  "@layout-header-background": "#fff",
+  "@card-radius": "@dvm-radius-base"
+}

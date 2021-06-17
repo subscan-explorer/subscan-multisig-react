@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 56.2 (81672) - https://sketch.com -->
+    <title>icon/blocks</title>
+    <desc>Created with Sketch.</desc>
+    <g id="icon/blocks" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linejoin="round">
+        <g id="编组-8" transform="translate(7.000000, 5.000000)" stroke="#302B3C">
+            <polygon id="矩形" fill="#FFFFFF" points="8.33999942 -5.32907052e-14 16.6799988 5.25111074 8.33999942 10.5022215 2.14939178e-13 5.25111074"></polygon>
+            <polyline id="矩形" stroke-linecap="round" transform="translate(12.520000, 12.417333) scale(-1, 1) translate(-12.520000, -12.417333) " points="8.36000058 5.25111074 16.7000005 10.2571697 16.7000005 19.5835544 8.36000058 14.5774954 8.33999892 9"></polyline>
+            <polygon id="矩形" fill="#302B3C" points="-3.41319449e-13 5.25111074 8.33999942 10.2571697 8.33999942 19.5835544 0 14.5774954"></polygon>
+            <polygon id="矩形" stroke-width="0.5" fill="#302B3C" transform="translate(12.800000, 12.450000) scale(-1, 1) translate(-12.800000, -12.450000) " points="11.3000005 10.3 14.3000003 12.197126 14.3000005 14.6 11.3000005 12.9028736"></polygon>
+        </g>
+    </g>
+</svg>

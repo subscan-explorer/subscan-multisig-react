@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 60 (88103) - https://sketch.com -->
+    <title>icon/era</title>
+    <desc>Created with Sketch.</desc>
+    <g id="icon/era" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="编组" transform="translate(6.000000, 6.000000)">
+            <path d="M3.57678854,11.4035534 L15.4232115,11.4035534 L19.9072114,17.3035534 L-0.907211441,17.3035534 L3.57678854,11.4035534 Z" id="矩形" stroke="#302B3C" stroke-width="0.899999976" stroke-linejoin="round"></path>
+            <polygon id="矩形" stroke="#302B3C" fill="#302B3C" stroke-linejoin="round" points="5.9 13.8535534 13.1 13.8535534 14 14.8535534 5 14.8535534"></polygon>
+            <rect id="矩形" stroke="#302B3C" stroke-width="0.899999976" stroke-linejoin="round" x="-0.449999988" y="16.55" width="19.9" height="2.89999998"></rect>
+            <rect id="矩形" stroke="#302B3C" fill="#302B3C" stroke-linejoin="round" transform="translate(9.853553, 7.000000) rotate(45.000000) translate(-9.853553, -7.000000) " x="6.35355339" y="2" width="7" height="10"></rect>
+            <g id="system-selects" transform="translate(7.000000, 4.853553)" fill="#FFFFFF" fill-rule="nonzero">
+                <polygon id="路径" points="2.10620582 3.28822733 5.39327462 0 6 0.606932514 2.10830415 4.5 2.10619242 4.49789423 2.10410079 4.49997988 0 2.3951442 0.606718674 1.78820498 2.10621253 3.28822733"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

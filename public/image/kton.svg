@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="26px" height="26px" viewBox="0 0 26 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>币/logo</title>
+    <defs>
+        <linearGradient x1="50%" y1="100%" x2="50%" y2="3.061617e-15%" id="linearGradient-1">
+            <stop stop-color="#ABEC79" offset="0%"></stop>
+            <stop stop-color="#72D444" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="98.134935%" id="linearGradient-2">
+            <stop stop-color="#36B564" offset="0%"></stop>
+            <stop stop-color="#598E69" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="100%" x2="50%" y2="-2.48949813e-15%" id="linearGradient-3">
+            <stop stop-color="#499D6C" offset="0%"></stop>
+            <stop stop-color="#1C8441" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-1.11022302e-14%" y1="50%" x2="100%" y2="50%" id="linearGradient-4">
+            <stop stop-color="#4C9B72" offset="0%"></stop>
+            <stop stop-color="#25623E" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="98.0604227%" id="linearGradient-5">
+            <stop stop-color="#B1F286" offset="0%"></stop>
+            <stop stop-color="#6BD240" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="100%" y1="50%" x2="0%" y2="50%" id="linearGradient-6">
+            <stop stop-color="#A6E579" offset="0%"></stop>
+            <stop stop-color="#66B740" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="100%" x2="50%" y2="3.061617e-15%" id="linearGradient-7">
+            <stop stop-color="#399163" offset="0%"></stop>
+            <stop stop-color="#205A38" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-8">
+            <stop stop-color="#54A66D" offset="0%"></stop>
+            <stop stop-color="#2A6D3B" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-9">
+            <stop stop-color="#B1F286" offset="0%"></stop>
+            <stop stop-color="#79E14E" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-10">
+            <stop stop-color="#4C9D69" offset="0%"></stop>
+            <stop stop-color="#256438" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="币/logo" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="编组" transform="translate(0.500000, 3.250000)" fill-rule="nonzero">
+            <polygon id="Path" fill="url(#linearGradient-1)" points="4.04977946 -2.6277468e-15 6.04683907 2.39643621 4.37957801e-14 4.79287243"></polygon>
+            <polygon id="Combined-Shape" fill="url(#linearGradient-2)" points="12.4965746 12.0754865 18.650083 4.79287243 21.7886111 4.79287243 12.4806712 15.8621254"></polygon>
+            <polygon id="Combined-Shape-Copy-16" fill="url(#linearGradient-3)" points="18.650083 4.79287243 1.40146496e-14 4.79287243 6.04683907 2.39643621 19.8350929 2.39643621 21.7886111 4.79287243"></polygon>
+            <polygon id="Combined-Shape-Copy-16" fill="url(#linearGradient-4)" points="18.650083 4.79287243 19.8350929 2.39643621 21.7886111 4.79287243"></polygon>
+            <polygon id="Combined-Shape" fill="url(#linearGradient-5)" points="19.8350929 2.39643621 6.04683907 2.39643621 4.04977946 -1.7518312e-15 20.9387374 -1.7518312e-15"></polygon>
+            <polygon id="Combined-Shape-Copy" fill="url(#linearGradient-6)" points="21.7886111 4.79287243 19.8350929 2.39643621 20.9387374 -2.6277468e-15 24.9504214 4.79287243"></polygon>
+            <polygon id="Combined-Shape-Copy" fill="url(#linearGradient-7)" points="12.4806712 15.8621254 21.7886111 4.79287243 24.9504214 4.79287243 15.6467438 15.8036794 12.5022879 19.5386339"></polygon>
+            <polygon id="Combined-Shape-Copy" fill="url(#linearGradient-8)" points="8.80346039 11.525717 12.4806712 15.8621254 12.5022879 19.5386339 4.09250727 9.58574485"></polygon>
+            <polygon id="Combined-Shape-Copy" fill="url(#linearGradient-9)" points="8.80346039 11.525717 4.09250727 9.58574485 10.3928457 9.58574485"></polygon>
+            <polygon id="Combined-Shape" fill="url(#linearGradient-10)" points="10.3928457 9.58574485 8.80346039 11.525717 12.4806712 15.8621254 12.4965746 12.0754865"></polygon>
+        </g>
+    </g>
+</svg>

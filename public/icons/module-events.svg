@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 56.2 (81672) - https://sketch.com -->
+    <title>icon/blocks</title>
+    <desc>Created with Sketch.</desc>
+    <g id="icon/blocks" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="编组-5" transform="translate(7.000000, 7.000000)">
+            <rect id="矩形" stroke="#302B3C" fill="#FFFFFF" stroke-linejoin="round" x="0" y="5" width="17" height="11"></rect>
+            <rect id="矩形" stroke="#302B3C" fill="#302B3C" stroke-linejoin="round" transform="translate(8.500000, 3.000000) scale(1, -1) translate(-8.500000, -3.000000) " x="0" y="1" width="17" height="4"></rect>
+            <rect id="矩形" fill="#302B3C" x="2" y="7" width="3" height="2"></rect>
+            <rect id="矩形" fill="#302B3C" x="7" y="7" width="3" height="2"></rect>
+            <rect id="矩形" fill="#302B3C" x="11.9999995" y="7" width="3" height="2"></rect>
+            <rect id="矩形" fill="#302B3C" x="2" y="11" width="3" height="2"></rect>
+            <rect id="矩形" fill="#302B3C" x="7" y="11" width="3" height="2"></rect>
+            <rect id="矩形" stroke="#302B3C" fill="#302B3C" stroke-linejoin="round" x="3.9999995" y="0" width="1" height="2"></rect>
+            <rect id="矩形" stroke="#302B3C" fill="#302B3C" stroke-linejoin="round" x="11.9999995" y="0" width="1" height="2"></rect>
+        </g>
+    </g>
+</svg>
