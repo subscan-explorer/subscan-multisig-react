@@ -175,7 +175,7 @@ export function Wallets() {
   }, [networkStatus, api]);
 
   return (
-    <Space direction="vertical" size="large" className="w-full">
+    <Space direction="vertical" size="large" className="w-full" id="wallets">
       <Link to={Path.wallet}>
         <Button type="primary">{t('wallet.add')}</Button>
       </Link>

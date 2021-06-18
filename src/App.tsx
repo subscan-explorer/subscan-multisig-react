@@ -32,14 +32,14 @@ function App() {
   const networks = useMemo(() => Object.entries(NETWORK_CONFIG).map(([key, value]) => ({ name: key, ...value })), []);
   const contactIcons = useMemo(
     () => [
-      { href: 'https://twitter.com/subscan_io/', icon: 'twitter-grey' },
+      { href: 'https://twitter.com/subscan_io/', icon: 'twitter-black' },
       {
         href: 'https://riot.im/app/#/room/!uaYUrKBueiKUurHliJ:matrix.org?via=matrix.org&via=matrix.parity.io&via=web3.foundation',
-        icon: 'riot-grey',
+        icon: 'riot-black',
       },
-      { href: 'https://github.com/itering/subscan-essentials', icon: 'github-grey' },
-      { href: 'https://medium.com/subscan', icon: 'medium-grey' },
-      { href: 'mailto:hello@subscan.io', icon: 'email' },
+      { href: 'https://github.com/itering/subscan-essentials', icon: 'github-black' },
+      { href: 'https://medium.com/subscan', icon: 'medium-black' },
+      { href: 'mailto:hello@subscan.io', icon: 'email-black' },
     ],
     []
   );
