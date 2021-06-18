@@ -162,7 +162,7 @@ module.exports = {
     ],
     'prefer-const': 'error',
     'quote-props': ['error', 'as-needed'],
-    quotes: ['error', 'single'],
+    quotes: ['error', 'single', { allowTemplateLiterals: true }],
     radix: 'error',
     'react/jsx-curly-spacing': 'off',
     'react/jsx-equals-spacing': 'off',

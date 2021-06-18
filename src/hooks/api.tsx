@@ -6,7 +6,7 @@ import { cryptoWaitReady } from '@polkadot/util-crypto';
 import React, { createContext, Dispatch, useCallback, useContext, useEffect, useReducer, useState } from 'react';
 import { LONG_DURATION, NETWORK_CONFIG } from '../config';
 import { Action, IAccountMeta, NetConfig, NetworkType } from '../model';
-import { ConnectStatus, connectSubstrate, getInfoFromHash, patchUrl } from '../utils';
+import { ConnectStatus, connectSubstrate, convertToSS58, getInfoFromHash, patchUrl } from '../utils';
 
 interface StoreState {
   accounts: IAccountMeta[] | null;
@@ -127,7 +127,12 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
         if (!extensions?.length && !newAccounts?.length) {
           setAccounts([]);
         } else {
-          setAccounts(newAccounts as IAccountMeta[]);
+          setAccounts(
+            newAccounts?.map(({ address, ...other }) => ({
+              ...other,
+              address: convertToSS58(address, ss58Format),
+            })) as IAccountMeta[]
+          );
         }
 
         patchUrl({ network: state.network });
