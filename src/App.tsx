@@ -55,9 +55,12 @@ function App() {
   }, [network]);
 
   return (
-    <Layout style={{ height: '100vh' }} className="overflow-scroll">
+    <Layout style={{ height: 'calc(100vh - 78px)' }} className="overflow-scroll">
       <Affix offsetTop={1} className={networkConfig.facade.bgClsName}>
-        <Header className="flex items-center justify-between sm:px-80 px-1" style={{ marginTop: -1 }}>
+        <Header
+          className="flex items-center justify-between sm:px-80 px-2"
+          style={{ marginTop: -1, background: THEME_CONFIG[network]['@layout-header-background'] }}
+        >
           <span className="flex items-center h-full gap-4">
             <Link to={Path.root} className="flex items-center h-full gap-4">
               <img src="/image/logo@2x.png" className="w-28 h-6" />
@@ -125,7 +128,7 @@ function App() {
         </Header>
       </Affix>
 
-      <Content className="sm:px-16 sm:py-8 px-2 py-1">
+      <Content className="sm:px-80 sm:py-8 p-2 py-1">
         <Spin spinning={networkStatus === 'connecting'}>
           <Switch>
             {routes.map((item, index) => (
@@ -136,7 +139,7 @@ function App() {
       </Content>
 
       <Layout.Footer
-        className="flex items-center justify-between sm:px-80 px-1 text-gray-400"
+        className="flex items-center justify-between sm:px-80 px-1 text-gray-400 z-10 fixed bottom-0 left-0 right-0"
         style={{ background: '#2d2d2d' }}
       >
         <div className="flex gap-4 text-gray-400">

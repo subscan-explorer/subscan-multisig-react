@@ -5,6 +5,6 @@
   "@btn-primary-bg": "@dvm-main-bg",
   "@btn-default-border": "@dvm-main-bg",
   "@btn-default-bg": "#fff",
-  "@layout-header-background": "#fff",
+  "@layout-header-background": "#5745de",
   "@card-radius": "@dvm-radius-base"
 }

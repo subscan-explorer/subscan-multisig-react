@@ -5,6 +5,6 @@
   "@btn-primary-bg": "@dvm-main-bg",
   "@btn-default-border": "2px solid transparent",
   "@btn-default-bg": "linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(to right, #5745de, #ec3783) border-box",
-  "@layout-header-background": "#fff",
+  "@layout-header-background": "linear-gradient(-45deg, #fe3876 0%, #7c30dd 71%, #3a30dd 100%)",
   "@card-radius": "@dvm-radius-base"
 }

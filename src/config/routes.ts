@@ -1,26 +1,29 @@
 import { RouteProps } from 'react-router-dom';
+import { Extrinsic } from '../pages/Extrinsic';
+import { Home } from '../pages/Home';
+import { Wallet } from '../pages/Wallet';
 
 export enum Path {
   root = '/',
-  intro = '/intro',
   wallet = '/wallet',
+  extrinsic = '/extrinsic',
 }
 
 export const routes: RouteProps[] = [
   {
     exact: true,
     path: '/',
-    children: null,
+    children: Home,
   },
   {
     exact: true,
-    path: '/wallet/create',
-    children: null,
+    path: '/wallet',
+    children: Wallet,
   },
   {
     exact: true,
-    path: '/wallet/:key',
-    children: null,
+    path: '/extrinsic/:account',
+    children: Extrinsic,
   },
   {
     exact: true,

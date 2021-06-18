@@ -74,6 +74,8 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
+    // react
+    'react/display-name': 'off',
     // eslint common rules
     'arrow-parens': ['error', 'always'],
     'comma-dangle': [
@@ -130,7 +132,7 @@ module.exports = {
     'no-console': [
       'error',
       {
-        allow: ['warn', 'error'],
+        allow: ['warn', 'error', 'info'],
       },
     ],
     'no-eval': 'error',
