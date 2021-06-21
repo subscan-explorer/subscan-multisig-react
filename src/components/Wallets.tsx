@@ -6,7 +6,7 @@ import { Badge, Button, Space, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Path } from '../config/routes';
 import { useApi } from '../hooks';
 import { accuracyFormat, convertToSS58 } from '../utils';
@@ -19,6 +19,7 @@ interface AddressPair {
 
 export function Wallets() {
   const { t } = useTranslation();
+  const history = useHistory();
   const { networkStatus, accounts: extensionAccounts, networkConfig, api, chain, network } = useApi();
   const [multisigAccounts, setMultisigAccounts] = useState<KeyringAddress[]>([]);
   const isExtensionAccount = useCallback(
@@ -101,7 +102,13 @@ export function Wallets() {
             ></Button>
             {/*  eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             <Badge dot count={(row as unknown as any).entries.length}>
-              <Button className="flex items-center justify-center" icon={<CaretRightOutlined />}></Button>
+              <Button
+                onClick={() => {
+                  history.push(Path.extrinsic + '/' + row.address);
+                }}
+                className="flex items-center justify-center"
+                icon={<CaretRightOutlined />}
+              ></Button>
             </Badge>
             <Button
               className="flex items-center justify-center"

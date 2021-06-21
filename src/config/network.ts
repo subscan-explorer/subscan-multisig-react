@@ -10,8 +10,9 @@ export const NETWORK_CONFIG: NetworkConfig = {
   darwinia: {
     // TODO
     facade: {
-      logo: '/image/darwinia-button-mobile.png',
       bgClsName: 'bg-darwinia',
+      color: { main: 'linear-gradient(-45deg, #fe3876 0%, #7c30dd 71%, #3a30dd 100%)' },
+      logo: '/image/darwinia-button-mobile.png',
       logoWithText: '/image/darwinia-logo.svg',
     },
     fullName: 'Darwinia Mainnet',
@@ -32,8 +33,9 @@ export const NETWORK_CONFIG: NetworkConfig = {
   },
   pangolin: {
     facade: {
-      logo: '/image/pangolin-button-mobile.png',
       bgClsName: 'bg-pangolin',
+      color: { main: '#5745de' },
+      logo: '/image/pangolin-button-mobile.png',
       logoWithText: '/image/pangolin-logo.svg',
     },
     fullName: 'Pangolin Testnet',
@@ -57,8 +59,9 @@ export const NETWORK_CONFIG: NetworkConfig = {
   },
   crab: {
     facade: {
-      logo: '/image/crab-button-mobile.png',
       bgClsName: 'bg-crab',
+      color: { main: '#ec3783' },
+      logo: '/image/crab-button-mobile.png',
       logoWithText: '/image/crab-logo.svg',
     },
     fullName: 'Crab Mainnet',

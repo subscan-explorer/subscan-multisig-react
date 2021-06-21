@@ -11,6 +11,7 @@ interface Facade {
   logo: string;
   bgClsName: string;
   logoWithText: string;
+  color: { main: string };
 }
 
 type TokenRecord = { [key in Token]: string };
