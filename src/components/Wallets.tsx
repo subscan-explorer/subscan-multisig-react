@@ -4,12 +4,13 @@ import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
 import { Badge, Button, Space, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
 import { Path } from '../config/routes';
-import { useApi } from '../hooks';
-import { accuracyFormat, convertToSS58 } from '../utils';
+import { useApi, useIsInjected } from '../hooks';
+import { accuracyFormat } from '../utils';
+import { SubscanLink } from './SubscanLink';
 
 interface AddressPair {
   name: string;
@@ -20,12 +21,9 @@ interface AddressPair {
 export function Wallets() {
   const { t } = useTranslation();
   const history = useHistory();
-  const { networkStatus, accounts: extensionAccounts, networkConfig, api, chain, network } = useApi();
+  const { networkStatus, api, chain, network } = useApi();
   const [multisigAccounts, setMultisigAccounts] = useState<KeyringAddress[]>([]);
-  const isExtensionAccount = useCallback(
-    (address) => extensionAccounts?.find((acc) => convertToSS58(acc.address, networkConfig.ss58Prefix) === address),
-    [extensionAccounts, networkConfig]
-  );
+  const isExtensionAccount = useIsInjected();
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
   const columns: ColumnsType<KeyringAddress> = [
     {
@@ -42,8 +40,7 @@ export function Wallets() {
       key: 'balance',
       render: (account) => {
         const { ring, kton } = account;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const { tokens } = chain!;
+        const { tokens } = chain;
 
         return (
           <Space direction="vertical">
@@ -129,12 +126,7 @@ export function Wallets() {
         render: (address) => (
           <Space size="middle">
             <BaseIdentityIcon theme="polkadot" size={32} value={address} />
-            <Button
-              type="link"
-              onClick={() => window?.open(`https://${network}.subscan.io/account/${address}`, '__blank')}
-            >
-              {address}
-            </Button>
+            <SubscanLink address={address} />
           </Space>
         ),
       },
@@ -186,6 +178,7 @@ export function Wallets() {
       <Link to={Path.wallet}>
         <Button type="primary">{t('wallet.add')}</Button>
       </Link>
+
       <Table
         columns={columns}
         dataSource={multisigAccounts}

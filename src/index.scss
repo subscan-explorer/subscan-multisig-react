@@ -78,3 +78,16 @@ body {
     }
   }
 }
+
+.value-column {
+  padding-left: 0;
+
+  .ant-table-tbody > tr > td > .ant-table-wrapper:only-child .ant-table,
+  .ant-table-tbody > tr > td > .ant-table-expanded-row-fixed > .ant-table-wrapper:only-child .ant-table {
+    margin-left: 0;
+  }
+
+  .ant-table.ant-table-bordered > .ant-table-container {
+    border-left: none;
+  }
+}

@@ -1,59 +1,28 @@
-import { ArrowDownOutlined, ArrowUpOutlined, CopyOutlined, DeleteOutlined } from '@ant-design/icons';
-import { StorageKey, U8aFixed } from '@polkadot/types';
-import { AccountId } from '@polkadot/types/interfaces';
-import { Codec } from '@polkadot/types/types';
+import { ArrowDownOutlined, ArrowUpOutlined, DeleteOutlined } from '@ant-design/icons';
 import keyring from '@polkadot/ui-keyring';
-import { KeyringAddress } from '@polkadot/ui-keyring/types';
-import { Button, Form, Input, message, Popconfirm, Space } from 'antd';
+import { Button, message, Popconfirm, Space, Typography } from 'antd';
 import { GraphQLClient, useQuery } from 'graphql-hooks';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useParams } from 'react-router-dom';
-import { TRANSFERS_QUERY } from '../config';
+import { TRANSFERS_COUNT_QUERY } from '../config';
 import { useApi } from '../hooks';
-import { copyTextToClipboard } from '../utils';
-import { EditableText } from './EditableText';
+import { useMultisig } from '../hooks/multisig';
 import { Members } from './Members';
+import { SubscanLink } from './SubscanLink';
 
-interface TransfersQueryRes {
-  transfers: { totalCount: number; nodes: Transfer[] };
-}
-
-interface Transfer {
-  fromId: string;
-  toId: string;
-  amount: string;
-  timestamp: string;
-  block: {
-    id: string;
-    extrinsics: {
-      nodes: {
-        id: string;
-        method: string;
-        section: string;
-        args: string;
-        signerId: string;
-        isSuccess: boolean;
-      }[];
-    };
-  };
-}
+const { Text } = Typography;
 
 export function WalletState() {
   const { t } = useTranslation();
   const history = useHistory();
-  const { api, network, networkStatus, networkConfig } = useApi();
+  const { networkConfig } = useApi();
   const { account } = useParams<{ account: string }>();
-  const [multisigAccount, setMultisigAccount] = useState<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (KeyringAddress & { ring: any; kton: any; entries: any[] }) | null
-  >(null);
+  const { multisigAccount, setMultisigAccount, inProgressCount } = useMultisig();
   const [isAccountsDisplay, setIsAccountsDisplay] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
-  const { loading, data } = useQuery<TransfersQueryRes>(TRANSFERS_QUERY, {
+  const { data } = useQuery<{ transfers: { totalCount: number } }>(TRANSFERS_COUNT_QUERY, {
     variables: {
-      limit: 10,
-      offset: 0,
       account,
     },
     client: new GraphQLClient({
@@ -65,7 +34,7 @@ export function WalletState() {
     () => [
       {
         label: 'multisig.In Progress',
-        count: multisigAccount?.entries?.length,
+        count: inProgressCount,
       },
       { label: 'multisig.Confirmed Extrinsic', count: data?.transfers.totalCount },
       {
@@ -78,11 +47,7 @@ export function WalletState() {
         count: (multisigAccount?.meta.who as any)?.length as number,
       },
     ],
-    [multisigAccount, data]
-  );
-  const subscanUrl = useMemo(
-    () => `https://${network}.subscan.io/account/${multisigAccount?.address}`,
-    [network, multisigAccount]
+    [multisigAccount, data, inProgressCount]
   );
   const renameWallet = useCallback(
     ({ name }: { name: string }) => {
@@ -107,7 +72,7 @@ export function WalletState() {
         message.error(error.message);
       }
     },
-    [multisigAccount, t]
+    [multisigAccount, t, setMultisigAccount]
   );
   const deleteWallet = useCallback(() => {
     try {
@@ -118,91 +83,37 @@ export function WalletState() {
     }
   }, [multisigAccount?.address, t, history]);
 
-  useEffect(() => {
-    if (networkStatus !== 'success' || loading) {
-      return;
-    }
-
-    (async () => {
-      const multisig = keyring.getAccount(account);
-      const balance = await api?.query.system.account(multisig?.address);
-      const entries = (await api?.query.multisig.multisigs.entries(multisig?.address)) as [
-        StorageKey<[AccountId, U8aFixed]>,
-        Codec
-      ][];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const amount = (balance as any)?.data;
-
-      setMultisigAccount({
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        ...multisig!,
-        ring: amount?.free.toString(),
-        kton: amount?.freeKton.toString(),
-        entries: entries?.map((entry) => {
-          const [address, callHash] = entry[0].toHuman() as string[];
-
-          return {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ...(entry[1] as unknown as any).toJSON(),
-            address,
-            callHash,
-          };
-        }),
-      });
-    })();
-  }, [account, api, networkStatus, loading]);
-
   return (
     <Space direction="vertical" className="w-full">
       <Space className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          {/* {isRenaming ? <Input defaultValue={multisigAccount?.meta.name} /> : <span>{multisigAccount?.meta.name}</span>} */}
-          <EditableText
-            textNode={multisigAccount?.meta.name}
-            onSave={(result) => {
-              renameWallet(result as { name: string });
+          <Text
+            editable={{
+              onChange(name) {
+                if (name && name !== multisigAccount?.meta.name) {
+                  renameWallet({ name });
+                }
+              },
             }}
           >
-            <Form.Item
-              name="name"
-              initialValue={multisigAccount?.meta.name}
-              rules={[{ required: true }]}
-              className="mb-0"
-            >
-              <Input />
-            </Form.Item>
-          </EditableText>
+            {multisigAccount?.meta.name}
+          </Text>
 
-          <a href={subscanUrl} target="__blank">
-            {multisigAccount?.address}
-          </a>
+          <SubscanLink address={multisigAccount?.address} copyable></SubscanLink>
 
           {multisigAccount && (
-            <>
-              <CopyOutlined
-                onClick={(event) => {
-                  event.stopPropagation();
-
-                  copyTextToClipboard(multisigAccount?.address || ' ')?.then(() => {
-                    message.success(t('Copied'));
-                  });
-                }}
-                className="cursor-pointer hover:text-blue-700"
+            <Popconfirm
+              title={t('wallet.delete')}
+              visible={isDeleting}
+              onCancel={() => setIsDeleting(false)}
+              onConfirm={deleteWallet}
+            >
+              <DeleteOutlined
+                onClick={() => setIsDeleting(true)}
+                className="cursor-pointer opacity-30 hover:opacity-70 transition-all duration-300"
+                style={{ color: '#ff0000', fontSize: 16 }}
               />
-
-              <Popconfirm
-                title={t('wallet.delete')}
-                visible={isDeleting}
-                onCancel={() => setIsDeleting(false)}
-                onConfirm={deleteWallet}
-              >
-                <DeleteOutlined
-                  onClick={() => setIsDeleting(true)}
-                  className="cursor-pointer opacity-30 hover:opacity-70 transition-all duration-300"
-                  style={{ color: '#ff0000' }}
-                />
-              </Popconfirm>
-            </>
+            </Popconfirm>
           )}
         </div>
 
@@ -232,8 +143,7 @@ export function WalletState() {
         ></Button>
       </Space>
 
-      {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
-      {isAccountsDisplay && multisigAccount && <Members record={multisigAccount!} />}
+      {isAccountsDisplay && multisigAccount && <Members record={multisigAccount} />}
     </Space>
   );
 }

@@ -178,8 +178,7 @@ export function WalletForm() {
                         const members: { name?: string; address: string }[] = form.getFieldValue('members');
 
                         if (account) {
-                          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                          members[index].name = account!.meta!.name;
+                          members[index].name = account?.meta?.name ?? '';
                           form.setFieldsValue({ members: [...members] });
                         }
 

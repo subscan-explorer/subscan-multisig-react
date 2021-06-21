@@ -1,0 +1,63 @@
+export const SUPPORT_TYPES = {
+  address: {
+    value: [
+      'address',
+      'lookupsource',
+      'reporter',
+      'validatorid',
+      'accountid',
+      'accountidof',
+      '<lookup as staticlookup>::source',
+      'vec<address>',
+      'vec<lookupsource>',
+      'vec<reporter>',
+      'vec<validatorid>',
+      'vec<accountid>',
+      'vec<accountidof>',
+      'vec<<lookup as staticlookup>::source>',
+      'compact<address>',
+      'compact<lookupsource>',
+      'compact<reporter>',
+      'compact<validatorid>',
+      'compact<accountid>',
+      'compact<accountidof>',
+      'compact<<lookup as staticlookup>::source>',
+      'option<address>',
+      'option<lookupsource>',
+      'option<reporter>',
+      'option<validatorid>',
+      'option<accountid>',
+      'option<accountidof>',
+      'option<<lookup as staticlookup>::source>',
+    ],
+  },
+  balance: {
+    value: [
+      'ringbalance',
+      'ktonbalance',
+      'balance',
+      'balanceof',
+      'vec<balance>',
+      'vec<balanceof>',
+      'compact<balance>',
+      'compact<balanceof>',
+      'option<balance>',
+      'option<balanceof>',
+    ],
+  },
+  good_judgements: {
+    value: ['reasonable', 'known good', 'knowngood'],
+  },
+  kton_balance: {
+    value: ['ktonbalance'],
+  },
+  bond_extrinsic: {
+    value: ['bond', 'unbond', 'bond_extra'],
+  },
+  kton_bond_event: {
+    value: ['bondkton', 'unbondkton'],
+  },
+  bond_event: {
+    value: ['bonded', 'unbonded', 'bondring', 'bondkton', 'unbondring', 'unbondkton'],
+  },
+};

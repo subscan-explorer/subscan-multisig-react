@@ -1,4 +1,5 @@
 import { Card } from 'antd';
+import { ExtrinsicRecords } from '../components/ExtrinsicRecords';
 import { WalletState } from '../components/WalletState';
 
 export function Extrinsic() {
@@ -7,7 +8,9 @@ export function Extrinsic() {
       <Card className="mb-8">
         <WalletState />
       </Card>
-      <Card> content </Card>
+      <Card>
+        <ExtrinsicRecords />
+      </Card>
     </>
   );
 }

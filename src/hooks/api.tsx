@@ -66,7 +66,7 @@ export type ApiCtx = {
   switchNetwork: (type: NetworkType) => void;
   setApi: (api: ApiPromise) => void;
   networkConfig: NetConfig;
-  chain: Chain | null;
+  chain: Chain;
 };
 
 type ActionHelper = <T = string>(type: ActionType) => (payload: T) => void;
@@ -80,7 +80,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
   const setAccounts = useCallback(createAction<IAccountMeta[]>('setAccounts'), []);
   const setNetworkStatus = useCallback(createAction<ConnectStatus>('updateNetworkStatus'), []);
   const [api, setApi] = useState<ApiPromise | null>(null);
-  const [chain, setChain] = useState<Chain | null>(null);
+  const [chain, setChain] = useState<Chain>({ ss58Format: '', tokens: [] });
 
   useEffect(() => {
     if (typeof window.ethereum === 'undefined') {
