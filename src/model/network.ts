@@ -16,7 +16,7 @@ interface Facade {
 
 type TokenRecord = { [key in Token]: string };
 
-type Api = { [key: string]: string };
+type Api = { subql: string; [key: string]: string };
 
 interface Donate {
   address: string;

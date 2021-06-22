@@ -1,7 +1,7 @@
 import { ArrowDownOutlined, ArrowUpOutlined, DeleteOutlined } from '@ant-design/icons';
 import keyring from '@polkadot/ui-keyring';
 import { Button, message, Popconfirm, Space, Typography } from 'antd';
-import { GraphQLClient, useQuery } from 'graphql-hooks';
+import { useQuery } from 'graphql-hooks';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useParams } from 'react-router-dom';
@@ -25,9 +25,6 @@ export function WalletState() {
     variables: {
       account,
     },
-    client: new GraphQLClient({
-      url: networkConfig.api.subql,
-    }),
     skipCache: true,
   });
   const states = useMemo<{ label: string; count: number | undefined }[]>(

@@ -23,7 +23,6 @@ import { SubscanLink } from './SubscanLink';
 
 export interface Entry {
   when: When;
-  deposit: number;
   depositor: string;
   approvals: string[];
   address: string;
@@ -73,6 +72,9 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
       title: t(!isConfirmed ? 'call_hash' : 'block_hash'),
       dataIndex: 'hash',
       align: 'center',
+      render(hash: string) {
+        return !isConfirmed ? hash : <SubscanLink block={hash} />;
+      },
     },
     {
       title: t('action'),
@@ -212,7 +214,7 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
       columns={columns}
       rowKey="hash"
       pagination={false}
-      expandable={{ expandedRowRender }}
+      expandable={{ expandedRowRender, defaultExpandAllRows: true }}
     ></Table>
   );
 }

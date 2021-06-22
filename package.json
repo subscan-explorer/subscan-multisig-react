@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "PORT=3008 craco start",
+    "start:dev": "PORT=3008 REACT_APP_HOST_TYPE=dev craco start",
     "build": "CI=false craco build",
     "test": "craco test",
     "eject": "react-scripts eject",
