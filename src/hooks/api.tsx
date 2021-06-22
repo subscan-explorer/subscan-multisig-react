@@ -65,6 +65,7 @@ export type ApiCtx = {
   setNetworkStatus: (status: ConnectStatus) => void;
   switchNetwork: (type: NetworkType) => void;
   setApi: (api: ApiPromise) => void;
+  setRandom: (num: number) => void;
   networkConfig: NetConfig;
   chain: Chain;
 };
@@ -81,6 +82,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
   const setNetworkStatus = useCallback(createAction<ConnectStatus>('updateNetworkStatus'), []);
   const [api, setApi] = useState<ApiPromise | null>(null);
   const [chain, setChain] = useState<Chain>({ ss58Format: '', tokens: [] });
+  const [random, setRandom] = useState<number>(0);
 
   useEffect(() => {
     if (typeof window.ethereum === 'undefined') {
@@ -96,6 +98,17 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
    * connect to substrate or metamask when account type changed.
    */
   useEffect(() => {
+    /**
+     * just from refresh purpose;
+     */
+    if (random) {
+      console.info(
+        '%c [ Network connection will be establish again ]-102',
+        'font-size:13px; background:pink; color:#bf2c9f;',
+        random
+      );
+    }
+
     (async () => {
       setNetworkStatus('connecting');
 
@@ -140,7 +153,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
         setNetworkStatus('fail');
       }
     })();
-  }, [state.network]);
+  }, [random, state.network]);
 
   return (
     <ApiContext.Provider
@@ -152,6 +165,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
         setNetworkStatus,
         setAccounts,
         setApi,
+        setRandom,
         api,
         networkConfig: NETWORK_CONFIG[state.network],
         chain,

@@ -1,6 +1,6 @@
 import { DownOutlined } from '@ant-design/icons';
 import BaseIdentityIcon from '@polkadot/react-identicon';
-import { Affix, Button, Dropdown, Layout, Menu, Spin } from 'antd';
+import { Affix, Button, Dropdown, Layout, Menu } from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
 import { getYear } from 'date-fns';
 import React, { useEffect, useMemo } from 'react';
@@ -12,6 +12,7 @@ import { NETWORK_CONFIG } from './config';
 import { Path, routes } from './config/routes';
 import { useApi } from './hooks';
 import { NetworkConfig, NetworkType } from './model';
+import { Connecting } from './pages/Connecting';
 import crabThemeJson from './theme/crab.json';
 import darwiniaThemeJson from './theme/darwinia.json';
 import pangolinThemeJson from './theme/pangolin.json';
@@ -129,13 +130,15 @@ function App() {
       </Affix>
 
       <Content className="sm:px-80 sm:py-8 p-2 py-1">
-        <Spin spinning={networkStatus === 'connecting'}>
+        {networkStatus === 'connecting' ? (
+          <Connecting />
+        ) : (
           <Switch>
             {routes.map((item, index) => (
               <Route key={index} {...item}></Route>
             ))}
           </Switch>
-        </Spin>
+        )}
       </Content>
 
       <Layout.Footer

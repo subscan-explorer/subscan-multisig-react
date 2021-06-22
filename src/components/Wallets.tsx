@@ -25,6 +25,7 @@ export function Wallets() {
   const [multisigAccounts, setMultisigAccounts] = useState<KeyringAddress[]>([]);
   const isExtensionAccount = useIsInjected();
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
+  const [isCalculating, setIsCalculating] = useState<boolean>(false);
   const columns: ColumnsType<KeyringAddress> = [
     {
       title: t('name'),
@@ -150,6 +151,8 @@ export function Wallets() {
   useEffect(() => {
     (async () => {
       if (networkStatus === 'success') {
+        setIsCalculating(true);
+
         const accounts = keyring.getAccounts().filter((account) => account.meta.isMultisig);
         const balances = await api?.query.system.account.multi(accounts.map(({ address }) => address));
         const entries = await Promise.all(
@@ -169,6 +172,8 @@ export function Wallets() {
             };
           })
         );
+
+        setIsCalculating(false);
       }
     })();
   }, [networkStatus, api]);
@@ -185,6 +190,7 @@ export function Wallets() {
         rowKey="address"
         expandable={{ expandedRowRender, expandedRowKeys }}
         pagination={false}
+        loading={isCalculating}
       />
     </Space>
   );

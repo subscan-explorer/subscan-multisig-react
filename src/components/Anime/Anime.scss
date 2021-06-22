@@ -1,0 +1,159 @@
+.anime {
+  position: relative;
+  height: 80px;
+
+  ul {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    transform: rotate(45deg);
+  }
+
+  li {
+    list-style-type: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+  }
+
+  @mixin place($n, $t, $l) {
+    animation: $n 1s ease-in-out infinite;
+    top: $t;
+    left: $l;
+  }
+
+  #a {
+    @include place(a, -40px, -40px);
+  }
+
+  #b {
+    @include place(b, -40px, 0);
+  }
+
+  #c {
+    @include place(c, -40px, 40px);
+  }
+
+  #d {
+    @include place(d, 0, -40px);
+  }
+
+  #e {
+    @include place(e, 0, 0);
+  }
+
+  #f {
+    @include place(f, 0, 40px);
+  }
+
+  #g {
+    @include place(g, 40px, -40px);
+  }
+
+  #h {
+    @include place(h, 40px, 0);
+  }
+
+  #i {
+    @include place(i, 40px, 40px);
+  }
+
+  @keyframes a {
+    50% {
+      top: 0;
+      left: -40px;
+    }
+
+    100% {
+      top: 0;
+      left: -40px;
+    }
+  }
+
+  @keyframes b {
+    50% {
+      top: -40px;
+      left: -40px;
+    }
+
+    100% {
+      top: -40px;
+      left: -40px;
+    }
+  }
+
+  @keyframes c {
+    50% {
+      top: -40px;
+      left: 0;
+    }
+
+    100% {
+      top: -40px;
+      left: 0;
+    }
+  }
+
+  @keyframes d {
+    50% {
+      top: 40px;
+      left: -40px;
+    }
+
+    100% {
+      top: 40px;
+      left: -40px;
+    }
+  }
+
+  @keyframes f {
+    50% {
+      top: -40px;
+      left: 40px;
+    }
+
+    100% {
+      top: -40px;
+      left: 40px;
+    }
+  }
+
+  @keyframes g {
+    50% {
+      top: 40px;
+      left: 0;
+    }
+
+    100% {
+      top: 40px;
+      left: 0;
+    }
+  }
+
+  @keyframes h {
+    50% {
+      top: 40px;
+      left: 40px;
+    }
+
+    100% {
+      top: 40px;
+      left: 40px;
+    }
+  }
+
+  @keyframes i {
+    50% {
+      top: 0;
+      left: 40px;
+    }
+
+    100% {
+      top: 0;
+      left: 40px;
+    }
+  }
+}
