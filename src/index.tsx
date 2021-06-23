@@ -3,10 +3,9 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 import App from './App';
 import './config/i18n';
-import { ApiProvider } from './hooks';
+import { ApiProvider, GqlProvider } from './service';
 import './index.scss';
 import reportWebVitals from './reportWebVitals';
-import { GqlProvider } from './service/provider';
 import './theme/antd/index.less';
 
 ReactDOM.render(
