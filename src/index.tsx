@@ -2,6 +2,8 @@ import { Api as PolkaApiProvider } from '@polkadot/react-api';
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
+import 'semantic-ui-css/semantic.min.css';
+import { ThemeProvider } from 'styled-components';
 import App from './App';
 import './config/i18n';
 import './index.scss';
@@ -13,11 +15,13 @@ ReactDOM.render(
   <Suspense fallback="loading">
     <Router>
       <ApiProvider>
-        <PolkaApiProvider>
-          <GqlProvider>
-            <App />
-          </GqlProvider>
-        </PolkaApiProvider>
+        <ThemeProvider theme={{ theme: 'light' }}>
+          <PolkaApiProvider>
+            <GqlProvider>
+              <App />
+            </GqlProvider>
+          </PolkaApiProvider>
+        </ThemeProvider>
       </ApiProvider>
     </Router>
   </Suspense>,

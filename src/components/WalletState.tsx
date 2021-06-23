@@ -144,7 +144,13 @@ export function WalletState() {
 
       {isAccountsDisplay && multisigAccount && <Members record={multisigAccount} />}
 
-      <Modal title={t('submit_extrinsic')} visible={isExtrinsicDisplay} onCancel={() => setIsExtrinsicDisplay(false)}>
+      <Modal
+        title={t('submit_extrinsic')}
+        visible={isExtrinsicDisplay}
+        onCancel={() => setIsExtrinsicDisplay(false)}
+        style={{ minWidth: 800 }}
+        footer={null}
+      >
         <ExtrinsicLaunch />
       </Modal>
     </Space>

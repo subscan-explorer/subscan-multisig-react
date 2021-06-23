@@ -3,7 +3,6 @@
 
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import { Button, Extrinsic, InputAddress, MarkError, Output, TxButton } from '@polkadot/react-components';
-// import { useApi } from '@polkadot/react-hooks';
 import { BalanceFree } from '@polkadot/react-query';
 import { u8aToHex } from '@polkadot/util';
 import React, { useCallback, useMemo, useState } from 'react';
