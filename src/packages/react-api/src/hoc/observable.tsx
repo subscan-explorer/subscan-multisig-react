@@ -1,0 +1,99 @@
+/* eslint-disable no-invalid-this */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// Copyright 2017-2021 @polkadot/react-api authors & contributors
+// SPDX-License-Identifier: Apache-2.0
+
+// TODO: Lots of duplicated code between this and withObservable, surely there is a better way of doing this?
+
+import { Observable, of } from '@polkadot/x-rxjs';
+import { catchError, map } from '@polkadot/x-rxjs/operators';
+import React from 'react';
+import echoTransform from '../transform/echo';
+import type { CallState } from '../types';
+import { intervalObservable, isEqual, triggerChange } from '../util';
+import type { DefaultProps, HOC, Options, RenderFn } from './types';
+
+interface State extends CallState {
+  subscriptions: { unsubscribe: () => void }[];
+}
+
+export default function withObservable<T, P>(
+  observable: Observable<P>,
+  { callOnResult, propName = 'value', transform = echoTransform }: Options = {}
+): HOC {
+  return (
+    Inner: React.ComponentType<any>,
+    defaultProps: DefaultProps = {},
+    render?: RenderFn
+  ): React.ComponentType<any> => {
+    class WithObservable extends React.Component<any, State> {
+      private isActive = true;
+
+      public state: State = {
+        callResult: undefined,
+        callUpdated: false,
+        callUpdatedAt: 0,
+        subscriptions: [],
+      };
+
+      public componentDidMount(): void {
+        this.setState({
+          subscriptions: [
+            observable
+              .pipe(
+                map(transform),
+                catchError(() => of(undefined))
+              )
+              .subscribe((value: any) => this.triggerUpdate(this.props, value)),
+            intervalObservable(this),
+          ],
+        });
+      }
+
+      public componentWillUnmount(): void {
+        this.isActive = false;
+        this.state.subscriptions.forEach((subscription): void => subscription.unsubscribe());
+      }
+
+      private triggerUpdate = (props: P, callResult?: T): void => {
+        try {
+          if (!this.isActive || isEqual(callResult, this.state.callResult)) {
+            return;
+          }
+
+          triggerChange(callResult, callOnResult, (props as Options).callOnResult || defaultProps.callOnResult);
+
+          this.setState({
+            callResult,
+            callUpdated: true,
+            callUpdatedAt: Date.now(),
+          });
+        } catch (error) {
+          console.error(this.props, error);
+        }
+      };
+
+      public render(): React.ReactNode {
+        const { children } = this.props;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const { callResult, callUpdated, callUpdatedAt } = this.state;
+        const _props = {
+          ...defaultProps,
+          ...this.props,
+          callUpdated,
+          callUpdatedAt,
+          [propName]: callResult,
+        };
+
+        return (
+          <Inner {..._props}>
+            {render && render(callResult)}
+            {children}
+          </Inner>
+        );
+      }
+    }
+
+    return WithObservable;
+  };
+}

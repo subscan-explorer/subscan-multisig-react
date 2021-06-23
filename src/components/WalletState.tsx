@@ -1,6 +1,6 @@
 import { ArrowDownOutlined, ArrowUpOutlined, DeleteOutlined } from '@ant-design/icons';
 import keyring from '@polkadot/ui-keyring';
-import { Button, message, Popconfirm, Space, Typography } from 'antd';
+import { Button, message, Modal, Popconfirm, Space, Typography } from 'antd';
 import { useQuery } from 'graphql-hooks';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import { TRANSFERS_COUNT_QUERY } from '../config';
 import { useApi } from '../hooks';
 import { useMultisig } from '../hooks/multisig';
+import { ExtrinsicLaunch } from './ExtrinsicLaunch';
 import { Members } from './Members';
 import { SubscanLink } from './SubscanLink';
 
@@ -21,6 +22,7 @@ export function WalletState() {
   const { multisigAccount, setMultisigAccount, inProgressCount } = useMultisig();
   const [isAccountsDisplay, setIsAccountsDisplay] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [isExtrinsicDisplay, setIsExtrinsicDisplay] = useState(false);
   const { data } = useQuery<{ transfers: { totalCount: number } }>(TRANSFERS_COUNT_QUERY, {
     variables: {
       account,
@@ -114,7 +116,7 @@ export function WalletState() {
           )}
         </div>
 
-        <Button type="primary" size="large">
+        <Button onClick={() => setIsExtrinsicDisplay(true)} type="primary" size="large">
           {t('submit_extrinsic')}
         </Button>
       </Space>
@@ -141,6 +143,10 @@ export function WalletState() {
       </Space>
 
       {isAccountsDisplay && multisigAccount && <Members record={multisigAccount} />}
+
+      <Modal title={t('submit_extrinsic')} visible={isExtrinsicDisplay} onCancel={() => setIsExtrinsicDisplay(false)}>
+        <ExtrinsicLaunch />
+      </Modal>
     </Space>
   );
 }

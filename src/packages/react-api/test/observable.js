@@ -1,0 +1,16 @@
+/* eslint-disable no-magic-numbers */
+/* eslint-disable @typescript-eslint/no-var-requires */
+// Copyright 2017-2021 @polkadot/react-api authors & contributors
+// SPDX-License-Identifier: Apache-2.0
+
+const createObservable = require('@polkadot/api-rx/observable');
+
+module.exports = function observable(method) {
+  const fn = () => Promise.resolve(12345);
+
+  fn.unsubscribe = () => Promise.resolve(true);
+
+  return createObservable(`section_${method}`, method, {
+    [method]: fn,
+  })();
+};

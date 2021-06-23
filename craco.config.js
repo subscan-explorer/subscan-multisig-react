@@ -16,6 +16,7 @@ const lightVars = {
   ...getLessVars('./node_modules/antd/lib/style/themes/compact.less'),
   '@primary-color': defaultVars['@primary-color'],
 };
+const { alias, configPaths } = require('react-app-rewire-alias');
 
 // just for dev purpose, use to compare vars in different theme.
 // fs.writeFileSync('./ant-theme-vars/dark.json', JSON.stringify(darkVars));
@@ -61,7 +62,7 @@ module.exports = {
         include: /node_modules/,
         type: 'javascript/auto',
       });
-      return webpackConfig;
+      return alias(configPaths('./tsconfig.paths.json'))(webpackConfig);
     },
   },
 };

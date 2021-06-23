@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@polkadot/react-api": ["src/packages/react-api/src"],
+      "@polkadot/react-api/*": ["src/packages/react-api/src/*"],
+      "@polkadot/react-components": ["src/packages/react-components/src"],
+      "@polkadot/react-components/*": ["src/packages/react-components/src/*"],
+      "@polkadot/react-hooks": ["src/packages/react-hooks/src"],
+      "@polkadot/react-hooks/*": ["src/packages/react-hooks/src/*"],
+      "@polkadot/react-params": ["src/packages/react-params/src"],
+      "@polkadot/react-params/*": ["src/packages/react-params/src/*"],
+      "@polkadot/react-query": ["src/packages/react-query/src"],
+      "@polkadot/react-query/*": ["src/packages/react-query/src/*"],
+      "@polkadot/react-signer": ["src/packages/react-signer/src"],
+      "@polkadot/react-signer/*": ["src/packages/react-signer/src/*"]
+    }
+  }
+}
