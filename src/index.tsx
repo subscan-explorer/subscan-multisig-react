@@ -1,20 +1,23 @@
+import { Api as PolkaApiProvider } from '@polkadot/react-api';
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 import App from './App';
 import './config/i18n';
-import { ApiProvider, GqlProvider } from './service';
 import './index.scss';
 import reportWebVitals from './reportWebVitals';
+import { ApiProvider, GqlProvider } from './service';
 import './theme/antd/index.less';
 
 ReactDOM.render(
   <Suspense fallback="loading">
     <Router>
       <ApiProvider>
-        <GqlProvider>
-          <App />
-        </GqlProvider>
+        <PolkaApiProvider>
+          <GqlProvider>
+            <App />
+          </GqlProvider>
+        </PolkaApiProvider>
       </ApiProvider>
     </Router>
   </Suspense>,

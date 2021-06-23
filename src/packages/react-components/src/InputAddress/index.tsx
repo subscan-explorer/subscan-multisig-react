@@ -14,7 +14,7 @@ import { isNull, isUndefined } from '@polkadot/util';
 import React from 'react';
 import store from 'store';
 import styled from 'styled-components';
-import { withMulti, withObservable } from '@polkadot/react-api';
+import { withMulti, withObservable } from '@polkadot/react-api/hoc';
 import Dropdown from '../Dropdown';
 import Static from '../Static';
 import { getAddressName } from '../util';

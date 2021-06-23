@@ -3,11 +3,12 @@
 
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import { Button, Extrinsic, InputAddress, MarkError, Output, TxButton } from '@polkadot/react-components';
-import { useApi } from '@polkadot/react-hooks';
+// import { useApi } from '@polkadot/react-hooks';
 import { BalanceFree } from '@polkadot/react-query';
 import { u8aToHex } from '@polkadot/util';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useApi } from '../hooks';
 
 interface Props {
   className?: string;
@@ -15,7 +16,7 @@ interface Props {
 
 export function ExtrinsicLaunch({ className }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
-  const { apiDefaultTxSudo } = useApi();
+  const { api } = useApi();
   const [accountId, setAccountId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [extrinsic, setExtrinsic] = useState<SubmittableExtrinsic<'promise'> | null>(null);
@@ -47,7 +48,8 @@ export function ExtrinsicLaunch({ className }: Props): React.ReactElement<Props>
         type="account"
       />
       <Extrinsic
-        defaultValue={apiDefaultTxSudo}
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        defaultValue={api!.tx.system.setCode}
         label={t<string>('submit the following extrinsic')}
         onChange={_onExtrinsicChange}
         onError={_onExtrinsicError}

@@ -42,7 +42,7 @@ class Params extends React.PureComponent<Props, State> {
   };
 
   public static getDerivedStateFromProps(
-    { isDisabled, params, registry = api.registry, values }: Props,
+    { isDisabled, params, registry = api?.registry, values }: Props,
     prevState: State
   ): Pick<State, never> | null {
     const isSame = JSON.stringify(prevState.params) === JSON.stringify(params);

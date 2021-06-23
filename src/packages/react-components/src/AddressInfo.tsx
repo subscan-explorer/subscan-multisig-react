@@ -18,7 +18,7 @@ import styled from 'styled-components';
 import { BlockToTime, FormatBalance } from '@polkadot/react-query';
 import { BN_ZERO, formatBalance, formatNumber, hexToString, isObject } from '@polkadot/util';
 import { useBestNumber } from '@polkadot/react-hooks';
-import { withCalls, withMulti } from '@polkadot/react-api';
+import { withCalls, withMulti } from '@polkadot/react-api/hoc';
 
 import CryptoType from './CryptoType';
 import DemocracyLocks from './DemocracyLocks';

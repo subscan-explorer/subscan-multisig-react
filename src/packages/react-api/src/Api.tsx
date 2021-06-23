@@ -6,10 +6,9 @@
 
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { ApiPromise } from '@polkadot/api/promise';
-import { ethereumChains, typesBundle, typesChain } from '@polkadot/apps-config';
+import { ethereumChains } from '@polkadot/apps-config';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 import type { InjectedExtension } from '@polkadot/extension-inject/types';
-import { WsProvider } from '@polkadot/rpc-provider';
 import type { ChainProperties, ChainType } from '@polkadot/types/interfaces';
 import { keyring } from '@polkadot/ui-keyring';
 import type { KeyringStore } from '@polkadot/ui-keyring/types';
@@ -19,6 +18,7 @@ import { defaults as addressDefaults } from '@polkadot/util-crypto/address/defau
 import type BN from 'bn.js';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import store from 'store';
+import { useApi } from '../../../hooks';
 import { TokenUnit } from '../../react-components/src/InputNumber';
 import { StatusContext } from '../../react-components/src/Status';
 import ApiSigner from '../../react-signer/src/signers/ApiSigner';
@@ -189,7 +189,7 @@ async function loadOnReady(
   };
 }
 
-function Api({ children, store, url }: Props): React.ReactElement<Props> | null {
+function Api({ children, store }: Props): React.ReactElement<Props> | null {
   const { queuePayload, queueSetTxStatus } = useContext(StatusContext);
   const [state, setState] = useState<ApiState>({
     hasInjectedAccounts: false,
@@ -199,11 +199,15 @@ function Api({ children, store, url }: Props): React.ReactElement<Props> | null 
   const [isApiInitialized, setIsApiInitialized] = useState(false);
   const [apiError, setApiError] = useState<null | string>(null);
   const [extensions, setExtensions] = useState<InjectedExtension[] | undefined>();
+  const {
+    api: iApi,
+    networkConfig: { rpc: url },
+  } = useApi();
 
   const value = useMemo<ApiProps>(
     () => ({
       ...state,
-      api,
+      api: iApi as ApiPromise,
       apiError,
       apiUrl: url,
       extensions,
@@ -211,37 +215,41 @@ function Api({ children, store, url }: Props): React.ReactElement<Props> | null 
       isApiInitialized,
       isWaitingInjected: !extensions,
     }),
-    [apiError, extensions, isApiConnected, isApiInitialized, state, url]
+    [apiError, extensions, isApiConnected, isApiInitialized, state, url, iApi]
   );
 
   // initial initialization
   useEffect((): void => {
-    const provider = new WsProvider(url);
+    if (!iApi) {
+      return;
+    }
+
+    api = iApi;
+
     const signer = new ApiSigner(registry, queuePayload, queueSetTxStatus);
     const types = getDevTypes();
 
-    api = new ApiPromise({ provider, registry, signer, types, typesBundle, typesChain });
+    iApi.setSigner(signer);
+    setIsApiConnected(true);
 
-    api.on('connected', () => setIsApiConnected(true));
-    api.on('disconnected', () => setIsApiConnected(false));
-    api.on('error', (error: Error) => setApiError(error.message));
-    api.on('ready', (): void => {
-      const injectedPromise = web3Enable('polkadot-js/apps');
+    iApi.on('disconnected', () => setIsApiConnected(false));
+    iApi.on('error', (error: Error) => setApiError(error.message));
 
-      injectedPromise.then(setExtensions).catch(console.error);
+    const injectedPromise = web3Enable('polkadot-js/apps');
 
-      loadOnReady(api, injectedPromise, store, types)
-        .then(setState)
-        .catch((error): void => {
-          console.error(error);
+    injectedPromise.then(setExtensions).catch(console.error);
 
-          setApiError((error as Error).message);
-        });
-    });
+    loadOnReady(iApi, injectedPromise, store, types)
+      .then(setState)
+      .catch((error): void => {
+        console.error(error);
+
+        setApiError((error as Error).message);
+      });
 
     setIsApiInitialized(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [iApi]);
 
   if (!value.isApiInitialized) {
     return null;
