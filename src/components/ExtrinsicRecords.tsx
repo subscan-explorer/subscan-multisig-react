@@ -76,10 +76,14 @@ function InProgress({ account }: InProgressProps) {
           return result[index];
         }
 
-        const callData = api?.registry.createType('Call', call[0]) as Call;
-        const meta = api?.tx[callData?.section][callData.method].meta.toJSON();
+        try {
+          const callData = api?.registry.createType('Call', call[0]) as Call;
+          const meta = api?.tx[callData?.section][callData.method].meta.toJSON();
 
-        return { ...result[index], callData, meta, hash: result[index].callHash };
+          return { ...result[index], callData, meta, hash: result[index].callHash };
+        } catch (_) {
+          return result[index];
+        }
       });
 
       setExtrinsic(calls || []);
