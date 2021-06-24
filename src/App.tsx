@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, Route, Switch } from 'react-router-dom';
 import { DonateIcon, DownIcon } from './components/icons';
 import { Language } from './components/Language';
+import Status from './components/Status';
 import { NETWORK_CONFIG } from './config';
 import { Path, routes } from './config/routes';
 import { useApi } from './hooks';
@@ -149,6 +150,7 @@ function App() {
               ))}
             </Switch>
           )}
+          <Status />
         </Content>
 
         <Layout.Footer

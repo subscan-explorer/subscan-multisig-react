@@ -128,10 +128,22 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
 
         await cryptoWaitReady();
 
-        keyring.loadAll({
-          genesisHash: newApi?.genesisHash,
-          ss58Format,
-        });
+        const injectedAccounts = newAccounts?.map(({ address, meta }, whenCreated) => ({
+          address,
+          meta: {
+            ...meta,
+            name: `${meta.name || 'unknown'} (${meta.source === 'polkadot-js' ? 'extension' : meta.source})`,
+            whenCreated,
+          },
+        }));
+
+        keyring.loadAll(
+          {
+            genesisHash: newApi?.genesisHash,
+            ss58Format,
+          },
+          injectedAccounts
+        );
 
         setChain(chainInfo);
         setApi(newApi);

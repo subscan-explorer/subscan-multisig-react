@@ -1,4 +1,7 @@
 import { Api as PolkaApiProvider } from '@polkadot/react-api';
+import Queue from '@polkadot/react-components/Status/Queue';
+import { BlockAuthors, Events } from '@polkadot/react-query';
+import Signer from '@polkadot/react-signer';
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
@@ -16,11 +19,19 @@ ReactDOM.render(
     <Router>
       <ApiProvider>
         <ThemeProvider theme={{ theme: 'light' }}>
-          <PolkaApiProvider>
-            <GqlProvider>
-              <App />
-            </GqlProvider>
-          </PolkaApiProvider>
+          <Queue>
+            <PolkaApiProvider>
+              <BlockAuthors>
+                <Events>
+                  <GqlProvider>
+                    <Signer>
+                      <App />
+                    </Signer>
+                  </GqlProvider>
+                </Events>
+              </BlockAuthors>
+            </PolkaApiProvider>
+          </Queue>
         </ThemeProvider>
       </ApiProvider>
     </Router>
