@@ -2,12 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
-import { Button, Extrinsic, InputAddress, MarkError, Output, TxButton } from '@polkadot/react-components';
+import { Button, Extrinsic, MarkError, Output, PureInputAddress, TxButton } from '@polkadot/react-components';
+import createHeader from '@polkadot/react-components/InputAddress/createHeader';
+import createItem from '@polkadot/react-components/InputAddress/createItem';
+import { Option } from '@polkadot/react-components/InputAddress/types';
 import { BalanceFree } from '@polkadot/react-query';
+import { keyring } from '@polkadot/ui-keyring';
+import { KeyringSectionOption } from '@polkadot/ui-keyring/options/types';
 import { u8aToHex } from '@polkadot/util';
-import React, { useCallback, useMemo, useState } from 'react';
+import { flatten } from 'lodash';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useApi } from '../hooks';
+import { useApi, useMultisig } from '../hooks';
+import { AddressPair } from '../model';
 
 interface Props {
   className?: string;
@@ -19,6 +26,20 @@ export function ExtrinsicLaunch({ className }: Props): React.ReactElement<Props>
   const [accountId, setAccountId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [extrinsic, setExtrinsic] = useState<SubmittableExtrinsic<'promise'> | null>(null);
+  const { multisigAccount } = useMultisig();
+  const options = useMemo<KeyringSectionOption[]>(
+    () =>
+      ((multisigAccount?.meta?.addressPair as AddressPair[]) ?? []).map(({ address, ...others }) => ({
+        ...others,
+        value: address,
+        key: address,
+      })),
+    [multisigAccount?.meta]
+  );
+  const [optionsAll, setOptionsAll] = useState<Record<string, Option[]>>({
+    account: [],
+    all: [],
+  });
 
   const _onExtrinsicChange = useCallback(
     (method?: SubmittableExtrinsic<'promise'>) => setExtrinsic(() => method || null),
@@ -38,12 +59,48 @@ export function ExtrinsicLaunch({ className }: Props): React.ReactElement<Props>
     return [u8aToHex(u8a), extrinsic.registry.hash(u8a).toHex()];
   }, [extrinsic]);
 
+  const createMultiItem = useCallback(
+    (option: Option): Option[] => {
+      if (option.value === multisigAccount?.address) {
+        return options.map((opt) => createItem(opt));
+      }
+
+      return [];
+    },
+    [multisigAccount?.address, options]
+  );
+
+  useEffect(() => {
+    const subscription = keyring.keyringOption.optionsSubject.subscribe((all) => {
+      const optAll = Object.entries(all).reduce(
+        (
+          result: Record<string, (Option | React.ReactNode)[]>,
+          [type, value]
+        ): Record<string, (Option | React.ReactNode)[]> => {
+          result[type] = flatten(
+            value.map((option): Option | React.ReactNode =>
+              option.value === null ? createHeader(option) : createMultiItem(option as Option)
+            )
+          );
+
+          return result;
+        },
+        {}
+      );
+
+      setOptionsAll(optAll as Record<string, Option[]>);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [createMultiItem]);
+
   return (
     <div className={className}>
-      <InputAddress
+      <PureInputAddress
         label={t<string>('using the selected account')}
         labelExtra={<BalanceFree label={<label>{t<string>('free balance')}</label>} params={accountId} />}
         onChange={setAccountId}
+        optionsAll={optionsAll}
         type="account"
       />
       <Extrinsic

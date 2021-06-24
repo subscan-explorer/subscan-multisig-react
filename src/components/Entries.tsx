@@ -10,6 +10,7 @@ import { intersection, isArray, isObject } from 'lodash';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApi, useIsInjected } from '../hooks';
+import { AddressPair } from '../model';
 import {
   formatBalance,
   isAddressType,
@@ -112,13 +113,8 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
 
         const actions: ActionType[] = [];
         // eslint-disable-next-line react/prop-types
-        const injectedAccounts: string[] = (account.meta.addressPair as AnyJson[])
-          ?.filter((pair) =>
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            isInjected((pair as any).address)
-          )
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .map((pair) => (pair as any).address);
+        const pairs = (account.meta?.addressPair ?? []) as AddressPair[];
+        const injectedAccounts: string[] = pairs.filter((pair) => isInjected(pair.address)).map((pair) => pair.address);
 
         if (injectedAccounts.includes(row.depositor)) {
           actions.push('cancel');
@@ -126,8 +122,7 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
 
         const localAccountInMultisigPairList = intersection(
           injectedAccounts,
-          // eslint-disable-next-line
-          (account.meta.addressPair as any[]).map((item) => item.address)
+          pairs.map((pair) => pair.address)
         );
         const approvedLocalAccounts = intersection(localAccountInMultisigPairList, row.approvals);
 

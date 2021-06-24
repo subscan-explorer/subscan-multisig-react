@@ -44,7 +44,7 @@ export { default as IconLink } from './IconLink';
 export { default as IdentityIcon } from './IdentityIcon';
 export { default as InfoForInput } from './InfoForInput';
 export { default as Input } from './Input';
-export { default as InputAddress } from './InputAddress';
+export { default as InputAddress, PureInputAddress } from './InputAddress';
 export { default as InputAddressMulti } from './InputAddressMulti';
 export { default as InputAddressSimple } from './InputAddressSimple';
 export { default as InputBalance } from './InputBalance';
