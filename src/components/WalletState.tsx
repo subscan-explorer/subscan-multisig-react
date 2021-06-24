@@ -150,6 +150,7 @@ export function WalletState() {
         onCancel={() => setIsExtrinsicDisplay(false)}
         style={{ minWidth: 800 }}
         footer={null}
+        destroyOnClose
       >
         <ExtrinsicLaunch />
       </Modal>

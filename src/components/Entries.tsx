@@ -1,17 +1,21 @@
-import { DownloadOutlined } from '@ant-design/icons';
+import { DownloadOutlined, SyncOutlined } from '@ant-design/icons';
+import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
+import { StatusContext } from '@polkadot/react-components';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import { Call } from '@polkadot/types/interfaces';
 import { AnyJson } from '@polkadot/types/types';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { encodeAddress } from '@polkadot/util-crypto';
-import { Button, Space, Table, Typography } from 'antd';
+import { Button, Descriptions, Modal, Space, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { intersection, isArray, isObject } from 'lodash';
-import { useCallback } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useApi, useIsInjected } from '../hooks';
+import { useApi, useIsInjected, useMultisig } from '../hooks';
 import { AddressPair } from '../model';
 import {
+  accuracyFormat,
+  extractExternal,
   formatBalance,
   isAddressType,
   isBalanceType,
@@ -48,26 +52,63 @@ export interface EntriesProps {
 
 type ActionType = 'pending' | 'approve' | 'cancel';
 
+interface Operation {
+  type: ActionType;
+  entry: Entry | null;
+}
+
 const { Title } = Typography;
+const DEFAULT_OPERATION: Operation = { entry: null, type: 'pending' };
 
 export function Entries({ source, isConfirmed, account }: EntriesProps) {
   const { t } = useTranslation();
   const isInjected = useIsInjected();
-  const handleAction = useCallback((type: ActionType, data: Entry) => {
-    if (type === 'pending') {
-      return;
-    }
+  const [operation, setOperation] = useState<Operation>(DEFAULT_OPERATION);
+  const [fee, setFee] = useState<string>('');
+  const { api, chain } = useApi();
+  const { multisigAccount } = useMultisig();
+  const { queueExtrinsic } = useContext(StatusContext);
+  const [cancelExtrinsic, setCancelExtrinsic] = useState<SubmittableExtrinsic | null>(null);
 
-    if (type === 'approve') {
-      //
-      console.info('%c [ data ]-129', 'font-size:13px; background:pink; color:#bf2c9f;', data);
-    }
+  const calcFee = useCallback(
+    async (tx: SubmittableExtrinsic) => {
+      // eslint-disable-next-line
+      // @ts-ignore
+      const { partialFee } = await tx?.paymentInfo(multisigAccount?.address);
+      const { decimal, symbol } = chain.tokens[0];
 
-    if (type === 'cancel') {
-      //
-      console.info('%c [ data ]-134', 'font-size:13px; background:pink; color:#bf2c9f;', data);
-    }
-  }, []);
+      setFee(accuracyFormat(partialFee?.toJSON(), decimal) + ' ' + symbol);
+    },
+    [chain.tokens, multisigAccount?.address]
+  );
+
+  const handleAction = useCallback(
+    (type: ActionType, data: Entry) => {
+      if (type === 'pending') {
+        return;
+      }
+
+      setFee('calculating');
+
+      if (type === 'approve') {
+        console.info('%c [ data ]-129', 'font-size:13px; background:pink; color:#bf2c9f;', data);
+      }
+
+      if (type === 'cancel') {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const multiAddress = multisigAccount!.address;
+        const { threshold, who } = extractExternal(multiAddress);
+        const others = who.filter((item) => item !== data.address);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const tx = api!.tx.multisig.cancelAsMulti(threshold, others, data.when, data.callHash!);
+
+        calcFee(tx);
+        setCancelExtrinsic(tx);
+        setOperation({ entry: data, type });
+      }
+    },
+    [api, calcFee, multisigAccount]
+  );
   const columns: ColumnsType<Entry> = [
     {
       title: t(!isConfirmed ? 'call_hash' : 'block_hash'),
@@ -178,7 +219,7 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
       },
     ];
     const callDataJson = entry.callData?.toJSON() ?? {};
-    const args = (entry.meta?.args as ArgObj[]).map((arg) => {
+    const args = ((entry.meta?.args ?? []) as ArgObj[]).map((arg) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const value = (callDataJson.args as any)[arg?.name ?? ''];
 
@@ -204,13 +245,50 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
   };
 
   return (
-    <Table
-      dataSource={source}
-      columns={columns}
-      rowKey="hash"
-      pagination={false}
-      expandable={{ expandedRowRender, defaultExpandAllRows: true }}
-    ></Table>
+    <>
+      <Table
+        dataSource={source}
+        columns={columns}
+        rowKey="callHash"
+        pagination={false}
+        expandable={{ expandedRowRender, defaultExpandAllRows: true }}
+      ></Table>
+      <Modal
+        title={t('multisig.cancel')}
+        visible={!!operation.entry && operation.type === 'cancel'}
+        footer={[
+          <Button type="default" onClick={() => setOperation(DEFAULT_OPERATION)} key="cancel">
+            {t('cancel')}
+          </Button>,
+          <Button
+            type="primary"
+            disabled={fee === 'calculating'}
+            onClick={async () => {
+              if (cancelExtrinsic) {
+                queueExtrinsic({
+                  extrinsic: cancelExtrinsic,
+                  accountId: operation.entry?.depositor,
+                  txStartCb: () => setOperation(DEFAULT_OPERATION),
+                });
+              }
+            }}
+            key="confirm"
+          >
+            {t('submit')}
+          </Button>,
+        ]}
+      >
+        <Descriptions column={1}>
+          <Descriptions.Item label={t('pending_hash')}>
+            <Typography.Text copyable>{operation.entry?.callHash}</Typography.Text>
+          </Descriptions.Item>
+          <Descriptions.Item label={t('account')}>{operation.entry?.depositor}</Descriptions.Item>
+          <Descriptions.Item label={t('fee')}>
+            <span className="flex items-center h-full">{fee === 'calculating' ? <SyncOutlined spin /> : fee}</span>
+          </Descriptions.Item>
+        </Descriptions>
+      </Modal>
+    </>
   );
 }
 

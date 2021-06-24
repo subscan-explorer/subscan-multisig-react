@@ -1,4 +1,5 @@
 export * from './address';
+export * from './multisig';
 export * from './balance';
 export * from './common';
 export * from './copy';

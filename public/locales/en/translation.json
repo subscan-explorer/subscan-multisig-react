@@ -44,7 +44,7 @@
   "extrinsic": "Extrinsic",
   "extrinsic_index": "Extrinsic Index",
   "false_label": "No",
-  "fee": "*Fee: {{num}}",
+  "fee": "Fee",
   "id": "ID",
   "include option": "include option",
   "injected": "Injected",

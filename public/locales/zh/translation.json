@@ -43,7 +43,7 @@
   "extrinsic": "交易",
   "extrinsic_index": "交易ID",
   "false_label": "否",
-  "fee": "*手续费: {{num}}",
+  "fee": "手续费",
   "id": "ID",
   "include option": "包括选项",
   "injected": "本地账号",
