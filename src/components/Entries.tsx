@@ -1,31 +1,21 @@
-import { DownloadOutlined, SyncOutlined } from '@ant-design/icons';
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import { StatusContext } from '@polkadot/react-components';
+import { PartialQueueTxExtrinsic } from '@polkadot/react-components/Status/types';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import { Call } from '@polkadot/types/interfaces';
 import { AnyJson } from '@polkadot/types/types';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
-import { encodeAddress } from '@polkadot/util-crypto';
-import { Button, Descriptions, Modal, Space, Table, Typography } from 'antd';
+import { Button, Descriptions, Form, Modal, Select, Space, Spin, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { intersection, isArray, isObject } from 'lodash';
+import { intersection } from 'lodash';
 import { useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useApi, useIsInjected, useMultisig } from '../hooks';
+import { useApi, useFee, useIsInjected, useMultiApprove, useMultisig, useUnapprovedAccounts } from '../hooks';
 import { AddressPair } from '../model';
-import {
-  accuracyFormat,
-  extractExternal,
-  formatBalance,
-  isAddressType,
-  isBalanceType,
-  isCrabValue,
-  isDownloadType,
-  isSS58Address,
-  isValueType,
-} from '../utils';
+import { extractExternal, txDoc, txMethod, txMethodDescription } from '../utils';
+import { ArgObj, Args } from './Args';
+import { Fee } from './Fee';
 import { SubscanLink } from './SubscanLink';
-
 export interface Entry {
   when: When;
   depositor: string;
@@ -48,6 +38,7 @@ export interface EntriesProps {
   source: Entry[];
   account: KeyringAddress;
   isConfirmed?: boolean;
+  isOnlyPolkadotModal?: boolean;
 }
 
 type ActionType = 'pending' | 'approve' | 'cancel';
@@ -55,43 +46,51 @@ type ActionType = 'pending' | 'approve' | 'cancel';
 interface Operation {
   type: ActionType;
   entry: Entry | null;
+  accounts: string[];
 }
 
-const { Title } = Typography;
-const DEFAULT_OPERATION: Operation = { entry: null, type: 'pending' };
+const { Title, Text } = Typography;
+const DEFAULT_OPERATION: Operation = { entry: null, type: 'pending', accounts: [] };
 
-export function Entries({ source, isConfirmed, account }: EntriesProps) {
+export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = true }: EntriesProps) {
   const { t } = useTranslation();
   const isInjected = useIsInjected();
   const [operation, setOperation] = useState<Operation>(DEFAULT_OPERATION);
-  const [fee, setFee] = useState<string>('');
-  const { api, chain } = useApi();
+  const { api, accounts = [] } = useApi();
   const { multisigAccount } = useMultisig();
   const { queueExtrinsic } = useContext(StatusContext);
-  const [cancelExtrinsic, setCancelExtrinsic] = useState<SubmittableExtrinsic | null>(null);
-
-  const calcFee = useCallback(
-    async (tx: SubmittableExtrinsic) => {
-      // eslint-disable-next-line
-      // @ts-ignore
-      const { partialFee } = await tx?.paymentInfo(multisigAccount?.address);
-      const { decimal, symbol } = chain.tokens[0];
-
-      setFee(accuracyFormat(partialFee?.toJSON(), decimal) + ' ' + symbol);
-    },
-    [chain.tokens, multisigAccount?.address]
-  );
-
+  const [extrinsic, setExtrinsic] = useState<PartialQueueTxExtrinsic | null>(null);
+  const [getApproveTx] = useMultiApprove();
+  const [getUnapprovedInjectedList] = useUnapprovedAccounts();
+  const [isSkeltonDisplay, setIsSkeltonDisplay] = useState(false);
   const handleAction = useCallback(
     (type: ActionType, data: Entry) => {
       if (type === 'pending') {
         return;
       }
 
-      setFee('calculating');
+      setIsSkeltonDisplay(true);
 
       if (type === 'approve') {
-        console.info('%c [ data ]-129', 'font-size:13px; background:pink; color:#bf2c9f;', data);
+        const unapprovedAddresses = getUnapprovedInjectedList(data);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const availableAccounts = accounts!
+          .map((item) => item.address)
+          .filter((extAddr) => unapprovedAddresses.includes(extAddr));
+
+        getApproveTx(data, availableAccounts[0]).then((tx) => {
+          const queueTx: PartialQueueTxExtrinsic = {
+            extrinsic: tx,
+            accountId: availableAccounts[0],
+            txSuccessCb: () => setExtrinsic(null),
+          };
+
+          queueExtrinsic(queueTx);
+          setExtrinsic(queueTx);
+          setIsSkeltonDisplay(false);
+        });
+
+        setOperation({ entry: data, type, accounts: availableAccounts });
       }
 
       if (type === 'cancel') {
@@ -101,14 +100,23 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
         const others = who.filter((item) => item !== data.address);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const tx = api!.tx.multisig.cancelAsMulti(threshold, others, data.when, data.callHash!);
+        const queueTx: PartialQueueTxExtrinsic = {
+          extrinsic: tx,
+          accountId: data.depositor,
+          txSuccessCb: () => {
+            setExtrinsic(null);
+          },
+        };
 
-        calcFee(tx);
-        setCancelExtrinsic(tx);
-        setOperation({ entry: data, type });
+        setExtrinsic(queueTx);
+        queueExtrinsic(queueTx);
+        setOperation({ entry: data, type, accounts: [] });
+        setIsSkeltonDisplay(false);
       }
     },
-    [api, calcFee, multisigAccount]
+    [accounts, api, getApproveTx, getUnapprovedInjectedList, multisigAccount, queueExtrinsic]
   );
+
   const columns: ColumnsType<Entry> = [
     {
       title: t(!isConfirmed ? 'call_hash' : 'block_hash'),
@@ -245,7 +253,7 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
   };
 
   return (
-    <>
+    <Spin size="large" spinning={isSkeltonDisplay}>
       <Table
         dataSource={source}
         columns={columns}
@@ -253,23 +261,60 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
         pagination={false}
         expandable={{ expandedRowRender, defaultExpandAllRows: true }}
       ></Table>
+
+      {/* By default we use polkadot approve workflow only, components below would not display */}
+      {!isOnlyPolkadotModal && (
+        <OperationModals
+          operation={operation}
+          queueTx={extrinsic}
+          onTxChange={(tx, accountId) => {
+            const queueTx: PartialQueueTxExtrinsic = {
+              extrinsic: tx,
+              accountId,
+              txSuccessCb: () => setExtrinsic(null),
+            };
+
+            queueExtrinsic(queueTx);
+            setExtrinsic(queueTx);
+          }}
+        />
+      )}
+    </Spin>
+  );
+}
+
+/* ---------------------------Custom extrinsic operation modals----------------- */
+
+interface OperationModalsProps {
+  operation?: Operation;
+  queueTx?: PartialQueueTxExtrinsic | null;
+  onCancel?: () => void;
+  onTxChange?: (tx: SubmittableExtrinsic, account: string) => void;
+}
+
+function OperationModals({ operation, queueTx, onCancel, onTxChange }: OperationModalsProps) {
+  const { t } = useTranslation();
+  const { api } = useApi();
+  const { fee } = useFee();
+  const [getApproveTx] = useMultiApprove();
+  const { queueExtrinsic } = useContext(StatusContext);
+
+  return (
+    <>
       <Modal
+        destroyOnClose
         title={t('multisig.cancel')}
-        visible={!!operation.entry && operation.type === 'cancel'}
+        visible={operation && !!operation.entry && operation.type === 'cancel'}
         footer={[
-          <Button type="default" onClick={() => setOperation(DEFAULT_OPERATION)} key="cancel">
+          <Button type="default" onClick={onCancel} key="cancel">
             {t('cancel')}
           </Button>,
           <Button
             type="primary"
             disabled={fee === 'calculating'}
-            onClick={async () => {
-              if (cancelExtrinsic) {
-                queueExtrinsic({
-                  extrinsic: cancelExtrinsic,
-                  accountId: operation.entry?.depositor,
-                  txStartCb: () => setOperation(DEFAULT_OPERATION),
-                });
+            onClick={() => {
+              if (queueTx) {
+                queueExtrinsic(queueTx);
               }
             }}
             key="confirm"
@@ -280,137 +325,94 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
       >
         <Descriptions column={1}>
           <Descriptions.Item label={t('pending_hash')}>
-            <Typography.Text copyable>{operation.entry?.callHash}</Typography.Text>
+            <Typography.Text copyable>{operation?.entry?.callHash}</Typography.Text>
           </Descriptions.Item>
-          <Descriptions.Item label={t('account')}>{operation.entry?.depositor}</Descriptions.Item>
+          <Descriptions.Item label={t('account')}>{operation?.entry?.depositor}</Descriptions.Item>
           <Descriptions.Item label={t('fee')}>
-            <span className="flex items-center h-full">{fee === 'calculating' ? <SyncOutlined spin /> : fee}</span>
+            <Fee extrinsic={queueTx?.extrinsic}></Fee>
           </Descriptions.Item>
         </Descriptions>
       </Modal>
+
+      <Modal
+        title={t('multisig.approval')}
+        visible={!!operation && !!operation.entry && operation.type === 'approve'}
+        destroyOnClose
+        style={{ minWidth: 800 }}
+        onCancel={onCancel}
+        footer={[
+          <Button onClick={onCancel} key="cancel">
+            {t('cancel')}
+          </Button>,
+          <Button
+            type="primary"
+            key="approve"
+            onClick={() => {
+              if (queueTx) {
+                queueExtrinsic(queueTx);
+              }
+            }}
+          >
+            {t('submit')}
+          </Button>,
+        ]}
+      >
+        <Form>
+          <Form.Item label={t('pending_hash')}>
+            <Text copyable>{operation?.entry?.callHash}</Text>
+          </Form.Item>
+
+          <Form.Item label={t('account')}>
+            <Select
+              onChange={(value: string) => {
+                if (operation && operation.entry && onTxChange) {
+                  getApproveTx(operation.entry, value).then((tx) => {
+                    onTxChange(tx, value);
+                  });
+                }
+              }}
+            >
+              {operation?.accounts.map((addr) => (
+                <Select.Option value={addr} key={addr}>
+                  {addr}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item label={t('multisig.from_chain')}>
+            {/* TODO support edit */}
+            <Text code>{operation?.entry?.callData?.toString()}</Text>
+          </Form.Item>
+        </Form>
+
+        <Descriptions layout="vertical" column={1}>
+          <Descriptions.Item
+            label={
+              <Title level={5}>
+                {t('multisig.sending_transaction', {
+                  transaction: txMethod(operation?.entry?.callData, api),
+                })}
+              </Title>
+            }
+          >
+            {txDoc(operation?.entry?.callData)}
+          </Descriptions.Item>
+          {txMethodDescription(operation?.entry?.callData, api).map(({ name, type, value }) => (
+            <Descriptions.Item label={<Typography.Title level={5}>{`${name} ${type}`}</Typography.Title>} key={name}>
+              {value}
+            </Descriptions.Item>
+          ))}
+        </Descriptions>
+
+        <Descriptions column={1}>
+          <Descriptions.Item label={t('fee')}>
+            <Fee></Fee>
+          </Descriptions.Item>
+        </Descriptions>
+
+        <Typography.Text>{t('multisig.approval_tip')}</Typography.Text>
+      </Modal>
     </>
-  );
-}
-
-/* -----------------------------------Args Component----------------------------------------- */
-
-interface ArgsProps {
-  args: Arg[];
-  call?: string;
-  className?: string;
-  isAddress?: boolean;
-  isBalance?: boolean;
-  isInner?: boolean;
-  isShowName?: boolean;
-  isValidate?: boolean;
-  isValue?: boolean;
-}
-
-type ArgObj = {
-  name?: string;
-  type?: string;
-  value?: string | number | boolean | Record<string, unknown>;
-  [key: string]: unknown;
-};
-
-type Arg = ArgObj | string | number | boolean;
-
-const parseValue = (value: AnyJson, ss58Format: number) => {
-  const addrLen = 66;
-
-  if (isArray(value)) {
-    return value.map((item) => {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const formatVal = (item as any)?.padStart(addrLen, '0x');
-
-        return encodeAddress(formatVal, ss58Format);
-      } catch (err) {
-        console.error('%c [ err ]-239', 'font-size:13px; background:pink; color:#bf2c9f;', err.message);
-
-        return item;
-      }
-    });
-  }
-
-  if (isObject(value)) {
-    return Object.entries(value).map(([k, v]) => ({ name: k, value: v, asValue: true }));
-  }
-
-  return value;
-};
-
-function Args({ args, isValidate, isBalance, isValue, isAddress, className, isShowName = true }: ArgsProps) {
-  const { t } = useTranslation();
-  const { chain } = useApi();
-  const paramValue = useCallback(
-    (value) => {
-      let element: JSX.Element | string = '';
-      if (isBalance || isCrabValue(value)) {
-        element = formatBalance(value, +chain.tokens[0].decimal);
-      } else if (isDownloadType(value)) {
-        element = (
-          <a href={value}>
-            {t('download')} <DownloadOutlined />
-          </a>
-        );
-      } else if (!isAddress) {
-        element = value;
-      } else {
-        element = <SubscanLink address={value} copyable />;
-      }
-
-      return element;
-    },
-    [chain.tokens, isAddress, isBalance, t]
-  );
-  const columns: ColumnsType<ArgObj> = [
-    {
-      key: 'name',
-      dataIndex: 'name',
-      render(name: string, record) {
-        if (isObject(record) && record.type) {
-          return isShowName ? name ?? '-' : record.type;
-        } else {
-          return name;
-        }
-      },
-    },
-    {
-      key: 'value',
-      dataIndex: 'value',
-      className: 'value-column',
-      // eslint-disable-next-line complexity
-      render(value, record) {
-        const { type, name } = record;
-        const isAddr = type ? isAddressType(record.type) : isSS58Address(value);
-
-        return (
-          <Args
-            isAddress={isAddr}
-            isBalance={!!type && isBalanceType(record.type)}
-            isValue={(!!name && isValueType(record.name)) || !!record.asValue}
-            isInner
-            isValidate={isValidate}
-            args={record.type ? parseValue(value, +chain.ss58Format) : value}
-          />
-        );
-      },
-    },
-  ];
-
-  return isValue ? (
-    <>{paramValue(args)}</>
-  ) : (
-    <Table
-      columns={columns}
-      /* antd form data source require object array */
-      dataSource={args.map((arg) => (isObject(arg) ? arg : { value: arg }))}
-      pagination={false}
-      bordered
-      rowKey="name"
-      showHeader={false}
-      className={className}
-    />
   );
 }

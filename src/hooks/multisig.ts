@@ -3,8 +3,10 @@ import { AccountId } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
-import { useEffect, useState } from 'react';
+import { difference, intersection } from 'lodash';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Entry } from '../components/Entries';
 import { useApi } from './api';
 
 export function useMultisig(acc?: string) {
@@ -35,4 +37,27 @@ export function useMultisig(acc?: string) {
     multisigAccount,
     setMultisigAccount,
   };
+}
+
+export function useUnapprovedAccounts() {
+  const { accounts } = useApi();
+  const { multisigAccount } = useMultisig();
+  const getUnapprovedInjectedList = useCallback(
+    (data: Entry | null) => {
+      if (!data) {
+        return [];
+      }
+
+      const extensionAddresses = accounts?.map((item) => item.address) || [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const multisigPairAddresses = (multisigAccount?.meta.addressPair as any[]).map((item) => item.address);
+      const extensionInPairs = intersection(extensionAddresses, multisigPairAddresses);
+      const approvedExtensionAddresses = intersection(extensionInPairs, data.approvals);
+
+      return difference(extensionInPairs, approvedExtensionAddresses);
+    },
+    [accounts, multisigAccount?.meta.addressPair]
+  );
+
+  return [getUnapprovedInjectedList];
 }
