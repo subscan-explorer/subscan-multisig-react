@@ -1,4 +1,4 @@
-![grants_badge](./grants_badge.png)
+![grants_badge](./docs/grants_badge.png)
 
 # Subscan Multisig UI
 
@@ -99,7 +99,7 @@ If you have installed the polkadot.js extension, you will be automatically conne
   </p>
 
   <p align="left">
-    2. In the multi-sig account details, click "Settings" to perform operations such as "Rename" and "Delete".
+    2. In the multi-sig account details, you can either edit the wallet name or delete the wallet by click the correspond icon.
   </p>
 
   <p align="center">
