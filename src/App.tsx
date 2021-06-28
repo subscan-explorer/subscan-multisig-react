@@ -1,5 +1,7 @@
 import { DownOutlined } from '@ant-design/icons';
 import { getSystemColor } from '@polkadot/apps-config';
+import { BlockAuthors, Events } from '@polkadot/react-query';
+import Signer from '@polkadot/react-signer';
 import GlobalStyle from '@polkadot/react-components/styles';
 import { useApi as usePolkaApi } from '@polkadot/react-hooks';
 import BaseIdentityIcon from '@polkadot/react-identicon';
@@ -144,11 +146,17 @@ function App() {
           {networkStatus === 'connecting' ? (
             <Connecting />
           ) : (
-            <Switch>
-              {routes.map((item, index) => (
-                <Route key={index} {...item}></Route>
-              ))}
-            </Switch>
+            <BlockAuthors>
+              <Events>
+                <Signer>
+                  <Switch>
+                    {routes.map((item, index) => (
+                      <Route key={index} {...item}></Route>
+                    ))}
+                  </Switch>
+                </Signer>
+              </Events>
+            </BlockAuthors>
           )}
           <Status />
         </Content>

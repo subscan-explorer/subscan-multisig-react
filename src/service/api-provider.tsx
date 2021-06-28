@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import type { InjectedExtension } from '@polkadot/extension-inject/types';
 import { ApiPromise } from '@polkadot/api';
 import { notification } from 'antd';
 import keyring from '@polkadot/ui-keyring';
@@ -68,6 +69,7 @@ export type ApiCtx = {
   setRandom: (num: number) => void;
   networkConfig: NetConfig;
   chain: Chain;
+  extensions: InjectedExtension[] | undefined;
 };
 
 type ActionHelper = <T = string>(type: ActionType) => (payload: T) => void;
@@ -83,6 +85,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
   const [api, setApi] = useState<ApiPromise | null>(null);
   const [chain, setChain] = useState<Chain>({ ss58Format: '', tokens: [] });
   const [random, setRandom] = useState<number>(0);
+  const [extensions, setExtensions] = useState<InjectedExtension[] | undefined>(undefined);
 
   useEffect(() => {
     if (typeof window.ethereum === 'undefined') {
@@ -113,7 +116,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
       setNetworkStatus('connecting');
 
       try {
-        const { accounts: newAccounts, api: newApi, extensions } = await connectSubstrate(state.network);
+        const { accounts: newAccounts, api: newApi, extensions: newExtensions } = await connectSubstrate(state.network);
         const chainState = await newApi?.rpc.system.properties();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { tokenDecimals, tokenSymbol, ss58Format } = chainState?.toHuman() as any;
@@ -148,8 +151,9 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
         setChain(chainInfo);
         setApi(newApi);
         setNetworkStatus('success');
+        setExtensions(newExtensions || undefined);
 
-        if (!extensions?.length && !newAccounts?.length) {
+        if (!newExtensions?.length && !newAccounts?.length) {
           setAccounts([]);
         } else {
           setAccounts(
@@ -181,6 +185,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
         api,
         networkConfig: NETWORK_CONFIG[state.network],
         chain,
+        extensions,
       }}
     >
       {children}
