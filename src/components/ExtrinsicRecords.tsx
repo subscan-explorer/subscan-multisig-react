@@ -1,6 +1,5 @@
-import { StorageKey, U8aFixed } from '@polkadot/types';
-import { AccountId, Call } from '@polkadot/types/interfaces';
-import { AnyJson, Codec } from '@polkadot/types/types';
+import { Call } from '@polkadot/types/interfaces';
+import { AnyJson } from '@polkadot/types/types';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { Space, Spin, Tabs } from 'antd';
 import { useQuery } from 'graphql-hooks';
@@ -49,15 +48,12 @@ function InProgress({ account }: InProgressProps) {
   const [extrinsic, setExtrinsic] = useState<Entry[]>([]);
 
   useEffect(() => {
-    if (!account) {
+    if (!account || !api) {
       return;
     }
 
     (async () => {
-      const entries = (await api?.query.multisig.multisigs.entries(account.address)) as [
-        StorageKey<[AccountId, U8aFixed]>,
-        Codec
-      ][];
+      const entries = await api.query.multisig.multisigs.entries(account.address);
       const result = entries?.map((entry) => {
         const [address, callHash] = entry[0].toHuman() as string[];
 
@@ -77,7 +73,7 @@ function InProgress({ account }: InProgressProps) {
         }
 
         try {
-          const callData = api?.registry.createType('Call', call[0]) as Call;
+          const callData = api.registry.createType('Call', call[0]);
           const meta = api?.tx[callData?.section][callData.method].meta.toJSON();
 
           return { ...result[index], callData, meta, hash: result[index].callHash };
@@ -110,7 +106,7 @@ function Confirmed({ account, multiAddress }: ConfirmedProps) {
     },
   });
   const extrinsic = useMemo(() => {
-    if (!data?.transfers) {
+    if (!data?.transfers || !api) {
       return [];
     }
 
@@ -131,13 +127,12 @@ function Confirmed({ account, multiAddress }: ConfirmedProps) {
       const multisigArgs = JSON.parse(args ?? '');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const callHash = multisigArgs.find((item: any) => item.name === 'call')?.value;
-      const callData = api?.registry.createType('Call', callHash) as Call;
-      const meta = api?.tx[callData?.section][callData.method].meta.toJSON();
+      const callData = api?.registry.createType('Call', callHash) as unknown as Call;
+      const meta = api?.tx[callData.section][callData.method].meta.toJSON();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { height, index } = multisigArgs.find((item: any) => item.name === 'maybe_timepoint')?.value;
 
       return {
-        // ...callDataInfo,
         callData,
         blockHash,
         meta,

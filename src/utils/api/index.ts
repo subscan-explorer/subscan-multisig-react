@@ -1,7 +1,8 @@
-import { typesBundleForPolkadot } from '@darwinia/types/mix';
 import { ApiPromise, WsProvider } from '@polkadot/api';
+import { typesBundle, typesChain } from '@polkadot/apps-config';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 import type ExtType from '@polkadot/extension-inject/types';
+import registry from '@polkadot/react-api/typeRegistry';
 import { NETWORK_CONFIG } from '../../config';
 import { NetworkType } from '../../model';
 
@@ -19,15 +20,9 @@ export async function connectNodeProvider(type: NetworkType = 'darwinia'): Promi
   const provider = new WsProvider(NETWORK_CONFIG[type].rpc);
   const darwiniaApi = await ApiPromise.create({
     provider,
-    typesBundle: {
-      spec: {
-        /* eslint-disable */
-        Crab: typesBundleForPolkadot.spec.crab as any,
-        Pangolin: typesBundleForPolkadot.spec.pangolin as any,
-        Darwinia: typesBundleForPolkadot.spec.darwinia as any,
-        /* eslint-enable */
-      },
-    },
+    typesBundle,
+    typesChain,
+    registry,
   });
 
   await darwiniaApi.isReady;

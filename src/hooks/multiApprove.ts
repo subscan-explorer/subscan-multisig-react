@@ -25,7 +25,8 @@ export function useMultiApprove() {
       let weight: BN | undefined = new BN(0);
 
       if (data.callData) {
-        const payment = await api?.tx(data.callData).paymentInfo(ZERO_ACCOUNT);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const payment = await api?.tx(data.callData as any).paymentInfo(ZERO_ACCOUNT);
 
         weight = payment?.weight;
         callData = api?.registry.createType('Call', data.callData);
