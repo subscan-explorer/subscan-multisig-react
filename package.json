@@ -5,7 +5,7 @@
   "scripts": {
     "start": "PORT=3008 craco start",
     "start:dev": "PORT=3008 REACT_APP_HOST_TYPE=dev craco start",
-    "build": "CI=false craco build",
+    "build": "CI=false GENERATE_SOURCEMAP=false craco build --max_old_space_size=2048",
     "test": "craco test",
     "eject": "react-scripts eject",
     "stylelint": "stylelint \"src/**/*.scss\" --config stylelint.config.js",
