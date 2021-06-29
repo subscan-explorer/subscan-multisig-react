@@ -128,9 +128,9 @@ export function WalletForm() {
       <LabelWithTip name="members" tipMessage="wallet.tip.members" />
 
       <Row gutter={10} className="bg-gray-100 mt-2 mb-6 p-4 rounded-lg">
-        <Col span={1}>{t('id')}</Col>
+        <Col span={2}>{t('id')}</Col>
         <Col span={5}>{t('name')}</Col>
-        <Col span={18}>{t('address')}</Col>
+        <Col span={17}>{t('address')}</Col>
       </Row>
 
       <Form.List name="members">
@@ -138,7 +138,7 @@ export function WalletForm() {
           <>
             {fields.map((field, index) => (
               <Row key={field.key} gutter={10} className="px-4">
-                <Col span={1} className="pl-2 pt-2">
+                <Col span={2} className="pl-2 pt-2">
                   {index + 1}
                 </Col>
                 <Col span={5}>
@@ -152,7 +152,7 @@ export function WalletForm() {
                   </Form.Item>
                 </Col>
 
-                <Col span={17}>
+                <Col span={15}>
                   <Form.Item
                     {...field}
                     name={[field.name, 'address']}
@@ -194,7 +194,7 @@ export function WalletForm() {
                   </Form.Item>
                 </Col>
 
-                <Col>
+                <Col span={2}>
                   <Form.Item>
                     <MinusCircleOutlined
                       onClick={() => {
