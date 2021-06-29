@@ -1,6 +1,3 @@
-import { StorageKey, U8aFixed } from '@polkadot/types';
-import { AccountId } from '@polkadot/types/interfaces';
-import { Codec } from '@polkadot/types/types';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { difference, intersection } from 'lodash';
@@ -22,10 +19,7 @@ export function useMultisig(acc?: string) {
 
     (async () => {
       const multisig = keyring.getAccount(acc ?? account);
-      const entries = (await api.query.multisig.multisigs.entries(multisig?.address)) as [
-        StorageKey<[AccountId, U8aFixed]>,
-        Codec
-      ][];
+      const entries = await api.query.multisig.multisigs.entries(multisig?.address);
 
       setMultisigAccount(multisig || null);
       setInProgressCount(entries.length);

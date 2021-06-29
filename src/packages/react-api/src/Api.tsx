@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-magic-numbers */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-shadow */
@@ -7,7 +8,7 @@
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { ApiPromise } from '@polkadot/api/promise';
 import { ethereumChains } from '@polkadot/apps-config';
-import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
+import { web3Accounts } from '@polkadot/extension-dapp';
 import type { InjectedExtension } from '@polkadot/extension-inject/types';
 import type { ChainProperties, ChainType } from '@polkadot/types/interfaces';
 import { keyring } from '@polkadot/ui-keyring';
@@ -195,13 +196,13 @@ function Api({ children, store }: Props): React.ReactElement<Props> | null {
     hasInjectedAccounts: false,
     isApiReady: false,
   } as unknown as ApiState);
-  const [isApiConnected, setIsApiConnected] = useState(false);
-  const [isApiInitialized, setIsApiInitialized] = useState(false);
   const [apiError, setApiError] = useState<null | string>(null);
-  const [extensions, setExtensions] = useState<InjectedExtension[] | undefined>();
   const {
     api: iApi,
     networkConfig: { rpc: url },
+    extensions,
+    networkStatus,
+    setNetworkStatus,
   } = useApi();
 
   const value = useMemo<ApiProps>(
@@ -211,11 +212,11 @@ function Api({ children, store }: Props): React.ReactElement<Props> | null {
       apiError,
       apiUrl: url,
       extensions,
-      isApiConnected,
-      isApiInitialized,
+      isApiConnected: networkStatus === 'success',
+      isApiInitialized: !!iApi,
       isWaitingInjected: !extensions,
     }),
-    [apiError, extensions, isApiConnected, isApiInitialized, state, url, iApi]
+    [state, iApi, apiError, url, extensions, networkStatus]
   );
 
   // initial initialization
@@ -230,16 +231,11 @@ function Api({ children, store }: Props): React.ReactElement<Props> | null {
     const types = getDevTypes();
 
     iApi.setSigner(signer);
-    setIsApiConnected(true);
 
-    iApi.on('disconnected', () => setIsApiConnected(false));
+    iApi.on('disconnected', () => setNetworkStatus('pending'));
     iApi.on('error', (error: Error) => setApiError(error.message));
 
-    const injectedPromise = web3Enable('polkadot-js/apps');
-
-    injectedPromise.then(setExtensions).catch(console.error);
-
-    loadOnReady(iApi, injectedPromise, store, types)
+    loadOnReady(iApi, Promise.resolve(extensions || []), store, types)
       .then(setState)
       .catch((error): void => {
         console.error(error);
@@ -247,13 +243,8 @@ function Api({ children, store }: Props): React.ReactElement<Props> | null {
         setApiError((error as Error).message);
       });
 
-    setIsApiInitialized(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [iApi]);
-
-  if (!value.isApiInitialized) {
-    return null;
-  }
 
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
 }
