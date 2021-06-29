@@ -114,6 +114,8 @@
   "version_history": "版本历史",
   "view_in_subscan": "去 Subscan 查看",
   "wallet": {
+    "Hide members": "隐藏成员",
+    "Show members": "显示成员",
     "add": "创建钱包",
     "delete": "删除钱包",
     "delete_confirm": "确认要删除 “{{name}}” ？",

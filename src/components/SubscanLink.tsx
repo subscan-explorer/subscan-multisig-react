@@ -18,7 +18,12 @@ export function SubscanLink({ address, extrinsic, children, copyable, block, ...
 
   if (address) {
     return (
-      <Link href={`https://${network}.subscan.io/account/${address}`} target="__blank" copyable={copyable}>
+      <Link
+        href={`https://${network}.subscan.io/account/${address}`}
+        target="__blank"
+        copyable={copyable}
+        className="w-full"
+      >
         {address}
       </Link>
     );
