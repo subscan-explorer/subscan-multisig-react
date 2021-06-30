@@ -15,7 +15,7 @@ export function Anime() {
       <div className="anime">
         <ul>
           {ids.map((item, index) => (
-            <li key={index} id={item} style={{ backgroundColor: networkConfig.facade.color.main }}></li>
+            <li key={index} id={item} style={{ background: networkConfig.facade.color.main }}></li>
           ))}
         </ul>
       </div>

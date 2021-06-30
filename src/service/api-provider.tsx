@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import type { InjectedExtension } from '@polkadot/extension-inject/types';
 import { ApiPromise } from '@polkadot/api';
-import { notification } from 'antd';
+import type { InjectedExtension } from '@polkadot/extension-inject/types';
 import keyring from '@polkadot/ui-keyring';
-import { cryptoWaitReady } from '@polkadot/util-crypto';
+import { KeyringJson } from '@polkadot/ui-keyring/types';
+import { notification } from 'antd';
+import { isObject } from 'lodash';
 import React, { createContext, Dispatch, useCallback, useEffect, useReducer, useState } from 'react';
 import { LONG_DURATION, NETWORK_CONFIG } from '../config';
 import { Action, IAccountMeta, NetConfig, NetworkType } from '../model';
@@ -28,6 +29,14 @@ export interface Chain {
 type ActionType = 'switchNetwork' | 'updateNetworkStatus' | 'setAccounts';
 
 const info = getInfoFromHash();
+
+const isKeyringLoaded = () => {
+  try {
+    return !!keyring.keyring;
+  } catch {
+    return false;
+  }
+};
 
 const initialState: StoreState = {
   network: info.network || 'pangolin',
@@ -112,6 +121,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
       );
     }
 
+    // eslint-disable-next-line complexity
     (async () => {
       setNetworkStatus('connecting');
 
@@ -129,8 +139,6 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
           { ss58Format, tokens: [] } as Chain
         );
 
-        await cryptoWaitReady();
-
         const injectedAccounts = newAccounts?.map(({ address, meta }, whenCreated) => ({
           address,
           meta: {
@@ -140,13 +148,22 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
           },
         }));
 
-        keyring.loadAll(
-          {
-            genesisHash: newApi?.genesisHash,
-            ss58Format,
-          },
-          injectedAccounts
-        );
+        if (!isKeyringLoaded()) {
+          keyring.loadAll(
+            {
+              genesisHash: newApi?.genesisHash,
+              ss58Format,
+              filter: (data: KeyringJson) => {
+                if (!isObject(data) || !data.meta) {
+                  return false;
+                }
+
+                return !!data.meta.isMultisig;
+              },
+            },
+            injectedAccounts
+          );
+        }
 
         setChain(chainInfo);
         setApi(newApi);
@@ -166,6 +183,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
 
         patchUrl({ network: state.network });
       } catch (error) {
+        console.info('🚀 ~ file: api-provider.tsx ~ line 169 ~ error', error);
         setNetworkStatus('fail');
       }
     })();

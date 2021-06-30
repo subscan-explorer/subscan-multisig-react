@@ -84,6 +84,7 @@ export function WalletForm() {
         members: [
           { name: '', address: '' },
           { name: '', address: '' },
+          { name: '', address: '' },
         ],
       }}
       onFinish={(values: WalletFormValue) => {
