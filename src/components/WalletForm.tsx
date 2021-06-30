@@ -68,7 +68,6 @@ export function WalletForm() {
       result = result.filter((item) => item !== value);
     }
 
-    console.info('%c [ result ]-57', 'font-size:13px; background:pink; color:#bf2c9f;', result);
     setSelectedAccounts(result);
   };
 
