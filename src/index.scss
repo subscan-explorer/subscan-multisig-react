@@ -79,6 +79,21 @@ body {
   }
 }
 
+.table-without-head {
+  .ant-table-thead {
+    display: none !important;
+  }
+
+  .ant-table {
+    margin: 0 !important;
+  }
+
+  .ant-table-container,
+  table {
+    border-radius: 0 !important;
+  }
+}
+
 .value-column {
   padding-left: 0;
 
@@ -89,5 +104,12 @@ body {
 
   .ant-table.ant-table-bordered > .ant-table-container {
     border-left: none;
+  }
+}
+
+.wallet-collapse {
+  .ant-collapse-header-text {
+    float: left;
+    max-width: 100%;
   }
 }

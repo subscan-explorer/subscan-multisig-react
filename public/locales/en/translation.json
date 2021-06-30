@@ -115,6 +115,8 @@
   "version_history": "Version History",
   "view_in_subscan": "View on Subscan",
   "wallet": {
+    "Hide members": "Hide members",
+    "Show members": "Show members",
     "add": "Create Wallet",
     "delete": "Delete Wallet",
     "delete_confirm": "Are you sure to delete “{{name}}” ？",

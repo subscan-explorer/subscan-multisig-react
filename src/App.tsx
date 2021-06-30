@@ -1,11 +1,11 @@
 import { DownOutlined } from '@ant-design/icons';
 import { getSystemColor } from '@polkadot/apps-config';
-import { BlockAuthors, Events } from '@polkadot/react-query';
-import Signer from '@polkadot/react-signer';
 import GlobalStyle from '@polkadot/react-components/styles';
 import { useApi as usePolkaApi } from '@polkadot/react-hooks';
 import BaseIdentityIcon from '@polkadot/react-identicon';
-import { Affix, Button, Dropdown, Layout, Menu } from 'antd';
+import { BlockAuthors, Events } from '@polkadot/react-query';
+import Signer from '@polkadot/react-signer';
+import { Button, Dropdown, Layout, Menu, Typography } from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
 import { getYear } from 'date-fns';
 import React, { useEffect, useMemo } from 'react';
@@ -70,79 +70,81 @@ function App() {
     <>
       <GlobalStyle uiHighlight={uiHighlight} />
       <Layout style={{ height: 'calc(100vh - 78px)' }} className="overflow-scroll theme-light">
-        <Affix offsetTop={1} className={networkConfig.facade.bgClsName} style={{ height: 64 }}>
-          <Header
-            className="flex items-center justify-between sm:px-80 px-2"
-            style={{ marginTop: -1, background: THEME_CONFIG[network]['@layout-header-background'] }}
-          >
-            <span className="flex items-center h-full gap-4">
-              <Link to={Path.root} className="flex items-center h-full gap-4">
-                <img src="/image/logo@2x.png" className="w-28 h-6" />
-                <span className="bg-white px-3 rounded-lg leading-6">{t('multisig.index')}</span>
-              </Link>
+        <Header
+          className="fixed left-0 right-0 top-0 z-10 flex sm:items-center flex-col sm:flex-row justify-around sm:justify-between lg:px-40 xl:px-80 px-4 h-24 sm:h-20"
+          style={{ marginTop: -1, background: THEME_CONFIG[network]['@layout-header-background'] }}
+        >
+          <span className="flex items-center gap-4 justify-between">
+            <Link to={Path.root} className="flex items-center gap-4">
+              <img src="/image/logo@2x.png" className="w-28 h-6" />
+              <span className="bg-white px-3 rounded-lg leading-6 whitespace-nowrap">{t('multisig.index')}</span>
+            </Link>
 
-              <img src={polkaLogo} style={{ width: 32, height: 24 }} />
-            </span>
+            <img src={polkaLogo} style={{ width: 32, height: 24 }} />
+          </span>
 
-            <div className="flex items-center h-full gap-4">
-              <a href={`https://${network}.subscan.io`} target="__blank" className="text-white">
-                {t('explorer')}
+          <div className="flex items-center gap-4">
+            <a href={`https://${network}.subscan.io`} target="__blank" className="text-white leading-normal">
+              {t('explorer')}
+            </a>
+
+            <Dropdown
+              overlay={
+                <Menu className="truncate" style={{ maxWidth: '80vw' }}>
+                  {accounts?.map((item) => (
+                    <Menu.Item key={item.address} className="header-account-list">
+                      <BaseIdentityIcon
+                        theme="substrate"
+                        size={24}
+                        className="md:mr-2 rounded-full border border-solid border-gray-100"
+                        value={item.address}
+                      />
+                      <div className="flex flex-col leading-5">
+                        <b>{item.meta?.name}</b>
+                        <span className="hidden md:inline opacity-60">{item.address}</span>
+                        <Typography.Text className="inline md:hidden opacity-60" copyable>
+                          {/* eslint-disable-next-line no-magic-numbers */}
+                          {item.address.slice(0, 20) + '...'}
+                        </Typography.Text>
+                      </div>
+                    </Menu.Item>
+                  ))}
+                </Menu>
+              }
+              placement="bottomCenter"
+              arrow
+            >
+              <a onClick={(e) => e.preventDefault()} className="text-white leading-normal whitespace-nowrap">
+                {t('accounts')} <DownOutlined />
               </a>
+            </Dropdown>
 
-              <Dropdown
-                overlay={
-                  <Menu>
-                    {accounts?.map((item) => (
-                      <Menu.Item key={item.address} className="header-account-list">
-                        <BaseIdentityIcon
-                          theme="substrate"
-                          size={24}
-                          className="mr-2 rounded-full border border-solid border-gray-100"
-                          value={item.address}
-                        />
-                        <div className="flex flex-col leading-5">
-                          <b>{item.meta?.name}</b>
-                          <span className="opacity-60">{item.address}</span>
-                        </div>
-                      </Menu.Item>
-                    ))}
-                  </Menu>
-                }
-                placement="bottomCenter"
-                arrow
-              >
-                <a onClick={(e) => e.preventDefault()} className="text-white">
-                  {t('accounts')} <DownOutlined />
-                </a>
-              </Dropdown>
+            <Dropdown
+              overlay={
+                <Menu>
+                  {networks.map((item) => (
+                    <Menu.Item key={item.name} onClick={() => switchNetwork(item.name as NetworkType)}>
+                      <div className="flex items-center gap-4">
+                        <img src={item.facade.logo} className="w-8 h-8" />
+                        <span>{item.fullName}</span>
+                      </div>
+                    </Menu.Item>
+                  ))}
+                </Menu>
+              }
+              placement="bottomCenter"
+              arrow
+            >
+              <Button className="flex justify-between items-center gap-2">
+                <img src={networkConfig.facade.logo} className="w-6 h-6" />
+                {networkConfig.fullName}
+                <DownIcon />
+              </Button>
+            </Dropdown>
+          </div>
+        </Header>
 
-              <Dropdown
-                overlay={
-                  <Menu>
-                    {networks.map((item) => (
-                      <Menu.Item key={item.name} onClick={() => switchNetwork(item.name as NetworkType)}>
-                        <div className="flex items-center gap-4">
-                          <img src={item.facade.logo} className="w-8 h-8" />
-                          <span>{item.fullName}</span>
-                        </div>
-                      </Menu.Item>
-                    ))}
-                  </Menu>
-                }
-                placement="bottomCenter"
-                arrow
-              >
-                <Button className="flex justify-between items-center gap-2">
-                  <img src={networkConfig.facade.logo} className="w-6 h-6" />
-                  {networkConfig.fullName}
-                  <DownIcon />
-                </Button>
-              </Dropdown>
-            </div>
-          </Header>
-        </Affix>
-
-        <Content className="sm:px-80 sm:py-8 p-2 py-1">
+        <Content className="xl:px-40 2xl:px-80 sm:py-8 p-2 py-1 mt-24 sm:mt-20 min-w-">
           {networkStatus === 'connecting' ? (
             <Connecting />
           ) : (
@@ -162,10 +164,10 @@ function App() {
         </Content>
 
         <Layout.Footer
-          className="flex items-center justify-between sm:px-80 px-1 text-gray-400 z-10 fixed bottom-0 left-0 right-0"
+          className="flex flex-col md:flex-row md:items-center md:justify-between lg:px-40 xl:px-80 px-2 text-gray-400 z-10 fixed bottom-0 left-0 right-0 md:py-6 py-2"
           style={{ background: '#2d2d2d' }}
         >
-          <div className="flex gap-4 text-gray-400">
+          <div className="flex gap-4 flex-wrap text-gray-400">
             <span>{t('copy_right', { year: getYear(new Date()) })}</span>
             <a href="https://www.subscan.io/privacy" className="text-gray-400 hover:text-gray-100">
               {t('privacy_policy')}
@@ -175,7 +177,7 @@ function App() {
             </a>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center md:mt-0 mt-2 gap-4">
             <Dropdown
               arrow
               placement="topCenter"

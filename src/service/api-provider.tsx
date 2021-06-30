@@ -20,7 +20,7 @@ interface Token {
   decimal: string;
 }
 
-interface Chain {
+export interface Chain {
   tokens: Token[];
   ss58Format: string;
 }

@@ -4,17 +4,31 @@ import { PartialQueueTxExtrinsic } from '@polkadot/react-components/Status/types
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import { Call } from '@polkadot/types/interfaces';
 import { AnyJson } from '@polkadot/types/types';
-import { KeyringAddress } from '@polkadot/ui-keyring/types';
-import { Button, Descriptions, Form, Modal, Select, Space, Spin, Table, Typography } from 'antd';
+import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
+import {
+  Button,
+  Collapse,
+  Descriptions,
+  Empty,
+  Form,
+  Modal,
+  Progress,
+  Select,
+  Space,
+  Spin,
+  Table,
+  Typography,
+} from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { intersection } from 'lodash';
 import { useCallback, useContext, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useApi, useFee, useIsInjected, useMultiApprove, useMultisig, useUnapprovedAccounts } from '../hooks';
 import { AddressPair } from '../model';
 import { extractExternal, txDoc, txMethod, txMethodDescription } from '../utils';
 import { ArgObj, Args } from './Args';
 import { Fee } from './Fee';
+import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
 export interface Entry {
   when: When;
@@ -50,7 +64,32 @@ interface Operation {
 }
 
 const { Title, Text } = Typography;
+const { Panel } = Collapse;
 const DEFAULT_OPERATION: Operation = { entry: null, type: 'pending', accounts: [] };
+
+const renderMethod = (data: Call | undefined) => {
+  const call = data?.toHuman();
+
+  if (call) {
+    return call.section + '(' + call.method + ')';
+  } else {
+    return '-';
+  }
+};
+
+const renderMemberStatus = (entry: Entry, pair: KeyringJson) => {
+  const { address } = pair;
+  const { approvals, when } = entry;
+  const approved = approvals.includes(address);
+
+  return approved ? (
+    <SubscanLink extrinsic={when}>
+      <Trans>status.approved</Trans>
+    </SubscanLink>
+  ) : (
+    <Trans>status.pending</Trans>
+  );
+};
 
 export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = true }: EntriesProps) {
   const { t } = useTranslation();
@@ -117,6 +156,52 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
     [accounts, api, getApproveTx, getUnapprovedInjectedList, multisigAccount, queueExtrinsic]
   );
 
+  const renderAction = useCallback(
+    // eslint-disable-next-line complexity
+    (row: Entry) => {
+      if (row.status) {
+        return <span>{t(`status.${row.status}`)}</span>;
+      }
+
+      const actions: ActionType[] = [];
+      // eslint-disable-next-line react/prop-types
+      const pairs = (account.meta?.addressPair ?? []) as AddressPair[];
+      const injectedAccounts: string[] = pairs.filter((pair) => isInjected(pair.address)).map((pair) => pair.address);
+
+      if (injectedAccounts.includes(row.depositor)) {
+        actions.push('cancel');
+      }
+
+      const localAccountInMultisigPairList = intersection(
+        injectedAccounts,
+        pairs.map((pair) => pair.address)
+      );
+      const approvedLocalAccounts = intersection(localAccountInMultisigPairList, row.approvals);
+
+      if (approvedLocalAccounts.length !== localAccountInMultisigPairList.length) {
+        actions.push('approve');
+      }
+
+      if (actions.length === 0) {
+        // eslint-disable-next-line react/prop-types
+        if (row.approvals && row.approvals.length === account.meta.threshold) {
+          actions.push('pending');
+        }
+      }
+
+      return (
+        <Space>
+          {actions.map((action) => (
+            <Button key={action} onClick={() => handleAction(action, row)}>
+              {t(action)}
+            </Button>
+          ))}
+        </Space>
+      );
+    },
+    [account.meta?.addressPair, account.meta.threshold, handleAction, isInjected, t]
+  );
+
   const columns: ColumnsType<Entry> = [
     {
       title: t(!isConfirmed ? 'call_hash' : 'block_hash'),
@@ -130,15 +215,7 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
       title: t('action'),
       dataIndex: 'callData',
       align: 'center',
-      render(data) {
-        const call = data?.toHuman();
-
-        if (call) {
-          return call.section + '(' + call.method + ')';
-        } else {
-          return '-';
-        }
-      },
+      render: renderMethod,
     },
     {
       title: t('progress'),
@@ -154,48 +231,7 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
       title: t('status.index'),
       key: 'status',
       align: 'center',
-      // eslint-disable-next-line complexity
-      render(_, row) {
-        if (row.status) {
-          return <span>{t(`status.${row.status}`)}</span>;
-        }
-
-        const actions: ActionType[] = [];
-        // eslint-disable-next-line react/prop-types
-        const pairs = (account.meta?.addressPair ?? []) as AddressPair[];
-        const injectedAccounts: string[] = pairs.filter((pair) => isInjected(pair.address)).map((pair) => pair.address);
-
-        if (injectedAccounts.includes(row.depositor)) {
-          actions.push('cancel');
-        }
-
-        const localAccountInMultisigPairList = intersection(
-          injectedAccounts,
-          pairs.map((pair) => pair.address)
-        );
-        const approvedLocalAccounts = intersection(localAccountInMultisigPairList, row.approvals);
-
-        if (approvedLocalAccounts.length !== localAccountInMultisigPairList.length) {
-          actions.push('approve');
-        }
-
-        if (actions.length === 0) {
-          // eslint-disable-next-line react/prop-types
-          if (row.approvals && row.approvals.length === account.meta.threshold) {
-            actions.push('pending');
-          }
-        }
-
-        return (
-          <Space>
-            {actions.map((action) => (
-              <Button key={action} onClick={() => handleAction(action, row)}>
-                {t(action)}
-              </Button>
-            ))}
-          </Space>
-        );
-      },
+      render: (_, row) => renderAction(row),
     },
   ];
   const expandedRowRender = (entry: Entry) => {
@@ -213,17 +249,7 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
       },
       {
         key: 'status',
-        render: (_, pair) => {
-          const { address } = pair;
-          const { approvals, when } = entry;
-          const approved = approvals.includes(address);
-
-          return approved ? (
-            <SubscanLink extrinsic={when}>{t('status.approved')}</SubscanLink>
-          ) : (
-            <span>{t('status.pending')}</span>
-          );
-        },
+        render: (_, pair) => renderMemberStatus(entry, pair),
       },
     ];
     const callDataJson = entry.callData?.toJSON() ?? {};
@@ -260,7 +286,42 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
         rowKey="callHash"
         pagination={false}
         expandable={{ expandedRowRender, defaultExpandAllRows: true }}
+        className="lg:block hidden"
       ></Table>
+
+      <Space direction="vertical" className="lg:hidden block">
+        {source.map((data) => {
+          const { address, callHash, callData, approvals } = data;
+          const approvedCount = approvals.length || 0;
+          const threshold = (account.meta.threshold as number) || 1;
+
+          return (
+            <Collapse key={address} expandIcon={() => <></>} className="wallet-collapse">
+              <Panel
+                header={
+                  <Space direction="vertical" className="w-full mb-4">
+                    <Typography.Text className="mr-4" copyable>
+                      {callHash}
+                    </Typography.Text>
+
+                    <Typography.Text>{renderMethod(callData)}</Typography.Text>
+
+                    {/* eslint-disable-next-line no-magic-numbers */}
+                    <Progress percent={parseInt(String((approvedCount / threshold) * 100), 10)} steps={threshold} />
+                  </Space>
+                }
+                key={address}
+                extra={renderAction(data)}
+                className="overflow-hidden mb-4"
+              >
+                <MemberList data={account} statusRender={(pair) => renderMemberStatus(data, pair)} />
+              </Panel>
+            </Collapse>
+          );
+        })}
+
+        {!source.length && <Empty />}
+      </Space>
 
       {/* By default we use polkadot approve workflow only, components below would not display */}
       {!isOnlyPolkadotModal && (

@@ -1,6 +1,6 @@
 import { ArrowDownOutlined, ArrowUpOutlined, DeleteOutlined } from '@ant-design/icons';
 import keyring from '@polkadot/ui-keyring';
-import { Button, message, Modal, Popconfirm, Space, Typography } from 'antd';
+import { Button, message, Modal, Popconfirm, Space, Statistic, Typography } from 'antd';
 import { useQuery } from 'graphql-hooks';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,7 @@ import { SubscanLink } from './SubscanLink';
 
 const { Text } = Typography;
 
+// eslint-disable-next-line complexity
 export function WalletState() {
   const { t } = useTranslation();
   const history = useHistory();
@@ -84,8 +85,8 @@ export function WalletState() {
 
   return (
     <Space direction="vertical" className="w-full">
-      <Space className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col md:flex-row items-start md:items-center md:justify-between">
+        <div className="flex flex-col md:flex-row md:items-center gap-4 md:w-auto w-full">
           <Text
             editable={{
               onChange(name) {
@@ -94,6 +95,7 @@ export function WalletState() {
                 }
               },
             }}
+            className="whitespace-nowrap"
           >
             {multisigAccount?.meta.name}
           </Text>
@@ -106,6 +108,7 @@ export function WalletState() {
               visible={isDeleting}
               onCancel={() => setIsDeleting(false)}
               onConfirm={deleteWallet}
+              className="sm:static absolute right-4"
             >
               <DeleteOutlined
                 onClick={() => setIsDeleting(true)}
@@ -116,12 +119,17 @@ export function WalletState() {
           )}
         </div>
 
-        <Button onClick={() => setIsExtrinsicDisplay(true)} type="primary" size="large">
+        <Button
+          onClick={() => setIsExtrinsicDisplay(true)}
+          type="primary"
+          size="large"
+          className="w-full md:w-auto mt-4 md:mt-0"
+        >
           {t('submit_extrinsic')}
         </Button>
-      </Space>
+      </div>
 
-      <Space size="middle" className="items-center">
+      <Space size="middle" className="items-center hidden md:flex">
         {states.map((state, index) => (
           <Space key={index}>
             <b>{t(state.label)}</b>
@@ -141,6 +149,16 @@ export function WalletState() {
           className="flex justify-center items-center"
         ></Button>
       </Space>
+
+      <div className="grid md:hidden grid-cols-2">
+        {states.map((state, index) => (
+          <Statistic title={t(state.label)} value={state.count} key={index} className="text-center" />
+        ))}
+
+        <Button type="ghost" className="col-span-2" onClick={() => setIsAccountsDisplay(!isAccountsDisplay)}>
+          {t(isAccountsDisplay ? 'wallet:Hide members' : 'wallet:Show members')}
+        </Button>
+      </div>
 
       {isAccountsDisplay && multisigAccount && <Members record={multisigAccount} />}
 

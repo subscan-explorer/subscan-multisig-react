@@ -1,19 +1,14 @@
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
-import { Button, Space, Table } from 'antd';
+import { List, Space, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useApi } from '../hooks';
-import { convertToSS58 } from '../utils';
+import { useIsInjected } from '../hooks';
+import { SubscanLink } from './SubscanLink';
 
 export const Members = ({ record }: { record: KeyringAddress }) => {
   const { t } = useTranslation();
-  const { accounts: extensionAccounts, networkConfig, network } = useApi();
-  const isExtensionAccount = useCallback(
-    (address) => extensionAccounts?.find((acc) => convertToSS58(acc.address, networkConfig.ss58Prefix) === address),
-    [extensionAccounts, networkConfig]
-  );
+  const isExtensionAccount = useIsInjected();
   const columnsNested: ColumnsType<KeyringJson> = [
     { dataIndex: 'name' },
     {
@@ -21,12 +16,7 @@ export const Members = ({ record }: { record: KeyringAddress }) => {
       render: (address) => (
         <Space size="middle">
           <BaseIdentityIcon theme="polkadot" size={32} value={address} />
-          <Button
-            type="link"
-            onClick={() => window?.open(`https://${network}.subscan.io/account/${address}`, '__blank')}
-          >
-            {address}
-          </Button>
+          <SubscanLink address={address} />
         </Space>
       ),
     },
@@ -37,12 +27,55 @@ export const Members = ({ record }: { record: KeyringAddress }) => {
   ];
 
   return (
-    <Table
-      columns={columnsNested}
-      dataSource={record.meta.addressPair as KeyringJson[]}
-      pagination={false}
-      bordered
-      className="mb-8 mr-12"
-    />
+    <>
+      <Table
+        columns={columnsNested}
+        dataSource={record.meta.addressPair as KeyringJson[]}
+        pagination={false}
+        bordered
+        className="table-without-head hidden lg:block"
+      />
+
+      <MemberList data={record} />
+    </>
   );
 };
+
+interface MemberListProps {
+  data: KeyringJson;
+  statusRender?: (pair: KeyringJson) => React.ReactNode;
+}
+
+export function MemberList({ data, statusRender }: MemberListProps) {
+  const { t } = useTranslation();
+  const isExtensionAccount = useIsInjected();
+
+  return (
+    <List
+      itemLayout="horizontal"
+      className="lg:hidden block"
+      dataSource={data.meta.addressPair as KeyringJson[]}
+      renderItem={(item) => (
+        <List.Item>
+          <List.Item.Meta
+            avatar={<BaseIdentityIcon theme="polkadot" size={24} value={item.address} />}
+            title={
+              <Space>
+                {/* eslint-disable-next-line  @typescript-eslint/no-explicit-any */}
+                <Typography.Text>{(item as any).name}</Typography.Text>
+                <Typography.Text>
+                  {statusRender ? statusRender(item) : t(isExtensionAccount(item.address) ? 'injected' : 'external')}
+                </Typography.Text>
+              </Space>
+            }
+            description={
+              <Typography.Text copyable className="w-full">
+                {item.address}
+              </Typography.Text>
+            }
+          />
+        </List.Item>
+      )}
+    />
+  );
+}
