@@ -268,6 +268,7 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
           dataSource={account.meta.addressPair as { key: string; name: string; address: string }[]}
           pagination={false}
           bordered
+          rowKey="address"
           showHeader={false}
           className="mb-4 mx-4"
         />
@@ -283,7 +284,7 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
       <Table
         dataSource={source}
         columns={columns}
-        rowKey="callHash"
+        rowKey={(record) => record.callHash ?? (record.blockHash as string)}
         pagination={false}
         expandable={{ expandedRowRender, defaultExpandAllRows: true }}
         className="lg:block hidden"
