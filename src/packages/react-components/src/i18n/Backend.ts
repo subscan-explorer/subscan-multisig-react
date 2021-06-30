@@ -33,7 +33,7 @@ export default class Backend {
 
   async createLoader(lng: string): Promise<LoadResult> {
     try {
-      const response = await fetch(`locales/${lng}/translation.json`, {});
+      const response = await fetch(`/locales/${lng}/translation.json`, {});
 
       if (!response.ok) {
         return [`i18n: failed loading ${lng}`, response.status >= 500 && response.status < 600];

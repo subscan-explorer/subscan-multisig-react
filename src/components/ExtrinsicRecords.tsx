@@ -3,12 +3,14 @@ import { AnyJson } from '@polkadot/types/types';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { Space, Spin, Tabs } from 'antd';
 import { useQuery } from 'graphql-hooks';
+import { isNumber } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { TRANSFERS_COUNT_QUERY, TRANSFERS_QUERY } from '../config';
 import { useApi } from '../hooks';
 import { useMultisig } from '../hooks/multisig';
+import { IExtrinsic, parseArgs } from '../utils';
 import { Entries, Entry } from './Entries';
 
 interface TransfersQueryRes {
@@ -23,14 +25,7 @@ interface Transfer {
   block: {
     id: string;
     extrinsics: {
-      nodes: {
-        id: string;
-        method: string;
-        section: string;
-        args: string;
-        signerId: string;
-        isSuccess: boolean;
-      }[];
+      nodes: IExtrinsic[];
     };
   };
 }
@@ -123,8 +118,8 @@ function Confirmed({ account, multiAddress }: ConfirmedProps) {
       } = node;
 
       const target = exNodes.find((item) => item.section === 'multisig');
-      const { args, signerId, isSuccess } = target ?? {};
-      const multisigArgs = JSON.parse(args ?? '');
+      const { signerId, isSuccess } = target ?? {};
+      const multisigArgs = parseArgs(api, target);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const callHash = multisigArgs.find((item: any) => item.name === 'call')?.value;
       const callData = api?.registry.createType('Call', callHash) as unknown as Call;
@@ -140,12 +135,12 @@ function Confirmed({ account, multiAddress }: ConfirmedProps) {
         address: fromId,
         approvals: [
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...multisigArgs.find((item: any) => item.name === 'other_signatories').value.slice(1), // 第1个是多签账号
+          ...multisigArgs.find((item: any) => item.name === 'other_signatories')?.value.slice(1), // 第1个是多签账号
           signerId,
         ],
         status: isSuccess ? 'executed' : 'pending',
         created_at: timestamp,
-        when: { height: +height.replace(',', ''), index: +index },
+        when: { height: isNumber(height) ? height : +height.replace(',', ''), index: +index },
         depositor: '',
       } as Entry;
     });
