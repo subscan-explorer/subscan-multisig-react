@@ -5,7 +5,7 @@ import { useApi as usePolkaApi } from '@polkadot/react-hooks';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import { BlockAuthors, Events } from '@polkadot/react-query';
 import Signer from '@polkadot/react-signer';
-import { Button, Dropdown, Layout, Menu } from 'antd';
+import { Button, Dropdown, Layout, Menu, Typography } from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
 import { getYear } from 'date-fns';
 import React, { useEffect, useMemo } from 'react';
@@ -90,7 +90,7 @@ function App() {
 
             <Dropdown
               overlay={
-                <Menu>
+                <Menu className="truncate" style={{ maxWidth: '80vw' }}>
                   {accounts?.map((item) => (
                     <Menu.Item key={item.address} className="header-account-list">
                       <BaseIdentityIcon
@@ -101,13 +101,18 @@ function App() {
                       />
                       <div className="flex flex-col leading-5">
                         <b>{item.meta?.name}</b>
-                        <span className="opacity-60">{item.address}</span>
+                        <span className="hidden md:inline opacity-60">{item.address}</span>
+                        <Typography.Text className="inline md:hidden opacity-60" copyable>
+                          {/* eslint-disable-next-line no-magic-numbers */}
+                          {item.address.slice(0, 20) + '...'}
+                        </Typography.Text>
                       </div>
                     </Menu.Item>
                   ))}
                 </Menu>
               }
               placement="bottomCenter"
+              arrow
             >
               <a onClick={(e) => e.preventDefault()} className="text-white leading-normal whitespace-nowrap">
                 {t('accounts')} <DownOutlined />
