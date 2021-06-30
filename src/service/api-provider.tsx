@@ -183,7 +183,6 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
 
         patchUrl({ network: state.network });
       } catch (error) {
-        console.info('🚀 ~ file: api-provider.tsx ~ line 169 ~ error', error);
         setNetworkStatus('fail');
       }
     })();
