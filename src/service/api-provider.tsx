@@ -111,7 +111,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
    */
   useEffect(() => {
     /**
-     * just from refresh purpose;
+     * just for refresh purpose;
      */
     if (random) {
       console.info(
@@ -187,6 +187,12 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
       }
     })();
   }, [random, state.network]);
+
+  useEffect(() => {
+    if (state.networkStatus === 'disconnected') {
+      setRandom(Math.random());
+    }
+  }, [state.networkStatus]);
 
   return (
     <ApiContext.Provider

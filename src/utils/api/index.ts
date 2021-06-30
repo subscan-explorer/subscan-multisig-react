@@ -12,7 +12,7 @@ export interface Connection {
   networkStatus: ConnectStatus;
 }
 
-export type ConnectStatus = 'pending' | 'connecting' | 'success' | 'fail';
+export type ConnectStatus = 'pending' | 'connecting' | 'success' | 'fail' | 'disconnected';
 
 export type TokenBalance = [string, string];
 

@@ -232,7 +232,7 @@ function Api({ children, store }: Props): React.ReactElement<Props> | null {
 
     iApi.setSigner(signer);
 
-    iApi.on('disconnected', () => setNetworkStatus('pending'));
+    iApi.on('disconnected', () => setNetworkStatus('disconnected'));
     iApi.on('error', (error: Error) => setApiError(error.message));
 
     loadOnReady(iApi, Promise.resolve(extensions || []), store, types)
