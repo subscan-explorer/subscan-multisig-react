@@ -22,7 +22,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.6.2",
     "@craco/craco": "^6.1.2",
-    "@darwinia/types": "^1.1.0-alpha.21",
+    "@darwinia/types": "^1.1.0-alpha.23",
     "@fontsource/ibm-plex-sans": "^4.2.2",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
