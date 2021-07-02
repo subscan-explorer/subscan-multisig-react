@@ -51,7 +51,7 @@ export function WalletForm() {
   const options = useMemo<{ label: string; value: string }[]>(
     () =>
       accounts
-        ?.map(({ address }) => ({ label: address, value: address }))
+        ?.map(({ address, meta }) => ({ label: meta?.name ? `${meta?.name} - ${address}` : address, value: address }))
         .filter(({ value }) => !selectedAccounts.includes(value)) || [],
     [accounts, selectedAccounts]
   );
