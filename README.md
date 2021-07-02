@@ -32,7 +32,7 @@ This is a React-rewrite of previous Vue [implementation](https://github.com/iter
 
 ## Tutorial
 
-### Presquises
+### Prerequisites
 
 #### 1.Install chrome extension polkadot.js
 
