@@ -179,7 +179,7 @@ export function ExtrinsicRecords() {
         tab={
           <Space>
             <span>{t('multisig.Confirmed Extrinsic')}</span>
-            <span>{data?.transfers.totalCount}</span>
+            <span>{data?.transfers.totalCount ?? 0}</span>
           </Space>
         }
         key="confirmed"
