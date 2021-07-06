@@ -12,6 +12,9 @@ export interface Connection {
   networkStatus: ConnectStatus;
 }
 
+/**
+ * pending: initial state, indicate that the connection never launched.
+ */
 export type ConnectStatus = 'pending' | 'connecting' | 'success' | 'fail' | 'disconnected';
 
 export type TokenBalance = [string, string];

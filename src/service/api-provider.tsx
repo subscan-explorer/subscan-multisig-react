@@ -9,11 +9,12 @@ import React, { createContext, Dispatch, useCallback, useEffect, useReducer, use
 import { LONG_DURATION, NETWORK_CONFIG } from '../config';
 import { Action, IAccountMeta, NetConfig, NetworkType } from '../model';
 import { ConnectStatus, connectSubstrate, convertToSS58, getInfoFromHash, patchUrl } from '../utils';
+import { readStorage, updateStorage } from '../utils/helper/storage';
 
 interface StoreState {
   accounts: IAccountMeta[] | null;
   network: NetworkType;
-  networkStatus: ConnectStatus; // FIXME unused now;
+  networkStatus: ConnectStatus;
 }
 
 interface Token {
@@ -28,7 +29,17 @@ export interface Chain {
 
 type ActionType = 'switchNetwork' | 'updateNetworkStatus' | 'setAccounts';
 
-const info = getInfoFromHash();
+const getInitialNetwork = (): NetworkType => {
+  const fromHash = getInfoFromHash();
+  const fromStorage = readStorage();
+
+  return fromHash.network ?? fromStorage.network ?? 'pangolin';
+};
+
+const cacheNetwork = (network: NetworkType): void => {
+  patchUrl({ network });
+  updateStorage({ network });
+};
 
 const isKeyringLoaded = () => {
   try {
@@ -39,7 +50,7 @@ const isKeyringLoaded = () => {
 };
 
 const initialState: StoreState = {
-  network: info.network || 'pangolin',
+  network: getInitialNetwork(),
   accounts: null,
   networkStatus: 'pending',
 };
@@ -121,6 +132,10 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
       );
     }
 
+    if (state.networkStatus === 'connecting') {
+      return;
+    }
+
     // eslint-disable-next-line complexity
     (async () => {
       setNetworkStatus('connecting');
@@ -181,7 +196,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
           );
         }
 
-        patchUrl({ network: state.network });
+        cacheNetwork(state.network);
       } catch (error) {
         setNetworkStatus('fail');
       }
