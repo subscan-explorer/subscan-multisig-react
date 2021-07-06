@@ -36,7 +36,7 @@ export function WalletState() {
         label: 'multisig.In Progress',
         count: inProgressCount,
       },
-      { label: 'multisig.Confirmed Extrinsic', count: data?.transfers.totalCount },
+      { label: 'multisig.Confirmed Extrinsic', count: data?.transfers.totalCount ?? 0 },
       {
         label: 'multisig.Threshold',
         count: multisigAccount?.meta.threshold as number,
