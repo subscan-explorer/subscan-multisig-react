@@ -69,9 +69,9 @@ function App() {
   return (
     <>
       <GlobalStyle uiHighlight={uiHighlight} />
-      <Layout style={{ height: 'calc(100vh - 78px)' }} className="overflow-y-scroll overflow-x-hidden theme-light">
+      <Layout style={{ height: 'calc(100vh - 78px)' }} className="overflow-x-hidden theme-light">
         <Header
-          className="fixed left-0 right-0 top-0 z-10 flex sm:items-center flex-col sm:flex-row justify-around sm:justify-between lg:px-40 xl:px-80 px-4 h-24 sm:h-20"
+          className="fixed left-0 right-0 top-0 z-10 flex sm:items-center flex-col sm:flex-row justify-around sm:justify-between xl:px-40 2xl:px-80 px-4 h-24 sm:h-20"
           style={{ marginTop: -1, background: THEME_CONFIG[network]['@layout-header-background'] }}
         >
           <span className="flex items-center gap-4 justify-between">
@@ -144,7 +144,7 @@ function App() {
           </div>
         </Header>
 
-        <Content className="xl:px-40 2xl:px-80 sm:py-8 p-2 py-1 mt-24 sm:mt-20 min-w-">
+        <Content className="xl:px-40 2xl:px-80 sm:py-8 py-1 px-4 mt-24 sm:mt-20">
           {networkStatus === 'connecting' ? (
             <Connecting />
           ) : (
