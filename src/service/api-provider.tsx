@@ -3,10 +3,9 @@ import { ApiPromise } from '@polkadot/api';
 import type { InjectedExtension } from '@polkadot/extension-inject/types';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringJson } from '@polkadot/ui-keyring/types';
-import { notification } from 'antd';
 import { isObject } from 'lodash';
 import React, { createContext, Dispatch, useCallback, useEffect, useReducer, useState } from 'react';
-import { LONG_DURATION, NETWORK_CONFIG } from '../config';
+import { NETWORK_CONFIG } from '../config';
 import { Action, IAccountMeta, NetConfig, NetworkType } from '../model';
 import { ConnectStatus, connectSubstrate, convertToSS58, getInfoFromHash, patchUrl } from '../utils';
 
@@ -95,16 +94,6 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
   const [chain, setChain] = useState<Chain>({ ss58Format: '', tokens: [] });
   const [random, setRandom] = useState<number>(0);
   const [extensions, setExtensions] = useState<InjectedExtension[] | undefined>(undefined);
-
-  useEffect(() => {
-    if (typeof window.ethereum === 'undefined') {
-      notification.warn({
-        message: 'MetaMask Undetected',
-        description: 'Please install MetaMask first! Otherwise, some functions will not work properly.',
-        duration: LONG_DURATION,
-      });
-    }
-  }, []);
 
   /**
    * connect to substrate or metamask when account type changed.
