@@ -1,5 +1,5 @@
 {
-  "name": "frontend-boilplate",
+  "name": "multisig",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,6 +11,7 @@
     "stylelint": "stylelint \"src/**/*.scss\" --config stylelint.config.js",
     "i18next:scanner": "i18next-scanner --config i18next-scanner.config.js",
     "lint": "eslint ./src -c .eslintrc.js --fix",
+    "changelog": "conventional-changelog -p eslint -i CHANGELOG.md -s",
     "format": "prettier ./src/**/*.tsx  --write"
   },
   "husky": {
@@ -136,5 +137,16 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "keywords": [
+    "multisig",
+    "multi-sign",
+    "substrate-multisig",
+    "substrate multisig",
+    "subscan multisig",
+    "subscan-multisig"
+  ],
+  "repository": {
+    "url": "https://github.com/itering/subscan-multisig-react"
   }
 }
