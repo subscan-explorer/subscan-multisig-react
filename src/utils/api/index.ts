@@ -6,31 +6,18 @@ import registry from '@polkadot/react-api/typeRegistry';
 import { NETWORK_CONFIG } from '../../config';
 import { NetworkType } from '../../model';
 
-export interface Connection {
-  accounts: ExtType.InjectedAccountWithMeta[];
-  api: ApiPromise;
-  networkStatus: ConnectStatus;
-}
-
-/**
- * pending: initial state, indicate that the connection never launched.
- */
-export type ConnectStatus = 'pending' | 'connecting' | 'success' | 'fail' | 'disconnected';
-
-export type TokenBalance = [string, string];
-
 export async function connectNodeProvider(type: NetworkType = 'darwinia'): Promise<ApiPromise> {
   const provider = new WsProvider(NETWORK_CONFIG[type].rpc);
-  const darwiniaApi = await ApiPromise.create({
+  const api = await ApiPromise.create({
     provider,
     typesBundle,
     typesChain,
     registry,
   });
 
-  await darwiniaApi.isReady;
+  await api.isReady;
 
-  return darwiniaApi;
+  return api;
 }
 
 interface SubstrateInfo {
@@ -49,24 +36,5 @@ export async function connectSubstrate(network: NetworkType, enable = 'polkadot-
   } catch (err) {
     // do nothing;
     return { accounts: null, extensions: null, api: null };
-  }
-}
-
-export function isMetamaskInstalled(): boolean {
-  return typeof window.ethereum !== 'undefined' || typeof window.web3 !== 'undefined';
-}
-
-export async function getTokenBalanceDarwinia(api: ApiPromise, account = ''): Promise<TokenBalance> {
-  try {
-    await api?.isReady;
-    // type = 0 query ring balance.  type = 1 query kton balance.
-    /* eslint-disable */
-    const ringUsableBalance = await (api?.rpc as any).balances.usableBalance(0, account);
-    const ktonUsableBalance = await (api?.rpc as any).balances.usableBalance(1, account);
-    /* eslint-enable */
-
-    return [ringUsableBalance.usableBalance.toString(), ktonUsableBalance.usableBalance.toString()];
-  } catch (error) {
-    return ['0', '0'];
   }
 }

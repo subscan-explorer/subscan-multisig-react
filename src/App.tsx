@@ -21,9 +21,13 @@ import { NetworkConfig, NetworkType } from './model';
 import { Connecting } from './pages/Connecting';
 import crabThemeJson from './theme/crab.json';
 import darwiniaThemeJson from './theme/darwinia.json';
+import kusamaThemeJson from './theme/kusama.json';
 import pangolinThemeJson from './theme/pangolin.json';
+import polkadotThemeJson from './theme/polkadot.json';
 
 const THEME_CONFIG: NetworkConfig<{ [key in keyof typeof darwiniaThemeJson]: string }> = {
+  polkadot: polkadotThemeJson,
+  kusama: kusamaThemeJson,
   darwinia: darwiniaThemeJson,
   crab: crabThemeJson,
   pangolin: pangolinThemeJson,

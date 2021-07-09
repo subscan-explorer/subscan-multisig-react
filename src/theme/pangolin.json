@@ -1,10 +1,10 @@
 {
+  "@btn-border-radius-base": "@dvm-radius-base",
+  "@btn-default-bg": "#fff",
+  "@btn-default-border": "@dvm-main-bg",
+  "@btn-primary-bg": "@dvm-main-bg",
+  "@card-radius": "@dvm-radius-base",
   "@dvm-main-bg": "#5745de",
   "@dvm-radius-base": "12px",
-  "@btn-border-radius-base": "@dvm-radius-base",
-  "@btn-primary-bg": "@dvm-main-bg",
-  "@btn-default-border": "@dvm-main-bg",
-  "@btn-default-bg": "#fff",
-  "@layout-header-background": "#5745de",
-  "@card-radius": "@dvm-radius-base"
+  "@layout-header-background": "#5745de"
 }

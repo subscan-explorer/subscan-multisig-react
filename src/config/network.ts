@@ -7,6 +7,54 @@ export enum Network {
 }
 
 export const NETWORK_CONFIG: NetworkConfig = {
+  polkadot: {
+    facade: {
+      bgClsName: '',
+      color: { main: '#e6007a' },
+      logo: '/image/polkadot-button-mobile.png',
+      logoWithText: '/image/polkadot-button.png',
+    },
+    fullName: 'Polkadot',
+    ss58Prefix: 0,
+    dvmWithdrawAddress: { ring: '', kton: '' },
+    token: { ring: 'DOT', kton: 'KTON' },
+    erc20: {
+      ring: '',
+      kton: '',
+    },
+    rpc: 'wss://polkadot.api.onfinality.io/public-ws',
+    api: {
+      subql: '',
+    },
+    donate: {
+      address: '14RYaXRSqb9rPqMaAVp1UZW2czQ6dMNGMbvukwfifi6m8ZgZ',
+    },
+  },
+  kusama: {
+    facade: {
+      bgClsName: '',
+      color: { main: '#000000' },
+      logo: '/image/kusama-button-mobile.png',
+      logoWithText: '/image/kusama-button.png',
+    },
+    fullName: 'Kusama',
+    ss58Prefix: 2,
+    dvmWithdrawAddress: { ring: '', kton: '' },
+    token: { ring: 'KSM', kton: 'KTON' },
+    erc20: {
+      ring: '',
+      kton: '',
+    },
+    // rpc: 'wss://kusama.api.onfinality.io/public-ws',
+    rpc: 'wss://kusama.elara.patract.io',
+    // rpc: 'wss://kusama-rpc.polkadot.io',
+    api: {
+      subql: '',
+    },
+    donate: {
+      address: 'Fzs6WWFcAuJhxAVyZa4EN2suxggjidJjV3AzJxKbRHjh2Jc',
+    },
+  },
   darwinia: {
     // TODO
     facade: {
