@@ -2,18 +2,14 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { typesBundle, typesChain } from '@polkadot/apps-config';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 import type { InjectedExtension } from '@polkadot/extension-inject/types';
-import registry from '@polkadot/react-api/typeRegistry';
-import keyring from '@polkadot/ui-keyring';
-import { KeyringJson } from '@polkadot/ui-keyring/types';
-import { isObject } from 'lodash';
 import React, { createContext, Dispatch, useCallback, useEffect, useReducer, useState } from 'react';
 import { NETWORK_CONFIG } from '../config';
-import { Action, ConnectStatus, IAccountMeta, NetConfig, NetworkType } from '../model';
+import { Action, ConnectStatus, InjectedAccountWithMeta, NetConfig, NetworkType } from '../model';
 import { convertToSS58, getInfoFromHash, patchUrl } from '../utils';
 import { readStorage, updateStorage } from '../utils/helper/storage';
 
 interface StoreState {
-  accounts: IAccountMeta[] | null;
+  accounts: InjectedAccountWithMeta[] | null;
   network: NetworkType;
   networkStatus: ConnectStatus;
 }
@@ -40,14 +36,6 @@ const getInitialNetwork = (): NetworkType => {
 const cacheNetwork = (network: NetworkType): void => {
   patchUrl({ network });
   updateStorage({ network });
-};
-
-const isKeyringLoaded = () => {
-  try {
-    return !!keyring.keyring;
-  } catch {
-    return false;
-  }
 };
 
 const initialState: StoreState = {
@@ -77,12 +65,12 @@ function accountReducer(state: StoreState, action: Action<ActionType, any>): Sto
 }
 
 export type ApiCtx = {
-  accounts: IAccountMeta[] | null;
+  accounts: InjectedAccountWithMeta[] | null;
   api: ApiPromise | null;
   dispatch: Dispatch<Action<ActionType>>;
   network: NetworkType;
   networkStatus: ConnectStatus;
-  setAccounts: (accounts: IAccountMeta[]) => void;
+  setAccounts: (accounts: InjectedAccountWithMeta[]) => void;
   setNetworkStatus: (status: ConnectStatus) => void;
   switchNetwork: (type: NetworkType) => void;
   setApi: (api: ApiPromise) => void;
@@ -97,7 +85,10 @@ export const ApiContext = createContext<ApiCtx | null>(null);
 export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
   const [state, dispatch] = useReducer(accountReducer, initialState);
   const switchNetwork = useCallback((payload: NetworkType) => dispatch({ type: 'switchNetwork', payload }), []);
-  const setAccounts = useCallback((payload: IAccountMeta[]) => dispatch({ type: 'setAccounts', payload }), []);
+  const setAccounts = useCallback(
+    (payload: InjectedAccountWithMeta[]) => dispatch({ type: 'setAccounts', payload }),
+    []
+  );
   const setNetworkStatus = useCallback(
     (payload: ConnectStatus) => dispatch({ type: 'updateNetworkStatus', payload }),
     []
@@ -118,20 +109,20 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
         random
       );
     }
+
     const url = NETWORK_CONFIG[state.network].rpc;
     const provider = new WsProvider(url);
     const nApi = new ApiPromise({
       provider,
       typesBundle,
       typesChain,
-      registry,
     });
+
     const onReady = async () => {
       const exts = await web3Enable('polkadot-js/apps');
 
       setExtensions(exts);
       setApi(nApi);
-      setNetworkStatus('success');
       cacheNetwork(state.network);
     };
 
@@ -166,39 +157,12 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
         { ss58Format, tokens: [] } as Chain
       );
 
-      const injectedAccounts = newAccounts?.map(({ address, meta }, whenCreated) => ({
-        address,
-        meta: {
-          ...meta,
-          name: `${meta.name || 'unknown'} (${meta.source === 'polkadot-js' ? 'extension' : meta.source})`,
-          whenCreated,
-        },
-      }));
-
-      if (!isKeyringLoaded()) {
-        keyring.loadAll(
-          {
-            genesisHash: api.genesisHash,
-            ss58Format,
-            filter: (data: KeyringJson) => {
-              if (!isObject(data) || !data.meta) {
-                return false;
-              }
-
-              return !!data.meta.isMultisig;
-            },
-          },
-          injectedAccounts
-        );
-      }
-
       setChain(chainInfo);
-
       setAccounts(
         newAccounts?.map(({ address, ...other }) => ({
           ...other,
           address: convertToSS58(address, ss58Format),
-        })) as IAccountMeta[]
+        }))
       );
     })();
   }, [api, setAccounts, state.networkStatus]);

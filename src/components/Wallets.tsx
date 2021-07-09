@@ -26,17 +26,15 @@ const renderAddress = (address: string) => <Link to={Path.extrinsic + '/' + addr
 
 const renderBalances = (account: KeyringAddress, chain: Chain) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { ring, kton } = account as any;
+  const { value, kton } = account as any;
   const { tokens } = chain;
   return tokens.map(({ decimal, symbol }) => {
     let amount = '';
 
-    if (symbol.toLocaleLowerCase().includes('ring')) {
-      amount = ring;
-    } else if (symbol.toLocaleLowerCase().includes('kton')) {
+    if (symbol.toLocaleLowerCase().includes('kton')) {
       amount = kton;
     } else {
-      amount = '-';
+      amount = value;
     }
 
     return (
@@ -50,7 +48,7 @@ const renderBalances = (account: KeyringAddress, chain: Chain) => {
 export function Wallets() {
   const { t } = useTranslation();
   const history = useHistory();
-  const { networkStatus, api, chain, network } = useApi();
+  const { api, chain, network } = useApi();
   const [multisigAccounts, setMultisigAccounts] = useState<KeyringAddress[]>([]);
   const isExtensionAccount = useIsInjected();
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
@@ -161,34 +159,32 @@ export function Wallets() {
   };
 
   useEffect(() => {
+    setIsCalculating(true);
+
     (async () => {
-      if (networkStatus === 'success') {
-        setIsCalculating(true);
+      const accounts = keyring.getAccounts().filter((account) => account.meta.isMultisig);
+      const balances = await api?.query.system.account.multi(accounts.map(({ address }) => address));
+      const entries = await Promise.all(
+        accounts.map(async ({ address }) => await api?.query.multisig.multisigs.entries(address))
+      );
 
-        const accounts = keyring.getAccounts().filter((account) => account.meta.isMultisig);
-        const balances = await api?.query.system.account.multi(accounts.map(({ address }) => address));
-        const entries = await Promise.all(
-          accounts.map(async ({ address }) => await api?.query.multisig.multisigs.entries(address))
-        );
+      setMultisigAccounts(
+        accounts.map((item, index) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const source = (balances as any)[index] as unknown as any;
 
-        setMultisigAccounts(
-          accounts.map((item, index) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const source = (balances as any)[index] as unknown as any;
-
-            return {
-              ...item,
-              ring: source.data.free.toString(),
-              kton: source.data.freeKton.toString(),
-              entries: entries[index] || [],
-            };
-          })
-        );
-
-        setIsCalculating(false);
-      }
+          return {
+            ...item,
+            value: source.data.free.toString(),
+            kton: source.data.freeKton?.toString() ?? '0',
+            entries: entries[index] || [],
+          };
+        })
+      );
     })();
-  }, [networkStatus, api]);
+
+    setIsCalculating(false);
+  }, [api]);
 
   return (
     <Space direction="vertical" className="w-full" id="wallets">

@@ -8,8 +8,6 @@
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { ApiPromise } from '@polkadot/api/promise';
 import { ethereumChains } from '@polkadot/apps-config';
-import { web3Accounts } from '@polkadot/extension-dapp';
-import type { InjectedExtension } from '@polkadot/extension-inject/types';
 import type { ChainProperties, ChainType } from '@polkadot/types/interfaces';
 import { keyring } from '@polkadot/ui-keyring';
 import type { KeyringStore } from '@polkadot/ui-keyring/types';
@@ -44,7 +42,6 @@ interface InjectedAccountExt {
 }
 
 interface ChainData {
-  injectedAccounts: InjectedAccountExt[];
   properties: ChainProperties;
   systemChain: string;
   systemChainType: ChainType;
@@ -78,42 +75,16 @@ function getDevTypes(): Record<string, Record<string, string>> {
   return types;
 }
 
-async function getInjectedAccounts(injectedPromise: Promise<InjectedExtension[]>): Promise<InjectedAccountExt[]> {
-  try {
-    await injectedPromise;
-
-    const accounts = await web3Accounts();
-
-    return accounts.map(
-      ({ address, meta }, whenCreated): InjectedAccountExt => ({
-        address,
-        meta: {
-          ...meta,
-          name: `${meta.name || 'unknown'} (${meta.source === 'polkadot-js' ? 'extension' : meta.source})`,
-          whenCreated,
-        },
-      })
-    );
-  } catch (error) {
-    console.error('web3Accounts', error);
-
-    return [];
-  }
-}
-
-async function retrieve(api: ApiPromise, injectedPromise: Promise<InjectedExtension[]>): Promise<ChainData> {
-  const [chainProperties, systemChain, systemChainType, systemName, systemVersion, injectedAccounts] =
-    await Promise.all([
-      api.rpc.system.properties(),
-      api.rpc.system.chain(),
-      api.rpc.system.chainType ? api.rpc.system.chainType() : Promise.resolve(registry.createType('ChainType', 'Live')),
-      api.rpc.system.name(),
-      api.rpc.system.version(),
-      getInjectedAccounts(injectedPromise),
-    ]);
+async function retrieve(api: ApiPromise): Promise<ChainData> {
+  const [chainProperties, systemChain, systemChainType, systemName, systemVersion] = await Promise.all([
+    api.rpc.system.properties(),
+    api.rpc.system.chain(),
+    api.rpc.system.chainType ? api.rpc.system.chainType() : Promise.resolve(registry.createType('ChainType', 'Live')),
+    api.rpc.system.name(),
+    api.rpc.system.version(),
+  ]);
 
   return {
-    injectedAccounts,
     properties: registry.createType('ChainProperties', {
       ss58Format: api.consts.system?.ss58Prefix || chainProperties.ss58Format,
       tokenDecimals: chainProperties.tokenDecimals,
@@ -129,15 +100,13 @@ async function retrieve(api: ApiPromise, injectedPromise: Promise<InjectedExtens
 // eslint-disable-next-line complexity
 async function loadOnReady(
   api: ApiPromise,
-  injectedPromise: Promise<InjectedExtension[]>,
+  injectedAccounts: InjectedAccountExt[],
   store: KeyringStore | undefined,
   types: Record<string, Record<string, string>>
 ): Promise<ApiState> {
   registry.register(types);
-  const { injectedAccounts, properties, systemChain, systemChainType, systemName, systemVersion } = await retrieve(
-    api,
-    injectedPromise
-  );
+
+  const { properties, systemChain, systemChainType, systemName, systemVersion } = await retrieve(api);
   const ss58Format = settings.prefix === -1 ? properties.ss58Format.unwrapOr(DEFAULT_SS58).toNumber() : settings.prefix;
   const tokenSymbol = properties.tokenSymbol.unwrapOr([formatBalance.getDefaults().unit, ...DEFAULT_AUX]);
   const tokenDecimals = properties.tokenDecimals.unwrapOr([DEFAULT_DECIMALS]);
@@ -155,8 +124,9 @@ async function loadOnReady(
   TokenUnit.setAbbr(tokenSymbol[0].toString());
 
   // finally load the keyring
-  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-  isKeyringLoaded() ||
+  const isLoaded = isKeyringLoaded();
+
+  if (!isLoaded) {
     keyring.loadAll(
       {
         genesisHash: api.genesisHash,
@@ -167,6 +137,7 @@ async function loadOnReady(
       },
       injectedAccounts
     );
+  }
 
   const defaultSection = Object.keys(api.tx)[0];
   const defaultMethod = Object.keys(api.tx[defaultSection])[0];
@@ -199,6 +170,7 @@ function Api({ children, store }: Props): React.ReactElement<Props> | null {
   const [apiError, setApiError] = useState<null | string>(null);
   const {
     api: iApi,
+    accounts,
     networkConfig: { rpc: url },
     extensions,
     networkStatus,
@@ -219,7 +191,6 @@ function Api({ children, store }: Props): React.ReactElement<Props> | null {
     [state, iApi, apiError, url, extensions, networkStatus]
   );
 
-  // initial initialization
   useEffect((): void => {
     if (!iApi) {
       return;
@@ -235,16 +206,28 @@ function Api({ children, store }: Props): React.ReactElement<Props> | null {
     iApi.on('disconnected', () => setNetworkStatus('disconnected'));
     iApi.on('error', (error: Error) => setApiError(error.message));
 
-    loadOnReady(iApi, Promise.resolve(extensions || []), store, types)
-      .then(setState)
+    const injectedAccounts = (accounts ?? []).map(
+      ({ address, meta }, whenCreated): InjectedAccountExt => ({
+        address,
+        meta: {
+          ...meta,
+          name: `${meta.name || 'unknown'} (${meta.source === 'polkadot-js' ? 'extension' : meta.source})`,
+          whenCreated,
+        },
+      })
+    );
+
+    loadOnReady(iApi, injectedAccounts, store, types)
+      .then((data) => {
+        setState(data);
+        setNetworkStatus('success');
+      })
       .catch((error): void => {
         console.error(error);
 
         setApiError((error as Error).message);
       });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [iApi]);
+  }, [accounts, extensions, iApi, queuePayload, queueSetTxStatus, setNetworkStatus, store]);
 
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
 }

@@ -3,10 +3,10 @@ import { convertToSS58 } from '../utils';
 import { useApi } from './api';
 
 export function useIsInjected() {
-  const { accounts: extensionAccounts, networkConfig } = useApi();
+  const { accounts: extensionAccounts } = useApi();
 
   return useCallback(
-    (address) => extensionAccounts?.find((acc) => convertToSS58(acc.address, networkConfig.ss58Prefix) === address),
-    [extensionAccounts, networkConfig]
+    (address) => extensionAccounts?.find((acc) => convertToSS58(acc.address, 0) === convertToSS58(address, 0)),
+    [extensionAccounts]
   );
 }
