@@ -1,17 +1,15 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { ApiPromise } from '@polkadot/api';
+import { ApiPromise, WsProvider } from '@polkadot/api';
+import { typesBundle, typesChain } from '@polkadot/apps-config';
+import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 import type { InjectedExtension } from '@polkadot/extension-inject/types';
-import keyring from '@polkadot/ui-keyring';
-import { KeyringJson } from '@polkadot/ui-keyring/types';
-import { isObject } from 'lodash';
 import React, { createContext, Dispatch, useCallback, useEffect, useReducer, useState } from 'react';
 import { NETWORK_CONFIG } from '../config';
-import { Action, IAccountMeta, NetConfig, NetworkType } from '../model';
-import { ConnectStatus, connectSubstrate, convertToSS58, getInfoFromHash, patchUrl } from '../utils';
+import { Action, ConnectStatus, InjectedAccountWithMeta, NetConfig, NetworkType } from '../model';
+import { convertToSS58, getInfoFromHash, patchUrl } from '../utils';
 import { readStorage, updateStorage } from '../utils/helper/storage';
 
 interface StoreState {
-  accounts: IAccountMeta[] | null;
+  accounts: InjectedAccountWithMeta[] | null;
   network: NetworkType;
   networkStatus: ConnectStatus;
 }
@@ -38,14 +36,6 @@ const getInitialNetwork = (): NetworkType => {
 const cacheNetwork = (network: NetworkType): void => {
   patchUrl({ network });
   updateStorage({ network });
-};
-
-const isKeyringLoaded = () => {
-  try {
-    return !!keyring.keyring;
-  } catch {
-    return false;
-  }
 };
 
 const initialState: StoreState = {
@@ -75,13 +65,12 @@ function accountReducer(state: StoreState, action: Action<ActionType, any>): Sto
 }
 
 export type ApiCtx = {
-  accounts: IAccountMeta[] | null;
+  accounts: InjectedAccountWithMeta[] | null;
   api: ApiPromise | null;
-  createAction: ActionHelper;
   dispatch: Dispatch<Action<ActionType>>;
   network: NetworkType;
   networkStatus: ConnectStatus;
-  setAccounts: (accounts: IAccountMeta[]) => void;
+  setAccounts: (accounts: InjectedAccountWithMeta[]) => void;
   setNetworkStatus: (status: ConnectStatus) => void;
   switchNetwork: (type: NetworkType) => void;
   setApi: (api: ApiPromise) => void;
@@ -91,24 +80,24 @@ export type ApiCtx = {
   extensions: InjectedExtension[] | undefined;
 };
 
-type ActionHelper = <T = string>(type: ActionType) => (payload: T) => void;
-
 export const ApiContext = createContext<ApiCtx | null>(null);
 
 export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
   const [state, dispatch] = useReducer(accountReducer, initialState);
-  const createAction: ActionHelper = (type) => (payload) => dispatch({ type, payload: payload as never });
-  const switchNetwork = useCallback(createAction<NetworkType>('switchNetwork'), []);
-  const setAccounts = useCallback(createAction<IAccountMeta[]>('setAccounts'), []);
-  const setNetworkStatus = useCallback(createAction<ConnectStatus>('updateNetworkStatus'), []);
+  const switchNetwork = useCallback((payload: NetworkType) => dispatch({ type: 'switchNetwork', payload }), []);
+  const setAccounts = useCallback(
+    (payload: InjectedAccountWithMeta[]) => dispatch({ type: 'setAccounts', payload }),
+    []
+  );
+  const setNetworkStatus = useCallback(
+    (payload: ConnectStatus) => dispatch({ type: 'updateNetworkStatus', payload }),
+    []
+  );
   const [api, setApi] = useState<ApiPromise | null>(null);
   const [chain, setChain] = useState<Chain>({ ss58Format: '', tokens: [] });
   const [random, setRandom] = useState<number>(0);
   const [extensions, setExtensions] = useState<InjectedExtension[] | undefined>(undefined);
 
-  /**
-   * connect to substrate or metamask when account type changed.
-   */
   useEffect(() => {
     /**
      * just for refresh purpose;
@@ -121,76 +110,62 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
       );
     }
 
-    if (state.networkStatus === 'connecting') {
+    const url = NETWORK_CONFIG[state.network].rpc;
+    const provider = new WsProvider(url);
+    const nApi = new ApiPromise({
+      provider,
+      typesBundle,
+      typesChain,
+    });
+
+    const onReady = async () => {
+      const exts = await web3Enable('polkadot-js/apps');
+
+      setExtensions(exts);
+      setApi(nApi);
+      cacheNetwork(state.network);
+    };
+
+    setNetworkStatus('connecting');
+
+    nApi.on('ready', onReady);
+
+    return () => {
+      nApi.off('ready', onReady);
+    };
+  }, [state.network, setNetworkStatus, random]);
+
+  /**
+   * connect to substrate or metamask when account type changed.
+   */
+  useEffect(() => {
+    if (state.networkStatus !== 'success' || !api) {
       return;
     }
 
-    // eslint-disable-next-line complexity
     (async () => {
-      setNetworkStatus('connecting');
+      const newAccounts = await web3Accounts();
+      const chainState = await api.rpc.system.properties();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { tokenDecimals, tokenSymbol, ss58Format } = chainState?.toHuman() as any;
+      const chainInfo = tokenDecimals.reduce(
+        (acc: Chain, decimal: string, index: number) => {
+          const token = { decimal, symbol: tokenSymbol[index] };
 
-      try {
-        const { accounts: newAccounts, api: newApi, extensions: newExtensions } = await connectSubstrate(state.network);
-        const chainState = await newApi?.rpc.system.properties();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { tokenDecimals, tokenSymbol, ss58Format } = chainState?.toHuman() as any;
-        const chainInfo = tokenDecimals.reduce(
-          (acc: Chain, decimal: string, index: number) => {
-            const token = { decimal, symbol: tokenSymbol[index] };
+          return { ...acc, tokens: [...acc.tokens, token] };
+        },
+        { ss58Format, tokens: [] } as Chain
+      );
 
-            return { ...acc, tokens: [...acc.tokens, token] };
-          },
-          { ss58Format, tokens: [] } as Chain
-        );
-
-        const injectedAccounts = newAccounts?.map(({ address, meta }, whenCreated) => ({
-          address,
-          meta: {
-            ...meta,
-            name: `${meta.name || 'unknown'} (${meta.source === 'polkadot-js' ? 'extension' : meta.source})`,
-            whenCreated,
-          },
-        }));
-
-        if (!isKeyringLoaded()) {
-          keyring.loadAll(
-            {
-              genesisHash: newApi?.genesisHash,
-              ss58Format,
-              filter: (data: KeyringJson) => {
-                if (!isObject(data) || !data.meta) {
-                  return false;
-                }
-
-                return !!data.meta.isMultisig;
-              },
-            },
-            injectedAccounts
-          );
-        }
-
-        setChain(chainInfo);
-        setApi(newApi);
-        setNetworkStatus('success');
-        setExtensions(newExtensions || undefined);
-
-        if (!newExtensions?.length && !newAccounts?.length) {
-          setAccounts([]);
-        } else {
-          setAccounts(
-            newAccounts?.map(({ address, ...other }) => ({
-              ...other,
-              address: convertToSS58(address, ss58Format),
-            })) as IAccountMeta[]
-          );
-        }
-
-        cacheNetwork(state.network);
-      } catch (error) {
-        setNetworkStatus('fail');
-      }
+      setChain(chainInfo);
+      setAccounts(
+        newAccounts?.map(({ address, ...other }) => ({
+          ...other,
+          address: convertToSS58(address, ss58Format),
+        }))
+      );
     })();
-  }, [random, state.network]);
+  }, [api, setAccounts, state.networkStatus]);
 
   useEffect(() => {
     if (state.networkStatus === 'disconnected') {
@@ -203,7 +178,6 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
       value={{
         ...state,
         dispatch,
-        createAction,
         switchNetwork,
         setNetworkStatus,
         setAccounts,

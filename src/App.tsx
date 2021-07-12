@@ -17,13 +17,17 @@ import Status from './components/Status';
 import { NETWORK_CONFIG } from './config';
 import { Path, routes } from './config/routes';
 import { useApi } from './hooks';
-import { NetworkConfig, NetworkType } from './model';
+import { NetworkConfig } from './model';
 import { Connecting } from './pages/Connecting';
 import crabThemeJson from './theme/crab.json';
 import darwiniaThemeJson from './theme/darwinia.json';
+import kusamaThemeJson from './theme/kusama.json';
 import pangolinThemeJson from './theme/pangolin.json';
+import polkadotThemeJson from './theme/polkadot.json';
 
 const THEME_CONFIG: NetworkConfig<{ [key in keyof typeof darwiniaThemeJson]: string }> = {
+  polkadot: polkadotThemeJson,
+  kusama: kusamaThemeJson,
   darwinia: darwiniaThemeJson,
   crab: crabThemeJson,
   pangolin: pangolinThemeJson,
@@ -31,7 +35,7 @@ const THEME_CONFIG: NetworkConfig<{ [key in keyof typeof darwiniaThemeJson]: str
 
 function App() {
   const { t } = useTranslation();
-  const { networkStatus, network, networkConfig, accounts, switchNetwork } = useApi();
+  const { networkStatus, network, networkConfig, accounts } = useApi();
   const { systemChain, systemName, specName, isDevelopment } = usePolkaApi();
   const polkaLogo = useMemo(
     () => (networkStatus === 'success' ? '/image/polka-check.png' : '/image/polka-cross.png'),
@@ -123,7 +127,15 @@ function App() {
               overlay={
                 <Menu>
                   {networks.map((item) => (
-                    <Menu.Item key={item.name} onClick={() => switchNetwork(item.name as NetworkType)}>
+                    <Menu.Item
+                      key={item.name}
+                      onClick={() => {
+                        if (item.name !== network) {
+                          location.hash = encodeURIComponent(`n=${item.name}`);
+                          location.reload();
+                        }
+                      }}
+                    >
                       <div className="flex items-center gap-4">
                         <img src={item.facade.logo} className="w-8 h-8" />
                         <span>{item.fullName}</span>
@@ -185,7 +197,7 @@ function App() {
                 <Menu>
                   <Menu.Item>
                     <div className="flex flex-col items-center text-blue-400 hover:text-blue-600">
-                      <span>{t('donate_unit', { unit: networkConfig.token.ring })}</span>
+                      <span>{t('donate_unit', { unit: networkConfig.token.native })}</span>
                       <span>{networkConfig.donate.address}</span>
                     </div>
                   </Menu.Item>
