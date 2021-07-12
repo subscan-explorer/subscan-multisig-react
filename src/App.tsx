@@ -17,7 +17,7 @@ import Status from './components/Status';
 import { NETWORK_CONFIG } from './config';
 import { Path, routes } from './config/routes';
 import { useApi } from './hooks';
-import { NetworkConfig, NetworkType } from './model';
+import { NetworkConfig } from './model';
 import { Connecting } from './pages/Connecting';
 import crabThemeJson from './theme/crab.json';
 import darwiniaThemeJson from './theme/darwinia.json';
@@ -35,7 +35,7 @@ const THEME_CONFIG: NetworkConfig<{ [key in keyof typeof darwiniaThemeJson]: str
 
 function App() {
   const { t } = useTranslation();
-  const { networkStatus, network, networkConfig, accounts, switchNetwork } = useApi();
+  const { networkStatus, network, networkConfig, accounts } = useApi();
   const { systemChain, systemName, specName, isDevelopment } = usePolkaApi();
   const polkaLogo = useMemo(
     () => (networkStatus === 'success' ? '/image/polka-check.png' : '/image/polka-cross.png'),
@@ -127,7 +127,15 @@ function App() {
               overlay={
                 <Menu>
                   {networks.map((item) => (
-                    <Menu.Item key={item.name} onClick={() => switchNetwork(item.name as NetworkType)}>
+                    <Menu.Item
+                      key={item.name}
+                      onClick={() => {
+                        if (item.name !== network) {
+                          location.hash = encodeURIComponent(`n=${item.name}`);
+                          location.reload();
+                        }
+                      }}
+                    >
                       <div className="flex items-center gap-4">
                         <img src={item.facade.logo} className="w-8 h-8" />
                         <span>{item.fullName}</span>
