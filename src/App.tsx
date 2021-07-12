@@ -197,7 +197,7 @@ function App() {
                 <Menu>
                   <Menu.Item>
                     <div className="flex flex-col items-center text-blue-400 hover:text-blue-600">
-                      <span>{t('donate_unit', { unit: networkConfig.token.ring })}</span>
+                      <span>{t('donate_unit', { unit: networkConfig.token.native })}</span>
                       <span>{networkConfig.donate.address}</span>
                     </div>
                   </Menu.Item>

@@ -16,8 +16,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     fullName: 'Polkadot',
     ss58Prefix: 0,
-    dvmWithdrawAddress: { ring: '', kton: '' },
-    token: { ring: 'DOT', kton: 'KTON' },
+    token: { native: 'DOT' },
     erc20: {
       ring: '',
       kton: '',
@@ -39,8 +38,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     fullName: 'Kusama',
     ss58Prefix: 2,
-    dvmWithdrawAddress: { ring: '', kton: '' },
-    token: { ring: 'KSM', kton: 'KTON' },
+    token: { native: 'KSM' },
     erc20: {
       ring: '',
       kton: '',
@@ -65,8 +63,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     fullName: 'Darwinia Mainnet',
     ss58Prefix: 18,
-    dvmWithdrawAddress: { ring: '', kton: '' },
-    token: { ring: 'RING', kton: 'KTON' },
+    token: { native: 'RING' },
     erc20: {
       ring: '',
       kton: '',
@@ -88,11 +85,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     fullName: 'Pangolin Testnet',
     ss58Prefix: 18,
-    dvmWithdrawAddress: {
-      ring: '0x0000000000000000000000000000000000000015',
-      kton: '0x0000000000000000000000000000000000000016',
-    },
-    token: { ring: 'PRING', kton: 'PKTON' },
+    token: { native: 'PRING' },
     erc20: {
       ring: '0xfe098c5eeDec594271618922B2F3364F0f8b1785',
       kton: '0x0eb47c5347B255e469101b9D71288b34DD5e2B95',
@@ -114,11 +107,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     fullName: 'Crab Mainnet',
     ss58Prefix: 42,
-    dvmWithdrawAddress: {
-      ring: '0x0000000000000000000000000000000000000015',
-      kton: '0x0000000000000000000000000000000000000016',
-    },
-    token: { ring: 'CRING', kton: 'CKTON' },
+    token: { native: 'CRING' },
     erc20: {
       ring: '0x588abe3F7EE935137102C5e2B8042788935f4CB0',
       kton: '0xbfE9E136270cE46A2A6a8E8D54718BdAEBEbaA3D',

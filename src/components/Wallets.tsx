@@ -52,7 +52,7 @@ export function Wallets() {
   const [multisigAccounts, setMultisigAccounts] = useState<KeyringAddress[]>([]);
   const isExtensionAccount = useIsInjected();
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
-  const [isCalculating, setIsCalculating] = useState<boolean>(false);
+  const [isCalculating, setIsCalculating] = useState<boolean>(true);
   const renderAction = useCallback(
     (row: KeyringAddress) => {
       const { address } = row;

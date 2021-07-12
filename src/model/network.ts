@@ -2,7 +2,7 @@ import { Config } from './common';
 
 export type NetworkType = 'pangolin' | 'crab' | 'darwinia' | 'polkadot' | 'kusama';
 
-export type Token = 'ring' | 'kton';
+export type Token = 'ring' | 'kton' | 'native';
 
 // eslint-disable-next-line no-magic-numbers
 export type SS58Prefix = 0 | 2 | 18 | 42;
@@ -14,7 +14,7 @@ interface Facade {
   color: { main: string };
 }
 
-type TokenRecord = { [key in Token]: string };
+type TokenRecord = { [key in Token]?: string };
 
 type Api = { subql: string; [key: string]: string };
 
@@ -23,7 +23,6 @@ interface Donate {
 }
 
 export interface NetConfig {
-  dvmWithdrawAddress: TokenRecord;
   facade: Facade;
   fullName: string;
   rpc: string;

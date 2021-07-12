@@ -139,7 +139,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
    * connect to substrate or metamask when account type changed.
    */
   useEffect(() => {
-    if (state.networkStatus === 'connecting' || !api) {
+    if (state.networkStatus !== 'success' || !api) {
       return;
     }
 
