@@ -82,7 +82,7 @@ export function Wallets() {
           </Badge>
           <Button
             className="flex items-center justify-center"
-            onClick={() => window?.open(`https://${network}.subscan.io/account/${address}`, '__blank')}
+            onClick={() => window?.open(`https://${network}.subscan.io/account/${address}`, '_blank')}
             icon={<GlobalOutlined />}
           ></Button>
         </Space>
