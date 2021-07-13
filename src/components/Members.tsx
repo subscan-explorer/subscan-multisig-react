@@ -33,6 +33,7 @@ export const Members = ({ record }: { record: KeyringAddress }) => {
         dataSource={record.meta.addressPair as KeyringJson[]}
         pagination={false}
         bordered
+        rowKey="address"
         className="table-without-head hidden lg:block"
       />
 

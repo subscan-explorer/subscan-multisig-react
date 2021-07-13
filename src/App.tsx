@@ -5,7 +5,7 @@ import { useApi as usePolkaApi } from '@polkadot/react-hooks';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import { BlockAuthors, Events } from '@polkadot/react-query';
 import Signer from '@polkadot/react-signer';
-import { Button, Dropdown, Layout, Menu, Typography } from 'antd';
+import { Alert, Button, Dropdown, Layout, Menu, Typography } from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
 import { getYear } from 'date-fns';
 import React, { useEffect, useMemo } from 'react';
@@ -36,7 +36,7 @@ const THEME_CONFIG: NetworkConfig<{ [key in keyof typeof darwiniaThemeJson]: str
 function App() {
   const { t } = useTranslation();
   const { networkStatus, network, networkConfig, accounts } = useApi();
-  const { systemChain, systemName, specName, isDevelopment } = usePolkaApi();
+  const { systemChain, systemName, specName, isDevelopment, apiError } = usePolkaApi();
   const polkaLogo = useMemo(
     () => (networkStatus === 'success' ? '/image/polka-check.png' : '/image/polka-cross.png'),
     [networkStatus]
@@ -230,6 +230,8 @@ function App() {
           </div>
         </Layout.Footer>
       </Layout>
+
+      {apiError && <Alert message={apiError} type="error" showIcon closable className="fixed top-24 right-20" />}
     </>
   );
 }
