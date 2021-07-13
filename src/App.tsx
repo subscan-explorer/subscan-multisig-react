@@ -49,7 +49,7 @@ function App() {
         href: 'https://riot.im/app/#/room/!uaYUrKBueiKUurHliJ:matrix.org?via=matrix.org&via=matrix.parity.io&via=web3.foundation',
         icon: 'riot-black',
       },
-      { href: 'https://github.com/itering/subscan-essentials', icon: 'github-black' },
+      { href: 'https://github.com/itering/subscan-multisig-react', icon: 'github-black' },
       { href: 'https://medium.com/subscan', icon: 'medium-black' },
       { href: 'mailto:hello@subscan.io', icon: 'email-black' },
     ],
