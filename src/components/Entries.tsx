@@ -212,7 +212,7 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
       },
     },
     {
-      title: t('action'),
+      title: t('actions'),
       dataIndex: 'callData',
       align: 'center',
       render: renderMethod,
