@@ -20,7 +20,7 @@ export function SubscanLink({ address, extrinsic, children, copyable, block, ...
     return (
       <Link
         href={`https://${network}.subscan.io/account/${address}`}
-        target="__blank"
+        target="_blank"
         copyable={copyable}
         className="w-full"
       >
@@ -33,7 +33,7 @@ export function SubscanLink({ address, extrinsic, children, copyable, block, ...
     const { height, index } = extrinsic;
 
     return (
-      <Link href={`https://${network}.subscan.io/extrinsic/${height}-${index}`} target="__blank" {...other}>
+      <Link href={`https://${network}.subscan.io/extrinsic/${height}-${index}`} target="_blank" {...other}>
         {children}
       </Link>
     );
@@ -41,7 +41,7 @@ export function SubscanLink({ address, extrinsic, children, copyable, block, ...
 
   if (block) {
     return (
-      <Link href={`https://${network}.subscan.io/block/${block}`} target="__blank" {...other}>
+      <Link href={`https://${network}.subscan.io/block/${block}`} target="_blank" {...other}>
         {block}
       </Link>
     );
