@@ -2,7 +2,7 @@ import { CaretRightOutlined, GlobalOutlined, TeamOutlined } from '@ant-design/ic
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
-import { Badge, Button, Collapse, Space, Table, Typography } from 'antd';
+import { Badge, Button, Collapse, Space, Table, Tooltip, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -59,36 +59,44 @@ export function Wallets() {
 
       return (
         <Space size="middle">
-          <Button
-            className="flex items-center justify-center"
-            icon={<TeamOutlined />}
-            onClick={() => {
-              if (expandedRowKeys.includes(address)) {
-                setExpandedRowKeys(expandedRowKeys.filter((item) => item !== address));
-              } else {
-                setExpandedRowKeys([...expandedRowKeys, address]);
-              }
-            }}
-          ></Button>
+          <Tooltip overlay={t('members')}>
+            <Button
+              className="flex items-center justify-center"
+              icon={<TeamOutlined />}
+              onClick={() => {
+                if (expandedRowKeys.includes(address)) {
+                  setExpandedRowKeys(expandedRowKeys.filter((item) => item !== address));
+                } else {
+                  setExpandedRowKeys([...expandedRowKeys, address]);
+                }
+              }}
+            ></Button>
+          </Tooltip>
+
           {/*  eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <Badge dot count={(row as unknown as any).entries.length}>
-            <Button
-              onClick={() => {
-                history.push(Path.extrinsic + '/' + row.address);
-              }}
-              className="flex items-center justify-center"
-              icon={<CaretRightOutlined />}
-            ></Button>
+            <Tooltip overlay={t('actions')}>
+              <Button
+                onClick={() => {
+                  history.push(Path.extrinsic + '/' + row.address);
+                }}
+                className="flex items-center justify-center"
+                icon={<CaretRightOutlined />}
+              ></Button>
+            </Tooltip>
           </Badge>
-          <Button
-            className="flex items-center justify-center"
-            onClick={() => window?.open(`https://${network}.subscan.io/account/${address}`, '_blank')}
-            icon={<GlobalOutlined />}
-          ></Button>
+
+          <Tooltip overlay={t('View in Subscan explorer')}>
+            <Button
+              className="flex items-center justify-center"
+              onClick={() => window?.open(`https://${network}.subscan.io/account/${address}`, '__blank')}
+              icon={<GlobalOutlined />}
+            ></Button>
+          </Tooltip>
         </Space>
       );
     },
-    [expandedRowKeys, history, network]
+    [expandedRowKeys, history, network, t]
   );
 
   const columns: ColumnsType<KeyringAddress> = [
@@ -122,7 +130,7 @@ export function Wallets() {
       },
     },
     {
-      title: t('action'),
+      title: t('actions'),
       key: 'action',
       render: (_1: unknown, row) => renderAction(row),
     },
