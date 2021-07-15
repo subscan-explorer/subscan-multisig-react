@@ -3,50 +3,21 @@ import { StatusContext } from '@polkadot/react-components';
 import { PartialQueueTxExtrinsic } from '@polkadot/react-components/Status/types';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import { Call } from '@polkadot/types/interfaces';
-import { AnyJson } from '@polkadot/types/types';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
-import {
-  Button,
-  Collapse,
-  Descriptions,
-  Empty,
-  Form,
-  Modal,
-  Progress,
-  Select,
-  Space,
-  Spin,
-  Table,
-  Typography,
-} from 'antd';
+import { Button, Collapse, Descriptions, Empty, Form, Modal, Progress, Select, Space, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { intersection } from 'lodash';
 import { useCallback, useContext, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { useApi, useFee, useIsInjected, useMultiApprove, useMultisig, useUnapprovedAccounts } from '../hooks';
-import { AddressPair } from '../model';
-import { extractExternal, txDoc, txMethod, txMethodDescription } from '../utils';
+import { useApi, useFee, useIsInjected, useMultiApprove } from '../hooks';
+import { AddressPair, Entry, TxActionType } from '../model';
+import { txDoc, txMethod, txMethodDescription } from '../utils';
 import { ArgObj, Args } from './Args';
 import { Fee } from './Fee';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
-export interface Entry {
-  when: When;
-  depositor: string;
-  approvals: string[];
-  address: string;
-  callHash?: string;
-  blockHash?: string;
-  callData?: Call;
-  meta?: Record<string, AnyJson>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
-}
-
-export interface When {
-  height: number;
-  index: number;
-}
+import { TxApprove } from './TxApprove';
+import { TxCancel } from './TxCancel';
 
 export interface EntriesProps {
   source: Entry[];
@@ -55,10 +26,8 @@ export interface EntriesProps {
   isOnlyPolkadotModal?: boolean;
 }
 
-type ActionType = 'pending' | 'approve' | 'cancel';
-
 interface Operation {
-  type: ActionType;
+  type: TxActionType;
   entry: Entry | null;
   accounts: string[];
 }
@@ -95,67 +64,8 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
   const { t } = useTranslation();
   const isInjected = useIsInjected();
   const [operation, setOperation] = useState<Operation>(DEFAULT_OPERATION);
-  const { api, accounts = [] } = useApi();
-  const { multisigAccount } = useMultisig();
   const { queueExtrinsic } = useContext(StatusContext);
   const [extrinsic, setExtrinsic] = useState<PartialQueueTxExtrinsic | null>(null);
-  const [getApproveTx] = useMultiApprove();
-  const [getUnapprovedInjectedList] = useUnapprovedAccounts();
-  const [isSkeltonDisplay, setIsSkeltonDisplay] = useState(false);
-  const handleAction = useCallback(
-    (type: ActionType, data: Entry) => {
-      if (type === 'pending') {
-        return;
-      }
-
-      setIsSkeltonDisplay(true);
-
-      if (type === 'approve') {
-        const unapprovedAddresses = getUnapprovedInjectedList(data);
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const availableAccounts = accounts!
-          .map((item) => item.address)
-          .filter((extAddr) => unapprovedAddresses.includes(extAddr));
-
-        getApproveTx(data, availableAccounts[0]).then((tx) => {
-          const queueTx: PartialQueueTxExtrinsic = {
-            extrinsic: tx,
-            accountId: availableAccounts[0],
-            txSuccessCb: () => setExtrinsic(null),
-          };
-
-          queueExtrinsic(queueTx);
-          setExtrinsic(queueTx);
-          setIsSkeltonDisplay(false);
-        });
-
-        setOperation({ entry: data, type, accounts: availableAccounts });
-      }
-
-      if (type === 'cancel') {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const multiAddress = multisigAccount!.address;
-        const { threshold, who } = extractExternal(multiAddress);
-        const others = who.filter((item) => item !== data.address);
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const tx = api!.tx.multisig.cancelAsMulti(threshold, others, data.when, data.callHash!);
-        const queueTx: PartialQueueTxExtrinsic = {
-          extrinsic: tx,
-          accountId: data.depositor,
-          txSuccessCb: () => {
-            setExtrinsic(null);
-          },
-        };
-
-        setExtrinsic(queueTx);
-        queueExtrinsic(queueTx);
-        setOperation({ entry: data, type, accounts: [] });
-        setIsSkeltonDisplay(false);
-      }
-    },
-    [accounts, api, getApproveTx, getUnapprovedInjectedList, multisigAccount, queueExtrinsic]
-  );
-
   const renderAction = useCallback(
     // eslint-disable-next-line complexity
     (row: Entry) => {
@@ -163,7 +73,7 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
         return <span>{t(`status.${row.status}`)}</span>;
       }
 
-      const actions: ActionType[] = [];
+      const actions: TxActionType[] = [];
       // eslint-disable-next-line react/prop-types
       const pairs = (account.meta?.addressPair ?? []) as AddressPair[];
       const injectedAccounts: string[] = pairs.filter((pair) => isInjected(pair.address)).map((pair) => pair.address);
@@ -191,15 +101,23 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
 
       return (
         <Space>
-          {actions.map((action) => (
-            <Button key={action} onClick={() => handleAction(action, row)}>
-              {t(action)}
-            </Button>
-          ))}
+          {actions.map((action) => {
+            if (action === 'pending') {
+              return (
+                <Button key={action} disabled>
+                  {t(action)}
+                </Button>
+              );
+            } else if (action === 'approve') {
+              return <TxApprove key={action} entry={row} txSpy={setExtrinsic} onOperation={setOperation} />;
+            } else {
+              return <TxCancel key={action} entry={row} />;
+            }
+          })}
         </Space>
       );
     },
-    [account.meta?.addressPair, account.meta.threshold, handleAction, isInjected, t]
+    [account.meta?.addressPair, account.meta.threshold, isInjected, t]
   );
 
   const columns: ColumnsType<Entry> = [
@@ -280,7 +198,7 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
   };
 
   return (
-    <Spin size="large" spinning={isSkeltonDisplay}>
+    <>
       <Table
         dataSource={source}
         columns={columns}
@@ -341,7 +259,7 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
           }}
         />
       )}
-    </Spin>
+    </>
   );
 }
 

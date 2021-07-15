@@ -4,7 +4,7 @@ import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { difference, intersection } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Entry } from '../components/Entries';
+import { Entry } from '../model';
 import { useApi } from './api';
 
 export function useMultisig(acc?: string) {
@@ -78,7 +78,7 @@ export function useUnapprovedAccounts() {
 
       const extensionAddresses = accounts?.map((item) => item.address) || [];
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const multisigPairAddresses = (multisigAccount?.meta.addressPair as any[]).map((item) => item.address);
+      const multisigPairAddresses = (multisigAccount?.meta.addressPair as any[])?.map((item) => item.address);
       const extensionInPairs = intersection(extensionAddresses, multisigPairAddresses);
       const approvedExtensionAddresses = intersection(extensionInPairs, data.approvals);
 
