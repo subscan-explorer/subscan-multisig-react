@@ -2,12 +2,12 @@ import { ArrowDownOutlined, ArrowUpOutlined, DeleteOutlined } from '@ant-design/
 import keyring from '@polkadot/ui-keyring';
 import { Button, message, Modal, Popconfirm, Space, Statistic, Typography } from 'antd';
 import { useQuery } from 'graphql-hooks';
-import { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useParams } from 'react-router-dom';
 import { TRANSFERS_COUNT_QUERY } from '../config';
 import { useApi } from '../hooks';
-import { useMultisig } from '../hooks/multisig';
+import { useMultisigContext } from '../hooks/multisigContext';
 import { ExtrinsicLaunch } from './ExtrinsicLaunch';
 import { Members } from './Members';
 import { SubscanLink } from './SubscanLink';
@@ -20,7 +20,7 @@ export function WalletState() {
   const history = useHistory();
   const { networkConfig } = useApi();
   const { account } = useParams<{ account: string }>();
-  const { multisigAccount, setMultisigAccount, inProgressCount } = useMultisig();
+  const { multisigAccount, setMultisigAccount, inProgress, setState: updateMultisig } = useMultisigContext();
   const [isAccountsDisplay, setIsAccountsDisplay] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isExtrinsicDisplay, setIsExtrinsicDisplay] = useState(false);
@@ -34,7 +34,7 @@ export function WalletState() {
     () => [
       {
         label: 'multisig.In Progress',
-        count: inProgressCount,
+        count: inProgress.length,
       },
       { label: 'multisig.Confirmed Extrinsic', count: data?.transfers.totalCount ?? 0 },
       {
@@ -47,7 +47,7 @@ export function WalletState() {
         count: (multisigAccount?.meta.who as any)?.length as number,
       },
     ],
-    [multisigAccount, data, inProgressCount]
+    [multisigAccount, data, inProgress]
   );
   const renameWallet = useCallback(
     ({ name }: { name: string }) => {
@@ -61,13 +61,15 @@ export function WalletState() {
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const { meta, ...others } = multisigAccount!;
-        setMultisigAccount({
-          ...others,
-          meta: {
-            ...meta,
-            name,
-          },
-        });
+        if (setMultisigAccount) {
+          setMultisigAccount({
+            ...others,
+            meta: {
+              ...meta,
+              name,
+            },
+          });
+        }
       } catch (error) {
         message.error(error.message);
       }
@@ -170,7 +172,12 @@ export function WalletState() {
         footer={null}
         destroyOnClose
       >
-        <ExtrinsicLaunch />
+        <ExtrinsicLaunch
+          onTxSuccess={() => {
+            setIsExtrinsicDisplay(false);
+            updateMultisig();
+          }}
+        />
       </Modal>
     </Space>
   );

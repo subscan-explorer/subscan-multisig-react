@@ -1,6 +1,7 @@
 // Copyright 2017-2021 @polkadot/app-extrinsics authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { SubmittableResult } from '@polkadot/api';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import { Button, Extrinsic, MarkError, Output, PureInputAddress, TxButton } from '@polkadot/react-components';
 import createHeader from '@polkadot/react-components/InputAddress/createHeader';
@@ -19,9 +20,11 @@ import { extractExternal } from '../utils';
 
 interface Props {
   className?: string;
+  onTxSuccess?: (res: SubmittableResult) => void;
+  onTxFail?: (res: SubmittableResult | null) => void;
 }
 
-export function ExtrinsicLaunch({ className }: Props): React.ReactElement<Props> {
+export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { api } = useApi();
   const [accountId, setAccountId] = useState<string | null>(null);
@@ -152,6 +155,7 @@ export function ExtrinsicLaunch({ className }: Props): React.ReactElement<Props>
           extrinsic={extrinsic}
           icon="sign-in-alt"
           label={t<string>('Submit Transaction')}
+          onSuccess={onTxSuccess}
         />
       </Button.Group>
     </div>

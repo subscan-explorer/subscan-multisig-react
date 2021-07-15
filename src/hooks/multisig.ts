@@ -1,3 +1,4 @@
+import { AnyJson } from '@polkadot/types/types';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { difference, intersection } from 'lodash';
@@ -10,26 +11,59 @@ export function useMultisig(acc?: string) {
   const [multisigAccount, setMultisigAccount] = useState<KeyringAddress | null>(null);
   const { api, networkStatus } = useApi();
   const { account } = useParams<{ account: string }>();
-  const [inProgressCount, setInProgressCount] = useState<number>(0);
-
-  useEffect(() => {
-    if (networkStatus !== 'success' || !api) {
+  const [inProgress, setInProgress] = useState<Entry[]>([]);
+  const setState = useCallback(async () => {
+    if (!api) {
       return;
     }
 
-    (async () => {
-      const multisig = keyring.getAccount(acc ?? account);
-      const entries = await api.query.multisig.multisigs.entries(multisig?.address);
+    const multisig = keyring.getAccount(acc ?? account);
+    const data = await api.query.multisig.multisigs.entries(multisig?.address);
+    const result = data?.map((entry) => {
+      const [address, callHash] = entry[0].toHuman() as string[];
 
-      setMultisigAccount(multisig || null);
-      setInProgressCount(entries.length);
-    })();
-  }, [account, api, networkStatus, acc]);
+      return {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ...(entry[1] as unknown as any).toJSON(),
+        address,
+        callHash,
+      };
+    });
+    const callInfos = await api?.query.multisig.calls.multi(result.map((item) => item.callHash));
+    const calls = callInfos?.map((callInfo, index) => {
+      const call = callInfo.toHuman() as AnyJson[];
+
+      if (!call) {
+        return result[index];
+      }
+
+      try {
+        const callData = api.registry.createType('Call', call[0]);
+        const meta = api?.tx[callData?.section][callData.method].meta.toJSON();
+
+        return { ...result[index], callData, meta, hash: result[index].callHash };
+      } catch (_) {
+        return result[index];
+      }
+    });
+
+    setMultisigAccount(multisig || null);
+    setInProgress(calls || []);
+  }, [api, acc, account]);
+
+  useEffect(() => {
+    if (networkStatus !== 'success') {
+      return;
+    }
+
+    setState();
+  }, [networkStatus, setState]);
 
   return {
-    inProgressCount,
+    inProgress,
     multisigAccount,
     setMultisigAccount,
+    setState,
   };
 }
 
