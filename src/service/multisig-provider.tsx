@@ -3,29 +3,28 @@ import { Spin } from 'antd';
 import { createContext, useState } from 'react';
 import { useMultisig } from '../hooks';
 import { Entry } from '../model';
+import { empty } from '../utils';
 
 export const MultisigContext = createContext<{
   inProgress: Entry[];
   multisigAccount: KeyringAddress | null;
   setMultisigAccount: React.Dispatch<React.SetStateAction<KeyringAddress | null>> | null;
   setState: () => Promise<void>;
-  setIsPackageLocked: (lock: boolean) => void;
+  setIsPageLock: (lock: boolean) => void;
 }>({
   inProgress: [],
   multisigAccount: null,
   setMultisigAccount: null,
   setState: () => Promise.resolve(),
-  setIsPackageLocked: () => {
-    /* */
-  },
+  setIsPageLock: empty,
 });
 
 export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) => {
-  const [isPageLocked, setIsPackageLocked] = useState<boolean>(false);
+  const [isPageLocked, setIsPageLock] = useState<boolean>(false);
   const value = useMultisig();
 
   return (
-    <MultisigContext.Provider value={{ ...value, setIsPackageLocked }}>
+    <MultisigContext.Provider value={{ ...value, setIsPageLock }}>
       <Spin size="large" spinning={isPageLocked}>
         {children}
       </Spin>

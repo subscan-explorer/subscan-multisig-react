@@ -1,5 +1,6 @@
 import { AnyJson } from '@polkadot/types/types';
 import { Call } from '@polkadot/types/interfaces';
+import { PartialQueueTxExtrinsic } from '@polkadot/react-components/Status/types';
 
 export interface When {
   height: number;
@@ -21,8 +22,14 @@ export interface Entry {
 
 export type TxActionType = 'pending' | 'approve' | 'cancel';
 
-export interface Operation {
+interface TxOperation {
   type: TxActionType;
   entry: Entry | null;
   accounts: string[];
+}
+
+export interface TxOperationComponentProps {
+  entry: Entry;
+  txSpy?: (tx: PartialQueueTxExtrinsic | null) => void;
+  onOperation?: (operation: TxOperation) => void;
 }
