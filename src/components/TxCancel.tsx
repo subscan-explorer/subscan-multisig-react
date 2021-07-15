@@ -12,7 +12,7 @@ import { useMultisigContext } from '../hooks/multisigContext';
 export function TxCancel({ entry, txSpy, onOperation }: TxOperationComponentProps) {
   const { t } = useTranslation();
   const { api } = useApi();
-  const { multisigAccount } = useMultisig();
+  const { multisigAccount, queryInProgress } = useMultisig();
   const { queueExtrinsic } = useContext(StatusContext);
   const { setIsPageLock } = useMultisigContext();
 
@@ -33,7 +33,10 @@ export function TxCancel({ entry, txSpy, onOperation }: TxOperationComponentProp
         const queueTx: PartialQueueTxExtrinsic = {
           extrinsic: tx,
           accountId: entry.depositor,
-          txSuccessCb: () => makeSure(txSpy)(null),
+          txSuccessCb: () => {
+            makeSure(txSpy)(null);
+            queryInProgress();
+          },
         };
 
         queueExtrinsic(queueTx);

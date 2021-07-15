@@ -9,13 +9,13 @@ export const MultisigContext = createContext<{
   inProgress: Entry[];
   multisigAccount: KeyringAddress | null;
   setMultisigAccount: React.Dispatch<React.SetStateAction<KeyringAddress | null>> | null;
-  setState: () => Promise<void>;
+  queryInProgress: () => Promise<void>;
   setIsPageLock: (lock: boolean) => void;
 }>({
   inProgress: [],
   multisigAccount: null,
   setMultisigAccount: null,
-  setState: () => Promise.resolve(),
+  queryInProgress: () => Promise.resolve(),
   setIsPageLock: empty,
 });
 

@@ -12,7 +12,7 @@ export function useMultisig(acc?: string) {
   const { api, networkStatus } = useApi();
   const { account } = useParams<{ account: string }>();
   const [inProgress, setInProgress] = useState<Entry[]>([]);
-  const setState = useCallback(async () => {
+  const queryInProgress = useCallback(async () => {
     if (!api) {
       return;
     }
@@ -56,14 +56,14 @@ export function useMultisig(acc?: string) {
       return;
     }
 
-    setState();
-  }, [networkStatus, setState]);
+    queryInProgress();
+  }, [networkStatus, queryInProgress]);
 
   return {
     inProgress,
     multisigAccount,
     setMultisigAccount,
-    setState,
+    queryInProgress,
   };
 }
 
