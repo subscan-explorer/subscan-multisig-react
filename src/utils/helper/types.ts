@@ -10,7 +10,7 @@ export function isBalanceType(type: string | undefined): boolean {
 }
 
 export function isValueType(type: string | undefined): boolean {
-  return !!type && /value/i.test(type);
+  return !!type && isString(type) && /value/i.test(type);
 }
 
 export function isCrabValue(value: string | undefined): boolean {
