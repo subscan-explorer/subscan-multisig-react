@@ -20,7 +20,7 @@ export function WalletState() {
   const history = useHistory();
   const { networkConfig } = useApi();
   const { account } = useParams<{ account: string }>();
-  const { multisigAccount, setMultisigAccount, inProgress, setState: updateMultisig } = useMultisigContext();
+  const { multisigAccount, setMultisigAccount, inProgress, queryInProgress } = useMultisigContext();
   const [isAccountsDisplay, setIsAccountsDisplay] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isExtrinsicDisplay, setIsExtrinsicDisplay] = useState(false);
@@ -175,7 +175,7 @@ export function WalletState() {
         <ExtrinsicLaunch
           onTxSuccess={() => {
             setIsExtrinsicDisplay(false);
-            updateMultisig();
+            queryInProgress();
           }}
         />
       </Modal>

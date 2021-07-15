@@ -32,3 +32,12 @@ export function asUTCString(timestamp: string): string {
 
   return timestamp.substr(0, index) + '.000Z';
 }
+
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+export function empty(...args: any[]) {
+  // nothing to do
+}
+
+export function makeSure<T = () => void>(fn: T | null | undefined): T | typeof empty {
+  return fn ?? empty;
+}

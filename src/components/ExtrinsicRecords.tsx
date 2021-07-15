@@ -9,8 +9,9 @@ import { useParams } from 'react-router-dom';
 import { TRANSFERS_COUNT_QUERY, TRANSFERS_QUERY } from '../config';
 import { useApi } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
+import { Entry } from '../model';
 import { IExtrinsic, parseArgs } from '../utils';
-import { Entries, Entry } from './Entries';
+import { Entries } from './Entries';
 
 interface TransfersQueryRes {
   transfers: { totalCount: number; nodes: Transfer[] };

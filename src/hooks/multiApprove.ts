@@ -1,7 +1,7 @@
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import BN from 'bn.js';
 import { useCallback } from 'react';
-import { Entry } from '../components/Entries';
+import { Entry } from '../model';
 import { extractExternal } from '../utils';
 import { useApi } from './api';
 import { useMultisig } from './multisig';
