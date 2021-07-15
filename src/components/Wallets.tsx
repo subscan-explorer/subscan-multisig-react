@@ -189,9 +189,8 @@ export function Wallets() {
           };
         })
       );
+      setIsCalculating(false);
     })();
-
-    setIsCalculating(false);
   }, [api]);
 
   return (

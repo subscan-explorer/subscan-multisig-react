@@ -1,15 +1,14 @@
 import { Call } from '@polkadot/types/interfaces';
-import { AnyJson } from '@polkadot/types/types';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { Space, Spin, Tabs } from 'antd';
 import { useQuery } from 'graphql-hooks';
 import { isNumber } from 'lodash';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { TRANSFERS_COUNT_QUERY, TRANSFERS_QUERY } from '../config';
 import { useApi } from '../hooks';
-import { useMultisig } from '../hooks/multisig';
+import { useMultisigContext } from '../hooks/multisigContext';
 import { IExtrinsic, parseArgs } from '../utils';
 import { Entries, Entry } from './Entries';
 
@@ -31,58 +30,6 @@ interface Transfer {
 }
 
 const { TabPane } = Tabs;
-
-/* -----------------------------------In progress extrinsic------------------------------------ */
-
-interface InProgressProps {
-  account: KeyringAddress | null;
-}
-
-function InProgress({ account }: InProgressProps) {
-  const { api } = useApi();
-  const [extrinsic, setExtrinsic] = useState<Entry[]>([]);
-
-  useEffect(() => {
-    if (!account || !api) {
-      return;
-    }
-
-    (async () => {
-      const entries = await api.query.multisig.multisigs.entries(account.address);
-      const result = entries?.map((entry) => {
-        const [address, callHash] = entry[0].toHuman() as string[];
-
-        return {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...(entry[1] as unknown as any).toJSON(),
-          address,
-          callHash,
-        };
-      });
-      const callInfos = await api?.query.multisig.calls.multi(result.map((item) => item.callHash));
-      const calls = callInfos?.map((callInfo, index) => {
-        const call = callInfo.toHuman() as AnyJson[];
-
-        if (!call) {
-          return result[index];
-        }
-
-        try {
-          const callData = api.registry.createType('Call', call[0]);
-          const meta = api?.tx[callData?.section][callData.method].meta.toJSON();
-
-          return { ...result[index], callData, meta, hash: result[index].callHash };
-        } catch (_) {
-          return result[index];
-        }
-      });
-
-      setExtrinsic(calls || []);
-    })();
-  }, [account, api]);
-
-  return account ? <Entries source={extrinsic} account={account} /> : <Spin className="w-full mt-4" />;
-}
 
 /* -----------------------------------Confirmed extrinsic------------------------------------ */
 
@@ -154,7 +101,7 @@ function Confirmed({ account, multiAddress }: ConfirmedProps) {
 export function ExtrinsicRecords() {
   const { t } = useTranslation();
   const { account: multiAddress } = useParams<{ account: string }>();
-  const { multisigAccount, inProgressCount } = useMultisig();
+  const { multisigAccount, inProgress } = useMultisigContext();
   const { data } = useQuery<{ transfers: { totalCount: number } }>(TRANSFERS_COUNT_QUERY, {
     variables: {
       account: multiAddress,
@@ -168,12 +115,16 @@ export function ExtrinsicRecords() {
         tab={
           <Space>
             <span>{t('multisig.In Progress')}</span>
-            <span>{inProgressCount}</span>
+            <span>{inProgress.length}</span>
           </Space>
         }
         key="inProgress"
       >
-        <InProgress account={multisigAccount} />
+        {multisigAccount?.address ? (
+          <Entries source={inProgress} account={multisigAccount} />
+        ) : (
+          <Spin className="w-full mt-4" />
+        )}
       </TabPane>
       <TabPane
         tab={
