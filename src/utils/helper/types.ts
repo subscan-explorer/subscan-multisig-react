@@ -14,7 +14,7 @@ export function isValueType(type: string | undefined): boolean {
 }
 
 export function isCrabValue(value: string | undefined): boolean {
-  return !!value && ['ringbalance', 'ktonbalance'].includes(value.toLowerCase());
+  return !!value && isString(value) && ['ringBalance', 'ktonBalance'].includes(value);
 }
 
 export function isDownloadType(type: string | undefined): boolean {

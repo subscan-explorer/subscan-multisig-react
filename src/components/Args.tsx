@@ -16,15 +16,15 @@ import {
   isSS58Address,
   isValueType,
 } from '../utils';
+import { Chain } from '../service/api-provider';
 import { SubscanLink } from './SubscanLink';
 
 interface ArgsProps {
-  args: Arg[];
+  args: Arg | Arg[];
   call?: string;
   className?: string;
   isAddress?: boolean;
   isBalance?: boolean;
-  isInner?: boolean;
   isShowName?: boolean;
   isValidate?: boolean;
   isValue?: boolean;
@@ -39,7 +39,7 @@ export type ArgObj = {
 
 type Arg = ArgObj | string | number | boolean;
 
-const parseValue = (value: AnyJson, ss58Format: number) => {
+const parseValue = (value: AnyJson, chain: Chain) => {
   const addrLen = 66;
 
   if (isArray(value)) {
@@ -48,7 +48,7 @@ const parseValue = (value: AnyJson, ss58Format: number) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const formatVal = (item as any)?.padStart(addrLen, '0x');
 
-        return encodeAddress(formatVal, ss58Format);
+        return encodeAddress(formatVal, +chain.ss58Format);
       } catch (err) {
         console.error('%c [ err ]-239', 'font-size:13px; background:pink; color:#bf2c9f;', err.message);
 
@@ -58,7 +58,11 @@ const parseValue = (value: AnyJson, ss58Format: number) => {
   }
 
   if (isObject(value)) {
-    return Object.entries(value).map(([k, v]) => ({ name: k, value: v, asValue: true }));
+    return Object.entries(value).map(([k, v]) => ({
+      name: k,
+      value: isBalanceType(k) || isCrabValue(k) ? formatBalance(v as string, +chain.tokens[0].decimal) : v,
+      asValue: true,
+    }));
   }
 
   return value;
@@ -68,8 +72,10 @@ export function Args({ args, isValidate, isBalance, isValue, isAddress, classNam
   const { t } = useTranslation();
   const { chain } = useApi();
   const paramValue = useCallback(
+    // eslint-disable-next-line complexity
     (value) => {
       let element: JSX.Element | string = '';
+
       if (isBalance || isCrabValue(value)) {
         element = formatBalance(value, +chain.tokens[0].decimal);
       } else if (isDownloadType(value)) {
@@ -78,13 +84,15 @@ export function Args({ args, isValidate, isBalance, isValue, isAddress, classNam
             {t('download')} <DownloadOutlined />
           </a>
         );
-      } else if (!isAddress) {
-        element = value;
-      } else {
+      } else if (isAddress) {
         element = <SubscanLink address={value} copyable />;
+      } else if (isArray(value)) {
+        element = <Args args={value} />;
+      } else {
+        element = value;
       }
 
-      return element;
+      return element ?? '-';
     },
     [chain.tokens, isAddress, isBalance, t]
   );
@@ -107,23 +115,22 @@ export function Args({ args, isValidate, isBalance, isValue, isAddress, classNam
       // eslint-disable-next-line complexity
       render(value, record) {
         const { type, name } = record;
-        const isAddr = type ? isAddressType(record.type) : isSS58Address(value);
+        const isAddr = type ? isAddressType(type) : isSS58Address(value);
 
         return (
           <Args
             isAddress={isAddr}
-            isBalance={!!type && isBalanceType(record.type)}
-            isValue={(!!name && isValueType(record.name)) || !!record.asValue}
-            isInner
+            isBalance={!!type && isBalanceType(type)}
+            isValue={(!!name && isValueType(name)) || !!record.asValue}
             isValidate={isValidate}
-            args={record.type ? parseValue(value, +chain.ss58Format) : value}
+            args={type ? parseValue(value, chain) : value}
           />
         );
       },
     },
   ];
 
-  return isValue ? (
+  return isValue || !Array.isArray(args) ? (
     <>{paramValue(args)}</>
   ) : (
     <Table

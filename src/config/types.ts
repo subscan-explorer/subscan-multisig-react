@@ -33,8 +33,8 @@ export const SUPPORT_TYPES = {
   },
   balance: {
     value: [
-      'ringbalance',
-      'ktonbalance',
+      'ringBalance',
+      'ktonBalance',
       'balance',
       'balanceof',
       'vec<balance>',
@@ -49,7 +49,7 @@ export const SUPPORT_TYPES = {
     value: ['reasonable', 'known good', 'knowngood'],
   },
   kton_balance: {
-    value: ['ktonbalance'],
+    value: ['ktonBalance'],
   },
   bond_extrinsic: {
     value: ['bond', 'unbond', 'bond_extra'],

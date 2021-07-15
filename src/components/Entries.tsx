@@ -171,7 +171,7 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
       },
     ];
     const callDataJson = entry.callData?.toJSON() ?? {};
-    const args = ((entry.meta?.args ?? []) as ArgObj[]).map((arg) => {
+    const args: Required<ArgObj>[] = ((entry.meta?.args ?? []) as Required<ArgObj>[]).map((arg) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const value = (callDataJson.args as any)[arg?.name ?? ''];
 

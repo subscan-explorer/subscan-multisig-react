@@ -35,7 +35,7 @@ const toString = (value: string | BN | number): string => {
   } else {
     throw new TypeError(
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      `Can not convert the value ${value} to String type. Value type if ${typeof value}`
+      `Can not convert the value ${value} to String type. Value type is ${typeof value}`
     );
   }
 };
