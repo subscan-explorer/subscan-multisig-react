@@ -1,3 +1,4 @@
+import { RightCircleOutlined } from '@ant-design/icons';
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import { StatusContext } from '@polkadot/react-components';
 import { PartialQueueTxExtrinsic } from '@polkadot/react-components/Status/types';
@@ -63,6 +64,7 @@ const renderMemberStatus = (entry: Entry, pair: KeyringJson) => {
 export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = true }: EntriesProps) {
   const { t } = useTranslation();
   const isInjected = useIsInjected();
+  const { networkConfig } = useApi();
   const [operation, setOperation] = useState<Operation>(DEFAULT_OPERATION);
   const { queueExtrinsic } = useContext(StatusContext);
   const [extrinsic, setExtrinsic] = useState<PartialQueueTxExtrinsic | null>(null);
@@ -204,7 +206,19 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
         columns={columns}
         rowKey={(record) => record.callHash ?? (record.blockHash as string)}
         pagination={false}
-        expandable={{ expandedRowRender, defaultExpandAllRows: true }}
+        expandable={{
+          expandedRowRender,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          expandIcon: ({ expanded, onExpand, record }: any) => (
+            <RightCircleOutlined
+              onClick={(event) => onExpand(record, event)}
+              className={`flex text-3xl transition origin-center duration-300 ease-linear transform rotate-${
+                expanded ? '90' : '0'
+              }`}
+              style={{ color: networkConfig.facade.color.main }}
+            />
+          ),
+        }}
         className="lg:block hidden"
       ></Table>
 

@@ -1,4 +1,4 @@
-import { CaretRightOutlined, GlobalOutlined, TeamOutlined } from '@ant-design/icons';
+import { CaretRightOutlined, GlobalOutlined, RightCircleOutlined } from '@ant-design/icons';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
@@ -48,10 +48,9 @@ const renderBalances = (account: KeyringAddress, chain: Chain) => {
 export function Wallets() {
   const { t } = useTranslation();
   const history = useHistory();
-  const { api, chain, network } = useApi();
+  const { api, chain, network, networkConfig } = useApi();
   const [multisigAccounts, setMultisigAccounts] = useState<KeyringAddress[]>([]);
   const isExtensionAccount = useIsInjected();
-  const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
   const [isCalculating, setIsCalculating] = useState<boolean>(true);
   const renderAction = useCallback(
     (row: KeyringAddress) => {
@@ -59,20 +58,6 @@ export function Wallets() {
 
       return (
         <Space size="middle">
-          <Tooltip overlay={t('members')}>
-            <Button
-              className="flex items-center justify-center"
-              icon={<TeamOutlined />}
-              onClick={() => {
-                if (expandedRowKeys.includes(address)) {
-                  setExpandedRowKeys(expandedRowKeys.filter((item) => item !== address));
-                } else {
-                  setExpandedRowKeys([...expandedRowKeys, address]);
-                }
-              }}
-            ></Button>
-          </Tooltip>
-
           {/*  eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <Badge dot count={(row as unknown as any).entries.length}>
             <Tooltip overlay={t('actions')}>
@@ -96,7 +81,7 @@ export function Wallets() {
         </Space>
       );
     },
-    [expandedRowKeys, history, network, t]
+    [history, network, t]
   );
 
   const columns: ColumnsType<KeyringAddress> = [
@@ -203,7 +188,19 @@ export function Wallets() {
         columns={columns}
         dataSource={multisigAccounts}
         rowKey="address"
-        expandable={{ expandedRowRender, expandedRowKeys }}
+        expandable={{
+          expandedRowRender,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          expandIcon: ({ expanded, onExpand, record }: any) => (
+            <RightCircleOutlined
+              onClick={(event) => onExpand(record, event)}
+              className={`flex text-3xl transition origin-center duration-300 ease-linear transform rotate-${
+                expanded ? '90' : '0'
+              }`}
+              style={{ color: networkConfig.facade.color.main }}
+            />
+          ),
+        }}
         pagination={false}
         loading={isCalculating}
         className="lg:block hidden"
