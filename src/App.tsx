@@ -33,6 +33,9 @@ const THEME_CONFIG: NetworkConfig<{ [key in keyof typeof darwiniaThemeJson]: str
   pangolin: pangolinThemeJson,
 };
 
+const MENU_CLASSES =
+  'text-white opacity-80 hover:opacity-100 leading-normal whitespace-nowrap cursor-pointer transition-all duration-200';
+
 function App() {
   const { t } = useTranslation();
   const { networkStatus, network, networkConfig, accounts } = useApi();
@@ -80,7 +83,7 @@ function App() {
         >
           <span className="flex items-center gap-4 justify-between">
             <Link to={Path.root} className="flex items-center gap-4">
-              <img src="/image/logo@2x.png" className="w-28 h-6" />
+              <img src="/image/logo@2x.png" style={{ width: '9rem' }} />
               <span
                 className="bg-white px-3 rounded-lg leading-6 whitespace-nowrap"
                 style={{ color: networkConfig.facade.color.main }}
@@ -93,9 +96,9 @@ function App() {
           </span>
 
           <div className="flex items-center gap-4">
-            <a href={`https://${network}.subscan.io`} target="__blank" className="text-white leading-normal">
+            <span onClick={() => window.open(`https://${network}.subscan.io`, '_blank')} className={MENU_CLASSES}>
               {t('explorer')}
-            </a>
+            </span>
 
             <Dropdown
               overlay={
@@ -123,9 +126,9 @@ function App() {
               placement="bottomCenter"
               arrow
             >
-              <a onClick={(e) => e.preventDefault()} className="text-white leading-normal whitespace-nowrap">
+              <span className={MENU_CLASSES}>
                 {t('accounts')} <DownOutlined />
-              </a>
+              </span>
             </Dropdown>
 
             <Dropdown
