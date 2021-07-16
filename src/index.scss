@@ -113,3 +113,8 @@ body {
     max-width: 100%;
   }
 }
+
+.wallet-member::placeholder,
+.wallet-member input::placeholder {
+  font-size: 12px;
+}

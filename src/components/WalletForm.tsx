@@ -146,9 +146,9 @@ export function WalletForm() {
                     {...field}
                     name={[field.name, 'name']}
                     fieldKey={[field.fieldKey, 'name']}
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: t('Member name is required') }]}
                   >
-                    <Input size="large" placeholder={t('wallet.tip.member_name')} />
+                    <Input size="large" placeholder={t('wallet.tip.member_name')} className="wallet-member" />
                   </Form.Item>
                 </Col>
 
@@ -157,8 +157,9 @@ export function WalletForm() {
                     {...field}
                     name={[field.name, 'address']}
                     fieldKey={[field.fieldKey, 'address']}
+                    validateFirst
                     rules={[
-                      { required: true },
+                      { required: true, message: t('Account address is required') },
                       {
                         validator: (_, value) =>
                           convertToSS58(value, networkConfig.ss58Prefix) ? Promise.resolve() : Promise.reject(),
@@ -189,6 +190,7 @@ export function WalletForm() {
                         suffix={<DownOutlined className="opacity-30" />}
                         size="large"
                         placeholder={t('wallet.tip.member_address')}
+                        className="wallet-member"
                       />
                     </AutoComplete>
                   </Form.Item>
