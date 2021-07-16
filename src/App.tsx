@@ -81,7 +81,12 @@ function App() {
           <span className="flex items-center gap-4 justify-between">
             <Link to={Path.root} className="flex items-center gap-4">
               <img src="/image/logo@2x.png" className="w-28 h-6" />
-              <span className="bg-white px-3 rounded-lg leading-6 whitespace-nowrap">{t('multisig.index')}</span>
+              <span
+                className="bg-white px-3 rounded-lg leading-6 whitespace-nowrap"
+                style={{ color: networkConfig.facade.color.main }}
+              >
+                {t('multisig.index')}
+              </span>
             </Link>
 
             <img src={polkaLogo} style={{ width: 32, height: 24 }} />
