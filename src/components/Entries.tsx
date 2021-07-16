@@ -177,7 +177,6 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
 
       return { ...arg, value };
     });
-    console.info('🚀 ~ file: Entries.tsx ~ line 175 ~ constargs:Required<ArgObj>[]= ~ args', args);
 
     return (
       <>
