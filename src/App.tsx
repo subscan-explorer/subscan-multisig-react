@@ -8,30 +8,17 @@ import Signer from '@polkadot/react-signer';
 import { Alert, Button, Dropdown, Layout, Menu, Typography } from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
 import { getYear } from 'date-fns';
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Route, Switch } from 'react-router-dom';
 import { DonateIcon, DownIcon } from './components/icons';
 import { Language } from './components/Language';
 import Status from './components/Status';
+import { ThemeSwitch } from './components/ThemeSwitch';
 import { NETWORK_CONFIG } from './config';
 import { Path, routes } from './config/routes';
 import { useApi } from './hooks';
-import { NetworkConfig } from './model';
 import { Connecting } from './pages/Connecting';
-import crabThemeJson from './theme/crab.json';
-import darwiniaThemeJson from './theme/darwinia.json';
-import kusamaThemeJson from './theme/kusama.json';
-import pangolinThemeJson from './theme/pangolin.json';
-import polkadotThemeJson from './theme/polkadot.json';
-
-const THEME_CONFIG: NetworkConfig<{ [key in keyof typeof darwiniaThemeJson]: string }> = {
-  polkadot: polkadotThemeJson,
-  kusama: kusamaThemeJson,
-  darwinia: darwiniaThemeJson,
-  crab: crabThemeJson,
-  pangolin: pangolinThemeJson,
-};
 
 const MENU_CLASSES =
   'text-white opacity-80 hover:opacity-100 leading-normal whitespace-nowrap cursor-pointer transition-all duration-200';
@@ -63,23 +50,13 @@ function App() {
     [isDevelopment, specName, systemChain, systemName]
   );
 
-  useEffect(() => {
-    window.less
-      .modifyVars(THEME_CONFIG[network])
-      .then(() => {
-        // do nothing;
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((error: any) => console.warn(error));
-  }, [network]);
-
   return (
     <>
       <GlobalStyle uiHighlight={uiHighlight} />
-      <Layout style={{ height: 'calc(100vh - 78px)' }} className="overflow-x-hidden theme-light">
+      <Layout style={{ height: 'calc(100vh - 68px)' }} className="overflow-x-hidden theme-light">
         <Header
           className="fixed left-0 right-0 top-0 z-10 flex sm:items-center flex-col sm:flex-row justify-around sm:justify-between xl:px-40 2xl:px-80 px-4 h-24 sm:h-20"
-          style={{ marginTop: -1, background: THEME_CONFIG[network]['@layout-header-background'] }}
+          style={{ marginTop: -1 }}
         >
           <span className="flex items-center gap-4 justify-between">
             <Link to={Path.root} className="flex items-center gap-4">
@@ -155,12 +132,14 @@ function App() {
               placement="bottomCenter"
               arrow
             >
-              <Button className="flex justify-between items-center gap-2">
+              <Button className="flex justify-between items-center gap-2 text-gray-800">
                 <img src={networkConfig.facade.logo} className="w-6 h-6" />
                 {networkConfig.fullName}
                 <DownIcon />
               </Button>
             </Dropdown>
+
+            <ThemeSwitch />
           </div>
         </Header>
 
