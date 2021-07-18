@@ -4,7 +4,7 @@
   "@btn-default-border": "@project-main-bg",
   "@btn-primary-bg": "@project-main-bg",
   "@card-radius": "@project-radius-base",
+  "@layout-header-background": "#000000",
   "@project-main-bg": "#000000",
-  "@project-radius-base": "12px",
-  "@layout-header-background": "#000000"
+  "@project-radius-base": "12px"
 }

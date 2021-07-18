@@ -9,11 +9,30 @@ module.exports = {
       backgroundColor: (_) => ({
         crab: '#EC3783',
         pangolin: '#5745DE',
+        polkadot: '#e6007a',
+        kusama: '#000',
       }),
       borderRadius: {
         xl: '10px',
         lg: '8px',
       },
+      colors: (_) => ({
+        pangolin: {
+          main: '#5745DE',
+        },
+        crab: {
+          main: '#EC3783',
+        },
+        darwinia: {
+          main: '#3a30dd',
+        },
+        polkadot: {
+          main: '#e6007a',
+        },
+        kusama: {
+          main: '#000',
+        },
+      }),
     },
   },
 };

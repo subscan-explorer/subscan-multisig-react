@@ -1,4 +1,4 @@
-import { CaretRightOutlined, GlobalOutlined, RightCircleOutlined } from '@ant-design/icons';
+import { CaretRightOutlined, GlobalOutlined } from '@ant-design/icons';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
@@ -11,6 +11,7 @@ import { Path } from '../config/routes';
 import { useApi, useIsInjected } from '../hooks';
 import { Chain } from '../service';
 import { accuracyFormat } from '../utils';
+import { genExpandIcon } from './expandIcon';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
 
@@ -48,7 +49,7 @@ const renderBalances = (account: KeyringAddress, chain: Chain) => {
 export function Wallets() {
   const { t } = useTranslation();
   const history = useHistory();
-  const { api, chain, network, networkConfig } = useApi();
+  const { api, chain, network } = useApi();
   const [multisigAccounts, setMultisigAccounts] = useState<KeyringAddress[]>([]);
   const isExtensionAccount = useIsInjected();
   const [isCalculating, setIsCalculating] = useState<boolean>(true);
@@ -188,19 +189,7 @@ export function Wallets() {
         columns={columns}
         dataSource={multisigAccounts}
         rowKey="address"
-        expandable={{
-          expandedRowRender,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          expandIcon: ({ expanded, onExpand, record }: any) => (
-            <RightCircleOutlined
-              onClick={(event) => onExpand(record, event)}
-              className={`flex text-3xl transition origin-center duration-300 ease-linear transform rotate-${
-                expanded ? '90' : '0'
-              }`}
-              style={{ color: networkConfig.facade.color.main }}
-            />
-          ),
-        }}
+        expandable={{ expandedRowRender, expandIcon: genExpandIcon(network) }}
         pagination={false}
         loading={isCalculating}
         className="lg:block hidden"

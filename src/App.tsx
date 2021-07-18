@@ -11,17 +11,21 @@ import { getYear } from 'date-fns';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Route, Switch } from 'react-router-dom';
-import { DonateIcon, DownIcon } from './components/icons';
+import { DownIcon } from './components/icons';
 import { Language } from './components/Language';
 import Status from './components/Status';
 import { ThemeSwitch } from './components/ThemeSwitch';
 import { NETWORK_CONFIG } from './config';
 import { Path, routes } from './config/routes';
 import { useApi } from './hooks';
+import { NetworkType } from './model';
 import { Connecting } from './pages/Connecting';
 
-const MENU_CLASSES =
-  'text-white opacity-80 hover:opacity-100 leading-normal whitespace-nowrap cursor-pointer transition-all duration-200';
+const genHeaderLinkStyle = (classes: TemplateStringsArray, network: NetworkType) => {
+  return `text-white opacity-80 hover:opacity-100 leading-normal whitespace-nowrap cursor-pointer transition-all duration-200 dark:text-${network}-main ${classes.join(
+    ' '
+  )}`;
+};
 
 function App() {
   const { t } = useTranslation();
@@ -49,6 +53,7 @@ function App() {
     () => (isDevelopment ? undefined : getSystemColor(systemChain, systemName, specName)),
     [isDevelopment, specName, systemChain, systemName]
   );
+  const headerLinkStyle = useMemo(() => genHeaderLinkStyle`${network}`, [network]);
 
   return (
     <>
@@ -61,10 +66,7 @@ function App() {
           <span className="flex items-center gap-4 justify-between">
             <Link to={Path.root} className="flex items-center gap-4">
               <img src="/image/logo@2x.png" style={{ width: '9rem' }} />
-              <span
-                className="bg-white px-3 rounded-lg leading-6 whitespace-nowrap"
-                style={{ color: networkConfig.facade.color.main }}
-              >
+              <span className={`bg-white px-3 rounded-lg leading-6 whitespace-nowrap text-${network}-main`}>
                 {t('multisig.index')}
               </span>
             </Link>
@@ -73,7 +75,7 @@ function App() {
           </span>
 
           <div className="flex items-center gap-4">
-            <span onClick={() => window.open(`https://${network}.subscan.io`, '_blank')} className={MENU_CLASSES}>
+            <span onClick={() => window.open(`https://${network}.subscan.io`, '_blank')} className={headerLinkStyle}>
               {t('explorer')}
             </span>
 
@@ -103,7 +105,7 @@ function App() {
               placement="bottomCenter"
               arrow
             >
-              <span className={MENU_CLASSES}>
+              <span className={headerLinkStyle}>
                 {t('accounts')} <DownOutlined />
               </span>
             </Dropdown>
@@ -132,7 +134,7 @@ function App() {
               placement="bottomCenter"
               arrow
             >
-              <Button className="flex justify-between items-center gap-2 text-gray-800">
+              <Button className="flex justify-between items-center gap-2">
                 <img src={networkConfig.facade.logo} className="w-6 h-6" />
                 {networkConfig.fullName}
                 <DownIcon />
@@ -197,23 +199,30 @@ function App() {
                 </Menu>
               }
             >
-              <DonateIcon />
+              <Typography.Link
+                target="__blank"
+                rel="noopener"
+                className="bg-white flex items-center justify-center rounded"
+                style={{ width: 30, height: 30 }}
+              >
+                <img src={`/icons/donate.svg`} className="w-6 h-6" />
+              </Typography.Link>
             </Dropdown>
 
             {contactIcons.map(({ href, icon }) => (
-              <a
+              <Typography.Link
                 target="__blank"
                 rel="noopener"
                 href={href}
                 key={icon}
                 className="bg-white flex items-center justify-center rounded"
-                style={{ width: 26, height: 26 }}
+                style={{ width: 30, height: 30 }}
               >
                 <img src={`/icons/${icon}.svg`} className="w-4 h-4" />
-              </a>
+              </Typography.Link>
             ))}
 
-            <Language className="text-2xl cursor-pointer text-gray-400" />
+            <Language />
           </div>
         </Layout.Footer>
       </Layout>
