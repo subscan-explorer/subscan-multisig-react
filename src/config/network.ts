@@ -9,8 +9,6 @@ export enum Network {
 export const NETWORK_CONFIG: NetworkConfig = {
   polkadot: {
     facade: {
-      bgClsName: '',
-      color: { main: '#e6007a' },
       logo: '/image/polkadot-button-mobile.png',
       logoWithText: '/image/polkadot-button.png',
     },
@@ -31,8 +29,6 @@ export const NETWORK_CONFIG: NetworkConfig = {
   },
   kusama: {
     facade: {
-      bgClsName: '',
-      color: { main: '#000000' },
       logo: '/image/kusama-button-mobile.png',
       logoWithText: '/image/kusama-button.png',
     },
@@ -56,8 +52,6 @@ export const NETWORK_CONFIG: NetworkConfig = {
   darwinia: {
     // TODO
     facade: {
-      bgClsName: 'bg-darwinia',
-      color: { main: 'linear-gradient(-45deg, #fe3876 0%, #7c30dd 71%, #3a30dd 100%)' },
       logo: '/image/darwinia-button-mobile.png',
       logoWithText: '/image/darwinia-logo.svg',
     },
@@ -78,8 +72,6 @@ export const NETWORK_CONFIG: NetworkConfig = {
   },
   pangolin: {
     facade: {
-      bgClsName: 'bg-pangolin',
-      color: { main: '#5745de' },
       logo: '/image/pangolin-button-mobile.png',
       logoWithText: '/image/pangolin-logo.svg',
     },
@@ -100,8 +92,6 @@ export const NETWORK_CONFIG: NetworkConfig = {
   },
   crab: {
     facade: {
-      bgClsName: 'bg-crab',
-      color: { main: '#ec3783' },
       logo: '/image/crab-button-mobile.png',
       logoWithText: '/image/crab-logo.svg',
     },

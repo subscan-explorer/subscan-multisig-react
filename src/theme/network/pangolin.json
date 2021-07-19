@@ -1,0 +1,10 @@
+{
+  "@btn-border-radius-base": "@project-radius-base",
+  "@btn-default-bg": "#fff",
+  "@btn-default-border": "@project-main-bg",
+  "@btn-primary-bg": "@project-main-bg",
+  "@card-radius": "@project-radius-base",
+  "@layout-header-background": "#5745de",
+  "@project-main-bg": "#5745de",
+  "@project-radius-base": "12px"
+}

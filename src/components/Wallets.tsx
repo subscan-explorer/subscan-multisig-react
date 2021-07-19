@@ -1,4 +1,4 @@
-import { CaretRightOutlined, GlobalOutlined, TeamOutlined } from '@ant-design/icons';
+import { CaretRightOutlined, GlobalOutlined } from '@ant-design/icons';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
@@ -11,6 +11,7 @@ import { Path } from '../config/routes';
 import { useApi, useIsInjected } from '../hooks';
 import { Chain } from '../service';
 import { accuracyFormat } from '../utils';
+import { genExpandIcon } from './expandIcon';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
 
@@ -51,7 +52,6 @@ export function Wallets() {
   const { api, chain, network } = useApi();
   const [multisigAccounts, setMultisigAccounts] = useState<KeyringAddress[]>([]);
   const isExtensionAccount = useIsInjected();
-  const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
   const [isCalculating, setIsCalculating] = useState<boolean>(true);
   const renderAction = useCallback(
     (row: KeyringAddress) => {
@@ -59,20 +59,6 @@ export function Wallets() {
 
       return (
         <Space size="middle">
-          <Tooltip overlay={t('members')}>
-            <Button
-              className="flex items-center justify-center"
-              icon={<TeamOutlined />}
-              onClick={() => {
-                if (expandedRowKeys.includes(address)) {
-                  setExpandedRowKeys(expandedRowKeys.filter((item) => item !== address));
-                } else {
-                  setExpandedRowKeys([...expandedRowKeys, address]);
-                }
-              }}
-            ></Button>
-          </Tooltip>
-
           {/*  eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <Badge dot count={(row as unknown as any).entries.length}>
             <Tooltip overlay={t('actions')}>
@@ -96,7 +82,7 @@ export function Wallets() {
         </Space>
       );
     },
-    [expandedRowKeys, history, network, t]
+    [history, network, t]
   );
 
   const columns: ColumnsType<KeyringAddress> = [
@@ -203,7 +189,7 @@ export function Wallets() {
         columns={columns}
         dataSource={multisigAccounts}
         rowKey="address"
-        expandable={{ expandedRowRender, expandedRowKeys }}
+        expandable={{ expandedRowRender, expandIcon: genExpandIcon(network) }}
         pagination={false}
         loading={isCalculating}
         className="lg:block hidden"

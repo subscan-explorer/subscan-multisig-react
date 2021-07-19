@@ -11,12 +11,16 @@ import './index.scss';
 import reportWebVitals from './reportWebVitals';
 import { ApiProvider, GqlProvider } from './service';
 import './theme/antd/index.less';
+import { readStorage } from './utils/helper/storage';
+
+// FIXME: Polkadot react-components does not support dark mode currently.
+const { theme = 'light' } = readStorage();
 
 ReactDOM.render(
   <Suspense fallback="loading">
     <Router>
       <ApiProvider>
-        <ThemeProvider theme={{ theme: 'light' }}>
+        <ThemeProvider theme={{ theme }}>
           <Queue>
             <PolkaApiProvider>
               <GqlProvider>

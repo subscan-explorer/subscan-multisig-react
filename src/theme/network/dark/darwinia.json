@@ -1,0 +1,11 @@
+{
+  "@btn-border-radius-base": "@project-radius-base",
+  "@btn-default-bg": "linear-gradient(#000, #000) padding-box, linear-gradient(to right, #5745de, #ec3783) border-box",
+  "@btn-default-border": "2px solid transparent",
+  "@btn-primary-bg": "@project-main-bg",
+  "@card-radius": "@project-radius-base",
+  "@project-accent": "#7c30dd",
+  "@project-main-bg": "linear-gradient(-45deg, #fe3876 0%, #7c30dd 71%, #3a30dd 100%)",
+  "@project-primary": "#3a30dd",
+  "@project-radius-base": "12px"
+}

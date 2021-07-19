@@ -4,7 +4,7 @@ import { useApi } from '../../hooks';
 import './Anime.scss';
 
 export function Anime() {
-  const { networkConfig, networkStatus, setRandom } = useApi();
+  const { networkStatus, setRandom, network } = useApi();
   const { t } = useTranslation();
   const length = 9;
   const ascIIStart = 97;
@@ -15,7 +15,7 @@ export function Anime() {
       <div className="anime">
         <ul>
           {ids.map((item, index) => (
-            <li key={index} id={item} style={{ background: networkConfig.facade.color.main }}></li>
+            <li key={index} id={item} className={`bg-${network}`}></li>
           ))}
         </ul>
       </div>

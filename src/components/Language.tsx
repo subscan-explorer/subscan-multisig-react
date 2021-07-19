@@ -1,10 +1,13 @@
-import { Dropdown, Menu } from 'antd';
-import { useState } from 'react';
+import { Button, Dropdown, Menu } from 'antd';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { NETWORK_LIGHT_THEME } from '../config';
+import { NetworkType } from '../model';
 import { EarthIcon } from './icons';
 
 export interface LanguageProps {
   className?: string;
+  network?: NetworkType;
 }
 
 const lang: { name: string; short: string }[] = [
@@ -12,9 +15,10 @@ const lang: { name: string; short: string }[] = [
   { name: 'English', short: 'en' },
 ];
 
-export function Language({ className = '' }: LanguageProps) {
+export function Language({ network, className = '' }: LanguageProps) {
   const { t, i18n } = useTranslation();
   const [current, setCurrent] = useState(i18n.language.includes('-') ? i18n.language.split('-')[0] : i18n.language);
+  const textColor = useMemo(() => (network ? 'text-' + network + '-main' : ''), [network]);
 
   return (
     <Dropdown
@@ -37,10 +41,14 @@ export function Language({ className = '' }: LanguageProps) {
       }
       className={className}
     >
-      <div className="rounded bg-white flex items-center px-2 py-0.5 cursor-pointer">
-        <EarthIcon />
-        <span className="ml-2 text-xs uppercase text-black">{t(current)}</span>
-      </div>
+      <Button
+        className={`${textColor} flex items-center justify-around uppercase`}
+        icon={
+          <EarthIcon style={{ color: (network && NETWORK_LIGHT_THEME[network]['@project-main-bg']) || 'inherit' }} />
+        }
+      >
+        <span className={textColor}>{current}</span>
+      </Button>
     </Dropdown>
   );
 }

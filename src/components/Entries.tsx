@@ -13,6 +13,7 @@ import { useApi, useFee, useIsInjected, useMultiApprove } from '../hooks';
 import { AddressPair, Entry, TxActionType } from '../model';
 import { txDoc, txMethod, txMethodDescription } from '../utils';
 import { ArgObj, Args } from './Args';
+import { genExpandIcon } from './expandIcon';
 import { Fee } from './Fee';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
@@ -63,6 +64,7 @@ const renderMemberStatus = (entry: Entry, pair: KeyringJson) => {
 export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = true }: EntriesProps) {
   const { t } = useTranslation();
   const isInjected = useIsInjected();
+  const { network } = useApi();
   const [operation, setOperation] = useState<Operation>(DEFAULT_OPERATION);
   const { queueExtrinsic } = useContext(StatusContext);
   const [extrinsic, setExtrinsic] = useState<PartialQueueTxExtrinsic | null>(null);
@@ -204,7 +206,10 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
         columns={columns}
         rowKey={(record) => record.callHash ?? (record.blockHash as string)}
         pagination={false}
-        expandable={{ expandedRowRender, defaultExpandAllRows: true }}
+        expandable={{
+          expandedRowRender,
+          expandIcon: genExpandIcon(network),
+        }}
         className="lg:block hidden"
       ></Table>
 

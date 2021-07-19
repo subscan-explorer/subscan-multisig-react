@@ -9,9 +9,7 @@ export type SS58Prefix = 0 | 2 | 18 | 42;
 
 interface Facade {
   logo: string;
-  bgClsName: string;
   logoWithText: string;
-  color: { main: string };
 }
 
 type TokenRecord = { [key in Token]?: string };

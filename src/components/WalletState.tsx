@@ -18,7 +18,7 @@ const { Text } = Typography;
 export function WalletState() {
   const { t } = useTranslation();
   const history = useHistory();
-  const { networkConfig } = useApi();
+  const { network } = useApi();
   const { account } = useParams<{ account: string }>();
   const { multisigAccount, setMultisigAccount, inProgress, queryInProgress } = useMultisigContext();
   const [isAccountsDisplay, setIsAccountsDisplay] = useState<boolean>(false);
@@ -142,9 +142,9 @@ export function WalletState() {
         <Button
           icon={
             isAccountsDisplay ? (
-              <ArrowUpOutlined style={{ color: networkConfig.facade.color.main }} />
+              <ArrowUpOutlined className={`text-${network}-main`} />
             ) : (
-              <ArrowDownOutlined style={{ color: networkConfig.facade.color.main }} />
+              <ArrowDownOutlined className={`text-${network}-main`} />
             )
           }
           onClick={() => setIsAccountsDisplay(!isAccountsDisplay)}

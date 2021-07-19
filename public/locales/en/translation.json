@@ -1,8 +1,10 @@
 {
   "0x...": "0x...",
+  "Account address is required": "Account address is required",
   "Decode": "Decode",
   "Drag file here or click to select": "Drag file here or click to select",
   "Insufficient parameters": "Insufficient parameters",
+  "Member name is required": "Member name is required",
   "Select approve account": "Select approve account",
   "Submission": "Submission",
   "Submit Transaction": "Submit Transaction",

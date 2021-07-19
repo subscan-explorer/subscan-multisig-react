@@ -5,8 +5,8 @@ import type { InjectedExtension } from '@polkadot/extension-inject/types';
 import React, { createContext, Dispatch, useCallback, useEffect, useReducer, useState } from 'react';
 import { NETWORK_CONFIG } from '../config';
 import { Action, ConnectStatus, InjectedAccountWithMeta, NetConfig, NetworkType } from '../model';
-import { convertToSS58, getInfoFromHash, patchUrl } from '../utils';
-import { readStorage, updateStorage } from '../utils/helper/storage';
+import { convertToSS58, getInitialSetting, patchUrl } from '../utils';
+import { updateStorage } from '../utils/helper/storage';
 
 interface StoreState {
   accounts: InjectedAccountWithMeta[] | null;
@@ -26,20 +26,13 @@ export interface Chain {
 
 type ActionType = 'switchNetwork' | 'updateNetworkStatus' | 'setAccounts';
 
-const getInitialNetwork = (): NetworkType => {
-  const fromHash = getInfoFromHash();
-  const fromStorage = readStorage();
-
-  return fromHash.network ?? fromStorage.network ?? 'pangolin';
-};
-
 const cacheNetwork = (network: NetworkType): void => {
   patchUrl({ network });
   updateStorage({ network });
 };
 
 const initialState: StoreState = {
-  network: getInitialNetwork(),
+  network: getInitialSetting<NetworkType>('network', 'pangolin'),
   accounts: null,
   networkStatus: 'pending',
 };

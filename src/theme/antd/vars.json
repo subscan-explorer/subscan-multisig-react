@@ -1,0 +1,20 @@
+{
+  "@border-radius-base": "10px",
+  "@shadow-2": "0 0 24px 0 rgba(191, 194, 234, 0.41)",
+  "@project-main-bg": "linear-gradient(-45deg, #fe3876 0%, #7c30dd 71%, #3a30dd 100%)",
+  "@project-primary": "#5745de",
+  "@project-accent": "#ec3783",
+  "@primary-color": "@project-primary",
+  "@select-item-selected-option-color": "@primary-color",
+  "@processing-color": "@primary-color",
+  "@select-item-selected-bg": "@background-color-base",
+  "@secondary-color": "@primary-color",
+  "@skeleton-color": "@primary-color",
+  "@btn-primary-bg": "@project-main-bg",
+  "@btn-default-border": "2px solid transparent",
+  "@btn-default-bg": "linear-gradient(#ffffff, #ffffff) padding-box,\n  linear-gradient(to right, #5745de, #ec3783) border-box",
+  "@card-shadow": "0 0 24px 0 rgba(191, 194, 234, 0.41)",
+  "@card-radius": "@border-radius-base * 2",
+  "@modal-footer-padding-vertical": "24px",
+  "@modal-footer-padding-horizontal": "24px"
+}
