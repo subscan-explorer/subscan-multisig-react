@@ -141,7 +141,7 @@ function App() {
               </Button>
             </Dropdown>
 
-            <ThemeSwitch />
+            <ThemeSwitch network={network} />
           </div>
         </Header>
 

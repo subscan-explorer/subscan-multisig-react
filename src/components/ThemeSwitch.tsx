@@ -1,7 +1,6 @@
 import { Switch } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { NETWORK_DARK_THEME, NETWORK_LIGHT_THEME, SKIN_THEME, THEME } from '../config';
-import { useApi } from '../hooks';
 import { NetworkType } from '../model';
 import { readStorage, updateStorage } from '../utils/helper/storage';
 
@@ -21,9 +20,12 @@ export const toggleTheme = (theme: THEME, network: NetworkType) => {
     });
 };
 
-export function ThemeSwitch() {
+export interface ThemeSwitchProps {
+  network: NetworkType;
+}
+
+export function ThemeSwitch({ network }: ThemeSwitchProps) {
   const [theme, setTheme] = useState<THEME>(readStorage()?.theme || THEME.LIGHT);
-  const { network } = useApi();
 
   useEffect(() => {
     toggleTheme(theme, network);
