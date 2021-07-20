@@ -1,3 +1,18 @@
+# [0.2.0](https://github.com/itering/subscan-multisig-react/compare/0.1.0...v0.2.0) (2021-07-20)
+
+### chore
+
+- add change log (#33) ([f21406b](https://github.com/itering/subscan-multisig-react/commit/f21406b2beb30e6325cb5e54401f861713928283)), closes [#33](https://github.com/itering/subscan-multisig-react/issues/33)
+- apache 2.0 license ([9bb3d22](https://github.com/itering/subscan-multisig-react/commit/9bb3d22b98752e8ff115971752cf045ea527e7bb))
+
+### ci
+
+- switch to npm (#34) ([d7ed252](https://github.com/itering/subscan-multisig-react/commit/d7ed25223ae94c816572dee4a6c0c6e0a0f3990e)), closes [#34](https://github.com/itering/subscan-multisig-react/issues/34)
+
+### test
+
+- test integration ([600fe80](https://github.com/itering/subscan-multisig-react/commit/600fe808cb4d961fab55c7e37423b29c2601a687))
+
 # [0.1.0](https://github.com/itering/subscan-multisig-react/compare/70a6cd9bf9f86a4f3d8f6573b915d91d6bb4b135...0.1.0) (2021-07-07)
 
 ### build
