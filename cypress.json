@@ -1,0 +1,13 @@
+{
+  "baseUrl": "http://localhost:3008",
+  "component": {
+    "componentFolder": "src",
+    "testFiles": "__tests__/**/*.test.{js,ts,jsx,tsx}"
+  },
+  "env": {
+    "product": "https://multisig.subscan.io/",
+    "staging": "https://multisig.subscan.io.l2me.com/"
+  },
+  "ignoreTestFiles": "*/examples/**",
+  "nodeVersion": "system"
+}

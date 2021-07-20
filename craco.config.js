@@ -6,14 +6,14 @@ const antdVarsPath = './src/theme/antd/vars.less';
 const CracoAntDesignPlugin = require('craco-antd');
 const { getLessVars } = require('antd-theme-generator');
 const themeVariables = getLessVars(path.join(__dirname, antdVarsPath));
-const defaultVars = getLessVars('./node_modules/antd/lib/style/themes/default.less');
+const defaultVars = getLessVars(path.join(__dirname, './node_modules/antd/lib/style/themes/default.less'));
 const darkVars = {
-  ...getLessVars('./node_modules/antd/lib/style/themes/dark.less'),
+  ...getLessVars(path.join(__dirname, './node_modules/antd/lib/style/themes/dark.less')),
   '@primary-color': defaultVars['@primary-color'],
   '@picker-basic-cell-active-with-range-color': 'darken(@primary-color, 20%)',
 };
 const lightVars = {
-  ...getLessVars('./node_modules/antd/lib/style/themes/compact.less'),
+  ...getLessVars(path.join(__dirname, './node_modules/antd/lib/style/themes/compact.less')),
   '@primary-color': defaultVars['@primary-color'],
 };
 const { alias, configPaths } = require('react-app-rewire-alias');
@@ -62,7 +62,9 @@ module.exports = {
         include: /node_modules/,
         type: 'javascript/auto',
       });
-      return alias(configPaths('./tsconfig.paths.json'))(webpackConfig);
+      const config = alias(configPaths(path.join(__dirname, './tsconfig.paths.json')))(webpackConfig);
+
+      return config;
     },
   },
 };

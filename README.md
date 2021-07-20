@@ -187,7 +187,7 @@ We welcome contributions of any kind. Issues labeled can be good (first) contrib
 
 ## LICENSE
 
-GPL-3.0
+[Apache License - 2.0](https://www.apache.org/licenses/LICENSE-2.0)
 
 ## Resource
 
