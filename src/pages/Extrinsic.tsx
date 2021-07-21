@@ -1,7 +1,7 @@
 import { Card } from 'antd';
 import { ExtrinsicRecords } from '../components/ExtrinsicRecords';
 import { WalletState } from '../components/WalletState';
-import { EntriesProvider } from '../service/multisig-provider';
+import { EntriesProvider } from '../providers/multisig-provider';
 
 export function Extrinsic() {
   return (

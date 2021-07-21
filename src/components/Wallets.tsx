@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
 import { Path } from '../config/routes';
 import { useApi, useIsInjected } from '../hooks';
-import { Chain } from '../service';
+import { Chain } from '../providers';
 import { accuracyFormat } from '../utils';
 import { genExpandIcon } from './expandIcon';
 import { MemberList } from './Members';
