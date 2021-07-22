@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const typescriptTransform = require('i18next-scanner-typescript');
 
 module.exports = {
@@ -16,10 +15,10 @@ module.exports = {
     browserLanguageDetection: true,
     func: {
       list: ['i18next.t', 'i18n.t', 't'],
-      extensions: ['.ts', '.tsx'],
+      extensions: ['.js', '.jsx'],
     },
     trans: {
-      extensions: ['.ts', '.tsx'],
+      extensions: ['.js', '.jsx'],
       fallbackKey(_, value) {
         return value;
       },
