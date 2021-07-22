@@ -9,7 +9,7 @@ import App from './App';
 import './config/i18n';
 import './index.scss';
 import reportWebVitals from './reportWebVitals';
-import { ApiProvider, GqlProvider } from './service';
+import { ApiProvider, GqlProvider } from './providers';
 import './theme/antd/index.less';
 import { readStorage } from './utils/helper/storage';
 

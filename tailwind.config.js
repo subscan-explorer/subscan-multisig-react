@@ -1,5 +1,4 @@
 module.exports = {
-  purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'], // tree-shake unused css in production
   darkMode: 'class', // or 'media' or 'class'
   theme: {
     extend: {

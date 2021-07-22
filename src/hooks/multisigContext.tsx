@@ -1,4 +1,4 @@
 import { useContext } from 'react';
-import { MultisigContext } from '../service/multisig-provider';
+import { MultisigContext } from '../providers/multisig-provider';
 
 export const useMultisigContext = () => useContext(MultisigContext);

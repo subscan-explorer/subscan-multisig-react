@@ -7,7 +7,7 @@ import { isArray, isObject, isString } from 'lodash';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApi } from '../hooks';
-import { Chain } from '../service/api-provider';
+import { Chain } from '../providers/api-provider';
 import {
   formatBalance,
   isAddressType,
