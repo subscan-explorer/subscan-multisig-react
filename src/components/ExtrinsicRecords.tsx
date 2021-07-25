@@ -9,7 +9,6 @@ import { useParams } from 'react-router-dom';
 import { TRANSFERS_COUNT_QUERY, TRANSFERS_QUERY } from '../config';
 import { useApi } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
-import { Entry } from '../model';
 import { IExtrinsic, parseArgs } from '../utils';
 import { Entries } from './Entries';
 
@@ -80,6 +79,7 @@ function Confirmed({ account, multiAddress }: ConfirmedProps) {
         blockHash,
         meta,
         hash: blockHash,
+        callHash: null,
         address: fromId,
         approvals: [
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -90,7 +90,7 @@ function Confirmed({ account, multiAddress }: ConfirmedProps) {
         created_at: timestamp,
         when: { height: isNumber(height) ? height : +height.replace(',', ''), index: +index },
         depositor: '',
-      } as Entry;
+      };
     });
   }, [api, data?.transfers]);
 

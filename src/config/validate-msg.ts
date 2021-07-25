@@ -4,7 +4,7 @@ const typeTemplateZh = '${label}不是合法的 ${type}';
 /* eslint-disable */
 const en = {
   default: 'Validation error on field ${name}',
-  required: '${name} is required',
+  required: '${label} is required',
   enum: '${name} must be one of [${enum}]',
   whitespace: '${name} cannot be empty',
   date: {

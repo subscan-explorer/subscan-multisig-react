@@ -32,7 +32,7 @@ export function extractExternal(accountId: string | undefined | null): MultiInfo
   };
 }
 
-export const txMethod = (data: Call | undefined, api: ApiPromise | null): string => {
+export const txMethod = (data: Call | undefined | null, api: ApiPromise | null): string => {
   if (!data || !api) {
     return '-';
   }
@@ -51,7 +51,7 @@ export const txMethod = (data: Call | undefined, api: ApiPromise | null): string
 };
 
 export const txMethodDescription = (
-  data: Call | undefined,
+  data: Call | undefined | null,
   api: ApiPromise | null
 ): { name: string; type: string; value: string }[] => {
   if (!data || !api) {
@@ -81,7 +81,7 @@ export const txMethodDescription = (
   return [];
 };
 
-export const txDoc = (data: Call | undefined): string => {
+export const txDoc = (data: Call | undefined | null): string => {
   if (!data) {
     return '-';
   }

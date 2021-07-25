@@ -37,7 +37,7 @@ const { Title, Text } = Typography;
 const { Panel } = Collapse;
 const DEFAULT_OPERATION: Operation = { entry: null, type: 'pending', accounts: [] };
 
-const renderMethod = (data: Call | undefined) => {
+const renderMethod = (data: Call | undefined | null) => {
   const call = data?.toHuman();
 
   if (call) {
