@@ -1,12 +1,13 @@
 import { ArrowDownOutlined, ArrowUpOutlined, DeleteOutlined } from '@ant-design/icons';
 import keyring from '@polkadot/ui-keyring';
+import { KeyringJson } from '@polkadot/ui-keyring/types';
 import { Button, message, Modal, Popconfirm, Space, Statistic, Typography } from 'antd';
 import { useQuery } from 'graphql-hooks';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useParams } from 'react-router-dom';
 import { TRANSFERS_COUNT_QUERY } from '../config';
-import { useApi } from '../hooks';
+import { useApi, useIsInjected } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
 import { ExtrinsicLaunch } from './ExtrinsicLaunch';
 import { Members } from './Members';
@@ -24,6 +25,7 @@ export function WalletState() {
   const [isAccountsDisplay, setIsAccountsDisplay] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isExtrinsicDisplay, setIsExtrinsicDisplay] = useState(false);
+  const isExtensionAccount = useIsInjected();
   const { data } = useQuery<{ transfers: { totalCount: number } }>(TRANSFERS_COUNT_QUERY, {
     variables: {
       account,
@@ -121,14 +123,18 @@ export function WalletState() {
           )}
         </div>
 
-        <Button
-          onClick={() => setIsExtrinsicDisplay(true)}
-          type="primary"
-          size="large"
-          className="w-full md:w-auto mt-4 md:mt-0"
-        >
-          {t('submit_extrinsic')}
-        </Button>
+        {((multisigAccount?.meta.addressPair as KeyringJson[]) || []).some((pair) =>
+          isExtensionAccount(pair.address)
+        ) && (
+          <Button
+            onClick={() => setIsExtrinsicDisplay(true)}
+            type="primary"
+            size="large"
+            className="w-full md:w-auto mt-4 md:mt-0"
+          >
+            {t('submit_extrinsic')}
+          </Button>
+        )}
       </div>
 
       <Space size="middle" className="items-center hidden md:flex">
