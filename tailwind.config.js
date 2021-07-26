@@ -32,6 +32,10 @@ module.exports = {
           main: '#000',
         },
       }),
+      height: {
+        'screen-sub-head': 'calc(100vh - 68px)',
+        'screen-sub-head-footer': 'calc(100vh - 2 * 68px)',
+      },
     },
   },
 };
