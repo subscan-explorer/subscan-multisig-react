@@ -12,10 +12,10 @@ export interface Entry {
   depositor: string;
   approvals: string[];
   address: string;
-  callHash?: string;
+  callHash: string | null;
   blockHash?: string;
-  callData?: Call;
-  meta?: Record<string, AnyJson>;
+  callData: Call | null;
+  meta: Record<string, AnyJson> | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }

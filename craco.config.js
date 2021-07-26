@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const AntDesignThemePlugin = require('antd-theme-webpack-plugin');
-// eslint-disable-next-line import/order
 const path = require('path');
 const antdVarsPath = './src/theme/antd/vars.less';
 const CracoAntDesignPlugin = require('craco-antd');

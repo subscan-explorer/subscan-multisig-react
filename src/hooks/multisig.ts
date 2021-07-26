@@ -19,7 +19,7 @@ export function useMultisig(acc?: string) {
 
     const multisig = keyring.getAccount(acc ?? account);
     const data = await api.query.multisig.multisigs.entries(multisig?.address);
-    const result = data?.map((entry) => {
+    const result: Pick<Entry, 'when' | 'depositor' | 'approvals' | 'address' | 'callHash'>[] = data?.map((entry) => {
       const [address, callHash] = entry[0].toHuman() as string[];
 
       return {
@@ -29,12 +29,12 @@ export function useMultisig(acc?: string) {
         callHash,
       };
     });
-    const callInfos = await api?.query.multisig.calls.multi(result.map((item) => item.callHash));
-    const calls = callInfos?.map((callInfo, index) => {
+    const callInfos = await api?.query.multisig.calls.multi(result.map((item) => item.callHash || ''));
+    const calls: Entry[] = callInfos?.map((callInfo, index) => {
       const call = callInfo.toHuman() as AnyJson[];
 
       if (!call) {
-        return result[index];
+        return { ...result[index], callData: null, meta: {}, hash: result[index].callHash };
       }
 
       try {
@@ -43,7 +43,7 @@ export function useMultisig(acc?: string) {
 
         return { ...result[index], callData, meta, hash: result[index].callHash };
       } catch (_) {
-        return result[index];
+        return { ...result[index], callData: null, meta: {}, hash: result[index].callHash };
       }
     });
 
