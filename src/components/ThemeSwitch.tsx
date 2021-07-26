@@ -45,7 +45,7 @@ export function ThemeSwitch({ network }: ThemeSwitchProps) {
       onChange={() => {
         setTheme(theme === THEME.DARK ? THEME.LIGHT : THEME.DARK);
       }}
-      className="ml-4"
+      className="ml-2 md:ml-4"
     />
   );
 }

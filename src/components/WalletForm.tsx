@@ -239,17 +239,11 @@ export function WalletForm() {
       </Form.List>
 
       <Form.Item>
-        <div className="w-full flex justify-between items-center gap-8">
-          <Button
-            type="primary"
-            size="large"
-            block
-            htmlType="submit"
-            className="flex justify-center items-center w-1/2"
-          >
+        <div className="w-full grid grid-cols-2 items-center gap-8">
+          <Button type="primary" size="large" block htmlType="submit" className="flex justify-center items-center">
             {t('create')}
           </Button>
-          <Link to="/" className="block w-1/2">
+          <Link to="/" className="block">
             <Button type="default" size="large" className="flex justify-center items-center w-full">
               {t('cancel')}
             </Button>
