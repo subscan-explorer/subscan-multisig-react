@@ -14,7 +14,7 @@ import { u8aToHex } from '@polkadot/util';
 import { flatten } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useApi, useMultisig } from '../hooks';
+import { useApi, useIsInjected, useMultisig } from '../hooks';
 import { AddressPair } from '../model';
 import { extractExternal } from '../utils';
 
@@ -31,6 +31,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
   const [error, setError] = useState<string | null>(null);
   const [extrinsic, setExtrinsic] = useState<SubmittableExtrinsic<'promise'> | null>(null);
   const { multisigAccount } = useMultisig();
+  const isExtensionAccount = useIsInjected();
   const options = useMemo<KeyringSectionOption[]>(
     () =>
       ((multisigAccount?.meta?.addressPair as AddressPair[]) ?? []).map(({ address, ...others }) => ({
@@ -108,7 +109,9 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
         ): Record<string, (Option | React.ReactNode)[]> => {
           result[type] = flatten(
             value.map((option): Option | React.ReactNode =>
-              option.value === null ? createHeader(option) : createMultiItem(option as Option)
+              option.value === null
+                ? createHeader(option)
+                : createMultiItem(option as Option).filter((item) => isExtensionAccount(item.value))
             )
           );
 
@@ -121,7 +124,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
     });
 
     return () => subscription.unsubscribe();
-  }, [createMultiItem]);
+  }, [createMultiItem, isExtensionAccount]);
 
   return (
     <div className={className}>
