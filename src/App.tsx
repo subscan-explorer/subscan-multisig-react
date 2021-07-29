@@ -149,9 +149,7 @@ function App() {
           )}
           <Status />
         </Content>
-        <Footer className="flex mt-4 md:hidden" networkConfig={networkConfig} />
-
-        <Footer className="md:flex hidden" networkConfig={networkConfig} />
+        <Footer networkConfig={networkConfig} />
       </Layout>
 
       {apiError && <Alert message={apiError} type="error" showIcon closable className="fixed top-24 right-20" />}
