@@ -46,7 +46,7 @@ function App() {
       <GlobalStyle uiHighlight={uiHighlight} />
       <Layout className="theme-light min-h-screen">
         <Header
-          className="fixed left-0 right-0 top-0 z-10 flex sm:items-center flex-col sm:flex-row justify-around sm:justify-between lg:px-40 xl:px-80 px-4 h-24 sm:h-20"
+          className="fixed left-0 right-0 top-0 z-10 flex sm:items-center flex-col sm:flex-row justify-around sm:justify-between lg:px-40 px-4 h-24 sm:h-20"
           style={{ marginTop: -1 }}
         >
           <span className="flex items-center justify-between">
@@ -131,7 +131,7 @@ function App() {
           </div>
         </Header>
 
-        <Content className="lg:px-40 xl:px-80 sm:py-8 py-1 px-4 my-24 sm:my-20">
+        <Content className="lg:px-40 sm:py-8 py-1 px-4 my-24 sm:my-20">
           {networkStatus === 'connecting' ? (
             <Connecting />
           ) : (
