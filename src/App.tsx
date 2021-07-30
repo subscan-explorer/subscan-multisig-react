@@ -7,12 +7,11 @@ import { BlockAuthors, Events } from '@polkadot/react-query';
 import Signer from '@polkadot/react-signer';
 import { Alert, Button, Dropdown, Layout, Menu, Typography } from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
-import { getYear } from 'date-fns';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Route, Switch } from 'react-router-dom';
+import { Footer } from './components/Footer';
 import { DownIcon } from './components/icons';
-import { Language } from './components/Language';
 import Status from './components/Status';
 import { ThemeSwitch } from './components/ThemeSwitch';
 import { NETWORK_CONFIG } from './config';
@@ -36,19 +35,6 @@ function App() {
     [networkStatus]
   );
   const networks = useMemo(() => Object.entries(NETWORK_CONFIG).map(([key, value]) => ({ name: key, ...value })), []);
-  const contactIcons = useMemo(
-    () => [
-      { href: 'https://twitter.com/subscan_io/', icon: 'twitter-black' },
-      {
-        href: 'https://riot.im/app/#/room/!uaYUrKBueiKUurHliJ:matrix.org?via=matrix.org&via=matrix.parity.io&via=web3.foundation',
-        icon: 'riot-black',
-      },
-      { href: 'https://github.com/itering/subscan-multisig-react', icon: 'github-black' },
-      { href: 'https://medium.com/subscan', icon: 'medium-black' },
-      { href: 'mailto:hello@subscan.io', icon: 'email-black' },
-    ],
-    []
-  );
   const uiHighlight = useMemo(
     () => (isDevelopment ? undefined : getSystemColor(systemChain, systemName, specName)),
     [isDevelopment, specName, systemChain, systemName]
@@ -58,9 +44,9 @@ function App() {
   return (
     <>
       <GlobalStyle uiHighlight={uiHighlight} />
-      <Layout>
+      <Layout className="theme-light min-h-screen">
         <Header
-          className="fixed left-0 right-0 top-0 z-10 flex sm:items-center flex-col sm:flex-row justify-around sm:justify-between lg:px-40 xl:px-80 px-4 h-24 sm:h-20"
+          className="fixed left-0 right-0 top-0 z-10 flex sm:items-center flex-col sm:flex-row justify-around sm:justify-between lg:px-40 px-4 h-24 sm:h-20"
           style={{ marginTop: -1 }}
         >
           <span className="flex items-center justify-between">
@@ -145,88 +131,25 @@ function App() {
           </div>
         </Header>
 
-        <Layout className="theme-light h-screen-sub-head-footer md:h-screen-sub-head">
-          <Content className="lg:px-40 xl:px-80 sm:py-8 py-1 px-4 mt-24 sm:mt-20">
-            {networkStatus === 'connecting' ? (
-              <Connecting />
-            ) : (
-              <BlockAuthors>
-                <Events>
-                  <Signer>
-                    <Switch>
-                      {routes.map((item, index) => (
-                        <Route key={index} {...item}></Route>
-                      ))}
-                    </Switch>
-                  </Signer>
-                </Events>
-              </BlockAuthors>
-            )}
-            <Status />
-          </Content>
-        </Layout>
-
-        <Layout.Footer
-          className="flex flex-col md:flex-row md:items-center md:justify-between lg:px-40 xl:px-80 px-2 text-gray-400 z-10 fixed bottom-0 left-0 right-0 md:py-6 py-2"
-          style={{ background: '#2d2d2d' }}
-        >
-          <div className="flex gap-4 flex-wrap text-gray-400">
-            <span>{t('copy_right', { year: getYear(new Date()) })}</span>
-            <a href="https://www.subscan.io/privacy" className="text-gray-400 hover:text-gray-100">
-              {t('privacy_policy')}
-            </a>
-            <a href="https://www.subscan.io/term" className="text-gray-400 hover:text-gray-100">
-              {t('term_of_use')}
-            </a>
-          </div>
-
-          <div className="flex items-center justify-between md:mt-0 mt-2 gap-4">
-            <Dropdown
-              arrow
-              placement="topCenter"
-              overlay={
-                <Menu>
-                  <Menu.Item>
-                    <div className="flex flex-col items-center text-blue-400 hover:text-blue-600">
-                      <span>{t('donate_unit', { unit: networkConfig.token.native })}</span>
-                      <span>{networkConfig.donate.address}</span>
-                    </div>
-                  </Menu.Item>
-
-                  <Menu.Item className="text-center text-blue-400 hover:text-blue-600">
-                    <a href="https://www.subscan.io/donate" target="__blank">
-                      {t('donate_other')}
-                    </a>
-                  </Menu.Item>
-                </Menu>
-              }
-            >
-              <Typography.Link
-                target="__blank"
-                rel="noopener"
-                className="bg-white flex items-center justify-center rounded"
-                style={{ width: 30, height: 30 }}
-              >
-                <img src={`/icons/donate.svg`} className="w-6 h-6" />
-              </Typography.Link>
-            </Dropdown>
-
-            {contactIcons.map(({ href, icon }) => (
-              <Typography.Link
-                target="__blank"
-                rel="noopener"
-                href={href}
-                key={icon}
-                className="bg-white flex items-center justify-center rounded"
-                style={{ width: 30, height: 30 }}
-              >
-                <img src={`/icons/${icon}.svg`} className="w-4 h-4" />
-              </Typography.Link>
-            ))}
-
-            <Language />
-          </div>
-        </Layout.Footer>
+        <Content className="lg:px-40 sm:py-8 py-1 px-4 my-24 sm:my-20">
+          {networkStatus === 'connecting' ? (
+            <Connecting />
+          ) : (
+            <BlockAuthors>
+              <Events>
+                <Signer>
+                  <Switch>
+                    {routes.map((item, index) => (
+                      <Route key={index} {...item}></Route>
+                    ))}
+                  </Switch>
+                </Signer>
+              </Events>
+            </BlockAuthors>
+          )}
+          <Status />
+        </Content>
+        <Footer networkConfig={networkConfig} />
       </Layout>
 
       {apiError && <Alert message={apiError} type="error" showIcon closable className="fixed top-24 right-20" />}

@@ -192,7 +192,7 @@ export function Wallets() {
         expandable={{ expandedRowRender, expandIcon: genExpandIcon(network) }}
         pagination={false}
         loading={isCalculating}
-        className="lg:block hidden"
+        className="lg:block hidden overflow-x-scroll"
       />
 
       <Space direction="vertical" className="lg:hidden block">
