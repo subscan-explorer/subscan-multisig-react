@@ -112,11 +112,9 @@ If you have installed the polkadot.js extension, you will be automatically conne
 
 #### 1.Perform a Multi-sig balance transfer
 
-Click "Initiate extrinsic," enter the transfer parameters, and click "Send" after confirmation.
+Click "Initiate extrinsic," enter the transfer parameters, choose the submission method you want, click the corresponding button to submit
 
-\*Currently, only transfer operations are supported. We will support more types of extrinsic in the second stage.
-
-\*The member account that initiates the multi-sig transfer needs to have some tokens balance to pay for the network fees. Otherwise, the extrinsic will fail, and an error of "LiquidityRestrictions" will be raised.
+The member account that initiates the multi-sig transfer needs to hold a few token balance to pay for the network fees. Otherwise, the extrinsic will fail, and an error of "LiquidityRestrictions" will be raised.
 
   <p align="center">
     <img src="./docs/8_initial_extrinsic.png" style="width:800px";>
@@ -163,7 +161,7 @@ Only the initiator has the authority to cancel the multi-sig extrinsic. Click "C
 - Linux / Mac OSX
 - Git
 - yarn / npm
-- Node 8.9.0+
+- Node 14.15.x
 
 ### Install
 
@@ -187,7 +185,7 @@ We welcome contributions of any kind. Issues labeled can be good (first) contrib
 
 ## LICENSE
 
-[Apache License - 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+[Apache-2.0 License](https://www.apache.org/licenses/LICENSE-2.0)
 
 ## Resource
 
