@@ -2,8 +2,6 @@
 
 # Subscan Multisig UI - React
 
-![License: GPL](https://img.shields.io/badge/license-GPL-blue.svg)
-
 Subscan Multisig UI is a web Multisignature management tool. It's developed by the Subscan team.
 Developers are free to use the codebase to extend functionalities and develop unique user experiences for their audiences.
 
@@ -112,7 +110,7 @@ If you have installed the polkadot.js extension, you will be automatically conne
 
 #### 1.Perform a Multi-sig balance transfer
 
-Click "Initiate extrinsic," enter the transfer parameters, choose the submission method you want, click the corresponding button to submit
+Click "Initiate extrinsic," enter the parameters, choose the submission method you want, click the corresponding button to submit
 
 The member account that initiates the multi-sig transfer needs to hold a few token balance to pay for the network fees. Otherwise, the extrinsic will fail, and an error of "LiquidityRestrictions" will be raised.
 
