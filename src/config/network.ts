@@ -1,10 +1,4 @@
-import { NetworkConfig } from '../model';
-
-export enum NetworkEnum {
-  pangolin = 'pangolin',
-  crab = 'crab',
-  darwinia = 'darwinia',
-}
+import { Network, NetworkConfig } from '../model';
 
 export const NETWORK_CONFIG: NetworkConfig = {
   polkadot: {
@@ -382,6 +376,8 @@ const networkSimple: Record<string, NetworkSimpleInfo> = {
     prefix: 10041,
   },
 };
+
+export const NETWORKS = Object.keys(NETWORK_CONFIG) as Network[];
 
 export const NETWORK_SIMPLE: Required<NetworkSimpleInfo>[] = Object.entries(networkSimple).map(([key, value]) => ({
   network: key,
