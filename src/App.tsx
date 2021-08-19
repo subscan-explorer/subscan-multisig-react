@@ -17,10 +17,10 @@ import { ThemeSwitch } from './components/ThemeSwitch';
 import { NETWORK_CONFIG } from './config';
 import { Path, routes } from './config/routes';
 import { useApi } from './hooks';
-import { NetworkType } from './model';
+import { Network } from './model';
 import { Connecting } from './pages/Connecting';
 
-const genHeaderLinkStyle = (classes: TemplateStringsArray, network: NetworkType) => {
+const genHeaderLinkStyle = (classes: TemplateStringsArray, network: Network) => {
   return `text-white opacity-80 hover:opacity-100 leading-normal whitespace-nowrap cursor-pointer transition-all duration-200 mr-4 dark:text-${network}-main ${classes.join(
     ' '
   )}`;

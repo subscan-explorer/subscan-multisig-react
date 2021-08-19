@@ -1,7 +1,10 @@
 {
   "0x...": "0x...",
   "Account address is required": "账号地址是必须的",
+  "All Networks": "所有网络",
   "Approve Account": "审批账号",
+  "Current Network": "当前网络",
+  "Custom": "自定义",
   "Decode": "Decode",
   "Drag file here or click to select": "Drag file here or click to select",
   "Insufficient parameters": "参数不足",
@@ -106,6 +109,7 @@
   "refresh": "刷新",
   "rename": "重命名",
   "send": "发送",
+  "share scope": "共享范围",
   "status": {
     "approved": "已批准",
     "cancel": "取消",
@@ -146,6 +150,7 @@
       "member_name": "成员名字",
       "members": "多签钱包成员账号，每一个成员为一个链上账号/地址。",
       "name": "多签钱包名称（任意名字帮助记忆）",
+      "share": "将此账号用于其它网络",
       "threshold": "多签生效至少需要获得的签名数"
     }
   }

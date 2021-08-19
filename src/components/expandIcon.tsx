@@ -1,9 +1,9 @@
 import { RightOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import { NetworkType } from '../model';
+import { Network } from '../model';
 
 export const genExpandIcon =
-  (network: NetworkType) =>
+  (network: Network) =>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ({ expanded, onExpand, record }: any) =>
     (

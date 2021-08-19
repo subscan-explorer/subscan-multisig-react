@@ -2,12 +2,12 @@ import { Button, Dropdown, Menu } from 'antd';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NETWORK_LIGHT_THEME } from '../config';
-import { NetworkType } from '../model';
+import { Network } from '../model';
 import { EarthIcon } from './icons';
 
 export interface LanguageProps {
   className?: string;
-  network?: NetworkType;
+  network?: Network;
 }
 
 const lang: { name: string; short: string }[] = [

@@ -1,10 +1,10 @@
 import { Switch } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { NETWORK_DARK_THEME, NETWORK_LIGHT_THEME, SKIN_THEME, THEME } from '../config';
-import { NetworkType } from '../model';
+import { Network } from '../model';
 import { readStorage, updateStorage } from '../utils/helper/storage';
 
-export const toggleTheme = (theme: THEME, network: NetworkType) => {
+export const toggleTheme = (theme: THEME, network: Network) => {
   const networkTheme = theme === THEME.DARK ? NETWORK_DARK_THEME : NETWORK_LIGHT_THEME;
 
   window.less
@@ -21,7 +21,7 @@ export const toggleTheme = (theme: THEME, network: NetworkType) => {
 };
 
 export interface ThemeSwitchProps {
-  network: NetworkType;
+  network: Network;
 }
 
 export function ThemeSwitch({ network }: ThemeSwitchProps) {

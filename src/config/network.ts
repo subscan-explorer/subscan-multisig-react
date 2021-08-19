@@ -1,6 +1,6 @@
 import { NetworkConfig } from '../model';
 
-export enum Network {
+export enum NetworkEnum {
   pangolin = 'pangolin',
   crab = 'crab',
   darwinia = 'darwinia',

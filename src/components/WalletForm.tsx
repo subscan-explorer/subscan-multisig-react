@@ -1,15 +1,16 @@
 import { DownOutlined, MinusCircleOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import keyring from '@polkadot/ui-keyring';
 import { encodeAddress } from '@polkadot/util-crypto';
-import { AutoComplete, Button, Col, Form, Input, InputNumber, message, Row, Tooltip } from 'antd';
+import { AutoComplete, Button, Col, Form, Input, InputNumber, message, Radio, Row, Select, Tag, Tooltip } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
-import { validateMessages } from '../config';
+import { NETWORK_CONFIG, validateMessages } from '../config';
 import i18n from '../config/i18n';
 import { useApi } from '../hooks';
-import { convertToSS58 } from '../utils';
+import { Network } from '../model';
+import { convertToSS58, getMainColor } from '../utils';
 
 interface LabelWithTipProps {
   name: string;
@@ -26,6 +27,14 @@ interface WalletFormValue {
   name: string;
   threshold: number;
   members: Member[];
+  share: ShareScope;
+  scope?: Network[];
+}
+
+enum ShareScope {
+  all = 1,
+  current,
+  custom,
 }
 
 const THRESHOLD = 2;
@@ -48,6 +57,7 @@ export function WalletForm() {
   const [form] = useForm();
   const history = useHistory();
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
+  const [share, setShare] = useState<ShareScope>(ShareScope.all);
   const options = useMemo<{ label: string; value: string }[]>(
     () =>
       accounts
@@ -75,7 +85,7 @@ export function WalletForm() {
     <Form
       name="wallet"
       layout="vertical"
-      validateMessages={validateMessages[i18n.language as 'en' | 'zh-CN' | 'zh']}
+      validateMessages={validateMessages[i18n.language as 'en' | 'en-US' | 'zh-CN' | 'zh']}
       form={form}
       initialValues={{
         name: '',
@@ -95,11 +105,12 @@ export function WalletForm() {
         }));
 
         try {
-          keyring.addMultisig(signatories, threshold, {
+          const res = keyring.addMultisig(signatories, threshold, {
             name,
             addressPair,
             genesisHash: api?.genesisHash.toHex(),
           });
+          console.info('%c create wallet result-103', 'font-size:13px; background:pink; color:#bf2c9f;', res);
 
           message.success(t('success'));
           history.push('/');
@@ -123,6 +134,32 @@ export function WalletForm() {
         rules={[{ required: true }]}
       >
         <InputNumber size="large" min={THRESHOLD} className="w-full" />
+      </Form.Item>
+
+      <Form.Item label={<LabelWithTip name="share scope" tipMessage="wallet.tip.share" />}>
+        <div className="flex items-center">
+          <Form.Item name="share" rules={[{ required: true }]} initialValue={1} className="mb-0">
+            <Radio.Group onChange={(event) => setShare(event.target.value)}>
+              <Radio value={ShareScope.all}>{t('All Networks')}</Radio>
+              <Radio value={ShareScope.current}>{t('Current Network')}</Radio>
+              <Radio value={ShareScope.custom}>{t('Custom')}</Radio>
+            </Radio.Group>
+          </Form.Item>
+
+          <Form.Item
+            name="networks"
+            rules={[{ required: share === ShareScope.custom }]}
+            className={`mb-0 flex-1 ${share === ShareScope.custom ? 'opacity-100' : 'opacity-0'}`}
+          >
+            <Select mode="multiple" disabled={share !== ShareScope.custom}>
+              {Object.keys(NETWORK_CONFIG).map((network) => (
+                <Select.Option value={network} key={network}>
+                  <Tag color={getMainColor(network as Network)}>{network}</Tag>
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </div>
       </Form.Item>
 
       <LabelWithTip name="members" tipMessage="wallet.tip.members" />

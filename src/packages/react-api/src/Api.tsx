@@ -12,7 +12,7 @@ import { web3Accounts } from '@polkadot/extension-dapp';
 import type { InjectedExtension } from '@polkadot/extension-inject/types';
 import type { ChainProperties, ChainType } from '@polkadot/types/interfaces';
 import { keyring } from '@polkadot/ui-keyring';
-import type { KeyringStore } from '@polkadot/ui-keyring/types';
+import type { KeyringJson, KeyringStore } from '@polkadot/ui-keyring/types';
 import { settings } from '@polkadot/ui-settings';
 import { formatBalance, isTestChain } from '@polkadot/util';
 import { defaults as addressDefaults } from '@polkadot/util-crypto/address/defaults';
@@ -160,7 +160,8 @@ async function loadOnReady(
   if (!isLoaded) {
     keyring.loadAll(
       {
-        genesisHash: api.genesisHash,
+        // genesisHash: api.genesisHash,
+        filter: (json: KeyringJson) => json.address !== '2qyaonwKVQRLjda4KCCMWkqsrpHUbpp8u1RbaRbhyQoenrUE',
         isDevelopment,
         ss58Format,
         store,
