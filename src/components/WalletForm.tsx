@@ -1,31 +1,38 @@
 import { DownOutlined, MinusCircleOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import keyring from '@polkadot/ui-keyring';
+import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { encodeAddress } from '@polkadot/util-crypto';
-import { AutoComplete, Button, Col, Form, Input, InputNumber, message, Row, Tooltip } from 'antd';
+import {
+  AutoComplete,
+  Button,
+  Col,
+  Descriptions,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Modal,
+  Radio,
+  Row,
+  Select,
+  Tag,
+  Tooltip,
+} from 'antd';
 import { useForm } from 'antd/lib/form/Form';
+import { format } from 'date-fns';
 import { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
-import { validateMessages } from '../config';
+import { NETWORKS, validateMessages } from '../config';
 import i18n from '../config/i18n';
 import { useApi } from '../hooks';
-import { convertToSS58 } from '../utils';
+import { Network, ShareScope, WalletFormValue } from '../model';
+import { convertToSS58, getMainColor, findMultiAccount, updateMultiAccountScope } from '../utils';
 
 interface LabelWithTipProps {
   name: string;
   tipMessage: string;
   icon?: React.ReactNode;
-}
-
-interface Member {
-  name: string;
-  address: string;
-}
-
-interface WalletFormValue {
-  name: string;
-  threshold: number;
-  members: Member[];
 }
 
 const THRESHOLD = 2;
@@ -42,12 +49,48 @@ function LabelWithTip({ name, tipMessage }: LabelWithTipProps) {
   );
 }
 
+function confirmToAdd(accountExist: KeyringAddress, confirm: () => void) {
+  return Modal.confirm({
+    cancelText: <Trans>cancel</Trans>,
+    okText: <Trans>confirm</Trans>,
+    onOk: (close) => {
+      if (confirm) {
+        confirm();
+      }
+
+      close();
+    },
+    maskClosable: false,
+    closeIcon: false,
+    content: (
+      <div>
+        <p className="mb-4">
+          <Trans>
+            There is an account configured by the same member and threshold. Confirm to replace it with a new account?
+          </Trans>
+        </p>
+        <Descriptions column={1} size="small" title={<Trans>Origin Account</Trans>}>
+          <Descriptions.Item label={<Trans>name</Trans>}>{accountExist.meta.name}</Descriptions.Item>
+          <Descriptions.Item label={<Trans>threshold</Trans>}>
+            {/*  eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {(accountExist.meta as any).threshold}
+          </Descriptions.Item>
+          <Descriptions.Item label={<Trans>Create Time</Trans>}>
+            {format(accountExist.meta.whenCreated || 0, 'yyyy-MM-dd hh:mm:ss')}
+          </Descriptions.Item>
+        </Descriptions>
+      </div>
+    ),
+  });
+}
+
 export function WalletForm() {
   const { t } = useTranslation();
-  const { accounts, networkConfig, api } = useApi();
+  const { accounts, networkConfig, api, network } = useApi();
   const [form] = useForm();
   const history = useHistory();
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
+  const [shareScope, setShareScope] = useState<ShareScope>(ShareScope.all);
   const options = useMemo<{ label: string; value: string }[]>(
     () =>
       accounts
@@ -75,7 +118,7 @@ export function WalletForm() {
     <Form
       name="wallet"
       layout="vertical"
-      validateMessages={validateMessages[i18n.language as 'en' | 'zh-CN' | 'zh']}
+      validateMessages={validateMessages[i18n.language as 'en' | 'en-US' | 'zh-CN' | 'zh']}
       form={form}
       initialValues={{
         name: '',
@@ -86,25 +129,35 @@ export function WalletForm() {
           { name: '', address: '' },
         ],
       }}
-      onFinish={(values: WalletFormValue) => {
+      onFinish={async (values: WalletFormValue) => {
         const { members, name, threshold } = values;
         const signatories = members.map(({ address }) => address);
         const addressPair = members.map(({ address, ...other }) => ({
           ...other,
           address: encodeAddress(address, networkConfig.ss58Prefix),
         }));
+        const exec = () => {
+          try {
+            keyring.addMultisig(signatories, threshold, {
+              name,
+              addressPair,
+              genesisHash: api?.genesisHash.toHex(),
+            });
 
-        try {
-          keyring.addMultisig(signatories, threshold, {
-            name,
-            addressPair,
-            genesisHash: api?.genesisHash.toHex(),
-          });
+            updateMultiAccountScope(values, network);
+            message.success(t('success'));
+            history.push('/');
+          } catch (error) {
+            message.error(t(error.message));
+          }
+        };
 
-          message.success(t('success'));
-          history.push('/');
-        } catch (error) {
-          message.error(t(error.message));
+        const acc = findMultiAccount(values);
+
+        if (acc) {
+          confirmToAdd(acc, exec);
+        } else {
+          exec();
         }
       }}
       className="max-w-3xl mx-auto"
@@ -123,6 +176,30 @@ export function WalletForm() {
         rules={[{ required: true }]}
       >
         <InputNumber size="large" min={THRESHOLD} className="w-full" />
+      </Form.Item>
+
+      <Form.Item label={<LabelWithTip name="share scope" tipMessage="wallet.tip.share" />}>
+        <div className="flex items-center">
+          <Form.Item name="share" rules={[{ required: true }]} initialValue={1} className="mb-0">
+            <Radio.Group onChange={(event) => setShareScope(event.target.value)}>
+              <Radio value={ShareScope.all}>{t('All Networks')}</Radio>
+              <Radio value={ShareScope.current}>{t('Current Network')}</Radio>
+              <Radio value={ShareScope.custom}>{t('Custom')}</Radio>
+            </Radio.Group>
+          </Form.Item>
+
+          {shareScope === ShareScope.custom && (
+            <Form.Item name="scope" rules={[{ required: true }]} initialValue={[network]} className="mb-0 flex-1">
+              <Select mode="multiple" disabled={shareScope !== ShareScope.custom}>
+                {NETWORKS.map((net) => (
+                  <Select.Option value={net} key={net}>
+                    <Tag color={getMainColor(net as Network)}>{net}</Tag>
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          )}
+        </div>
       </Form.Item>
 
       <LabelWithTip name="members" tipMessage="wallet.tip.members" />

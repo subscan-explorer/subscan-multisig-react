@@ -10,7 +10,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { Path } from '../config/routes';
 import { useApi, useIsInjected } from '../hooks';
 import { Chain } from '../providers';
-import { accuracyFormat } from '../utils';
+import { accuracyFormat, isInCurrentScope } from '../utils';
 import { genExpandIcon } from './expandIcon';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
@@ -156,7 +156,9 @@ export function Wallets() {
     setIsCalculating(true);
 
     (async () => {
-      const accounts = keyring.getAccounts().filter((account) => account.meta.isMultisig);
+      const accounts = keyring
+        .getAccounts()
+        .filter((account) => account.meta.isMultisig && isInCurrentScope(account.publicKey, network));
       const balances = await api?.query.system.account.multi(accounts.map(({ address }) => address));
       const entries = await Promise.all(
         accounts.map(async ({ address }) => await api?.query.multisig.multisigs.entries(address))
@@ -177,7 +179,7 @@ export function Wallets() {
       );
       setIsCalculating(false);
     })();
-  }, [api]);
+  }, [api, network]);
 
   return (
     <Space direction="vertical" className="w-full" id="wallets">

@@ -1,6 +1,12 @@
 import { ApiPromise } from '@polkadot/api';
 import { Call } from '@polkadot/types/interfaces';
 import keyring from '@polkadot/ui-keyring';
+import { KeyringAddress } from '@polkadot/ui-keyring/types';
+import { u8aToHex } from '@polkadot/util';
+import { createKeyMulti } from '@polkadot/util-crypto';
+import store from 'store';
+import { NETWORKS } from '../../config';
+import { Network, ShareScope, WalletFormValue } from '../../model';
 
 interface MultiInfo {
   isMultisig: boolean;
@@ -89,3 +95,39 @@ export const txDoc = (data: Call | undefined | null): string => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data?.meta as any).get('documentation').toHuman().join('');
 };
+
+export function findMultiAccount({
+  threshold,
+  members,
+}: Pick<WalletFormValue, 'members' | 'threshold'>): KeyringAddress | null {
+  const existsAccounts = keyring.getAccounts().filter((account) => account.meta.isMultisig);
+  const key = createKeyMulti(
+    members.map((item) => item.address),
+    threshold
+  );
+
+  return existsAccounts.find((acc) => acc.publicKey.toString() === key.toString()) ?? null;
+}
+
+function scopeKey(publicKey: Uint8Array) {
+  return `scope:${u8aToHex(publicKey)}`;
+}
+
+export function updateMultiAccountScope(
+  { share, scope = [], members, threshold }: WalletFormValue,
+  network: Network
+): void {
+  const networks = ShareScope.custom === share ? (scope as Network[]) : share === ShareScope.all ? NETWORKS : [network];
+  const key = createKeyMulti(
+    members.map((item) => item.address),
+    threshold
+  );
+
+  store.set(scopeKey(key), networks);
+}
+
+export function isInCurrentScope(publicKey: Uint8Array, network: Network): boolean {
+  const scope: Network[] = store.get(scopeKey(publicKey)) ?? null;
+
+  return scope && scope.includes(network);
+}

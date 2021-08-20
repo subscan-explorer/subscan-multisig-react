@@ -1,15 +1,15 @@
 /* eslint-disable no-restricted-globals */
 import { mapKeys } from 'lodash';
-import { NetworkType, StorageInfo, ValueOf } from './../../model';
+import { Network, StorageInfo, ValueOf } from './../../model';
 import { readStorage } from './storage';
 
 interface HashInfo {
-  network?: NetworkType;
+  network?: Network;
   toAccount?: string;
 }
 
 interface HashShort {
-  n?: NetworkType;
+  n?: Network;
   t?: string;
 }
 

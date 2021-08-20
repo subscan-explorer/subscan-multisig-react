@@ -4,13 +4,13 @@ import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 import type { InjectedExtension } from '@polkadot/extension-inject/types';
 import React, { createContext, Dispatch, useCallback, useEffect, useReducer, useState } from 'react';
 import { NETWORK_CONFIG } from '../config';
-import { Action, ConnectStatus, InjectedAccountWithMeta, NetConfig, NetworkType } from '../model';
+import { Action, ConnectStatus, InjectedAccountWithMeta, NetConfig, Network } from '../model';
 import { convertToSS58, getInitialSetting, patchUrl } from '../utils';
 import { updateStorage } from '../utils/helper/storage';
 
 interface StoreState {
   accounts: InjectedAccountWithMeta[] | null;
-  network: NetworkType;
+  network: Network;
   networkStatus: ConnectStatus;
 }
 
@@ -26,13 +26,13 @@ export interface Chain {
 
 type ActionType = 'switchNetwork' | 'updateNetworkStatus' | 'setAccounts';
 
-const cacheNetwork = (network: NetworkType): void => {
+const cacheNetwork = (network: Network): void => {
   patchUrl({ network });
   updateStorage({ network });
 };
 
 const initialState: StoreState = {
-  network: getInitialSetting<NetworkType>('network', 'pangolin'),
+  network: getInitialSetting<Network>('network', 'pangolin'),
   accounts: null,
   networkStatus: 'pending',
 };
@@ -41,7 +41,7 @@ const initialState: StoreState = {
 function accountReducer(state: StoreState, action: Action<ActionType, any>): StoreState {
   switch (action.type) {
     case 'switchNetwork': {
-      return { ...state, network: action.payload as NetworkType };
+      return { ...state, network: action.payload as Network };
     }
 
     case 'setAccounts': {
@@ -61,11 +61,11 @@ export type ApiCtx = {
   accounts: InjectedAccountWithMeta[] | null;
   api: ApiPromise | null;
   dispatch: Dispatch<Action<ActionType>>;
-  network: NetworkType;
+  network: Network;
   networkStatus: ConnectStatus;
   setAccounts: (accounts: InjectedAccountWithMeta[]) => void;
   setNetworkStatus: (status: ConnectStatus) => void;
-  switchNetwork: (type: NetworkType) => void;
+  switchNetwork: (type: Network) => void;
   setApi: (api: ApiPromise) => void;
   setRandom: (num: number) => void;
   networkConfig: NetConfig;
@@ -77,7 +77,7 @@ export const ApiContext = createContext<ApiCtx | null>(null);
 
 export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
   const [state, dispatch] = useReducer(accountReducer, initialState);
-  const switchNetwork = useCallback((payload: NetworkType) => dispatch({ type: 'switchNetwork', payload }), []);
+  const switchNetwork = useCallback((payload: Network) => dispatch({ type: 'switchNetwork', payload }), []);
   const setAccounts = useCallback(
     (payload: InjectedAccountWithMeta[]) => dispatch({ type: 'setAccounts', payload }),
     []

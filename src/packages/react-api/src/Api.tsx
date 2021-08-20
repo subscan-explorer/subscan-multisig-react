@@ -160,7 +160,6 @@ async function loadOnReady(
   if (!isLoaded) {
     keyring.loadAll(
       {
-        genesisHash: api.genesisHash,
         isDevelopment,
         ss58Format,
         store,

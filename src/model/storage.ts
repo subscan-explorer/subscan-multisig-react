@@ -1,7 +1,7 @@
 import { THEME } from '../config';
-import { NetworkType } from './network';
+import { Network } from './network';
 
 export interface StorageInfo {
-  network?: NetworkType;
+  network?: Network;
   theme?: THEME;
 }

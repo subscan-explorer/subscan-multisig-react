@@ -103,4 +103,5 @@ export const validateMessages = {
   en,
   zh,
   'zh-CN': zh,
+  'en-US': en,
 };

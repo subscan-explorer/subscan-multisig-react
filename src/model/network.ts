@@ -1,6 +1,6 @@
 import { Config } from './common';
 
-export type NetworkType = 'pangolin' | 'crab' | 'darwinia' | 'polkadot' | 'kusama';
+export type Network = 'pangolin' | 'crab' | 'darwinia' | 'polkadot' | 'kusama';
 
 export type Token = 'ring' | 'kton' | 'native';
 
@@ -31,7 +31,7 @@ export interface NetConfig {
   donate: Donate;
 }
 
-export type NetworkConfig<T = NetConfig> = Config<NetworkType, T>;
+export type NetworkConfig<T = NetConfig> = Config<Network, T>;
 
 export type TxStatus =
   | 'future'

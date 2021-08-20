@@ -1,18 +1,25 @@
 {
   "0x...": "0x...",
   "Account address is required": "账号地址是必须的",
+  "All Networks": "所有网络",
   "Approve Account": "审批账号",
+  "Create Time": "创建时间",
+  "Current Network": "当前网络",
+  "Custom": "自定义",
   "Decode": "Decode",
   "Drag file here or click to select": "Drag file here or click to select",
   "Insufficient parameters": "参数不足",
   "Invalid call data": "无效的 data 值",
   "Invalid call hash": "无效的 hash 值",
   "Member name is required": "成员名称是必须的",
+  "Only one wallet with the same member and threshold can be registered, but you can share it between different networks": "相同成员及阈值的钱包只能注册一个，但是你可以在不同的网络之间共享它",
+  "Origin Account": "已存在账号",
   "Select approve account": "选择批准账户",
   "Submission": "Submission",
   "Submit Transaction": "提交交易",
   "Submit Unsigned": "提交未签名",
   "Transaction information": "交易信息",
+  "There is an account configured by the same member and threshold. Confirm to replace it with a new account?": "已存在一个有相同成员及阈值的多签账号，确定使用新账号替换吗？",
   "View in Subscan explorer": "至 Subscan 浏览器查看",
   "about": "关于",
   "account": "账户",
@@ -106,6 +113,7 @@
   "refresh": "刷新",
   "rename": "重命名",
   "send": "发送",
+  "share scope": "共享范围",
   "status": {
     "approved": "已批准",
     "cancel": "取消",
@@ -146,6 +154,7 @@
       "member_name": "成员名字",
       "members": "多签钱包成员账号，每一个成员为一个链上账号/地址。",
       "name": "多签钱包名称（任意名字帮助记忆）",
+      "share": "将此账号用于其它网络",
       "threshold": "多签生效至少需要获得的签名数"
     }
   }
