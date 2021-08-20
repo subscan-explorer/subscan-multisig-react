@@ -2,7 +2,7 @@ import { ClientContext, GraphQLClient } from 'graphql-hooks';
 import { createContext, useMemo } from 'react';
 import { useApi } from '../hooks';
 
-export const GqlContext = createContext<null>(null);
+export const GqlContext = createContext<GraphQLClient | null>(null);
 
 const isDev = process.env.REACT_APP_HOST_TYPE === 'dev';
 const subqlDev = 'http://localhost:3000/';

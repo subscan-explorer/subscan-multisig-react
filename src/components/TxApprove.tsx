@@ -21,7 +21,7 @@ export function TxApprove({ entry, txSpy, onOperation }: TxOperationComponentPro
   const [getApproveTx] = useMultiApprove();
   const { queueExtrinsic } = useContext(StatusContext);
   const [getUnapprovedInjectedList] = useUnapprovedAccounts();
-  const { setIsPageLock, queryInProgress } = useMultisigContext();
+  const { setIsPageLock, queryInProgress, refreshConfirmedAccount } = useMultisigContext();
   const unapprovedAddresses = getUnapprovedInjectedList(entry);
   const availableAccounts = (accounts ?? []).filter((extAddr) => unapprovedAddresses.includes(extAddr.address));
   const handleApprove = useCallback(
@@ -35,6 +35,10 @@ export function TxApprove({ entry, txSpy, onOperation }: TxOperationComponentPro
           txSuccessCb: () => {
             makeSure(txSpy)(null);
             queryInProgress();
+            setTimeout(() => {
+              refreshConfirmedAccount();
+              // eslint-disable-next-line no-magic-numbers
+            }, 6000);
           },
         };
 
@@ -49,7 +53,16 @@ export function TxApprove({ entry, txSpy, onOperation }: TxOperationComponentPro
         accounts: availableAccounts.map((account) => account.address),
       });
     },
-    [availableAccounts, getApproveTx, onOperation, queryInProgress, queueExtrinsic, setIsPageLock, txSpy]
+    [
+      availableAccounts,
+      getApproveTx,
+      onOperation,
+      queryInProgress,
+      queueExtrinsic,
+      refreshConfirmedAccount,
+      setIsPageLock,
+      txSpy,
+    ]
   );
 
   if (availableAccounts.length === 1) {
