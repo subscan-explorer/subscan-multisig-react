@@ -7,6 +7,10 @@ import { readStorage, updateStorage } from '../utils/helper/storage';
 export const toggleTheme = (theme: THEME, network: NetworkType) => {
   const networkTheme = theme === THEME.DARK ? NETWORK_DARK_THEME : NETWORK_LIGHT_THEME;
 
+  if (document && document.documentElement) {
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+
   window.less
     .modifyVars({
       ...SKIN_THEME[theme],
