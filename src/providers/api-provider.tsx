@@ -32,7 +32,7 @@ const cacheNetwork = (network: Network): void => {
 };
 
 const initialState: StoreState = {
-  network: getInitialSetting<Network>('network', 'pangolin'),
+  network: getInitialSetting<Network>('network', 'polkadot'),
   accounts: null,
   networkStatus: 'pending',
 };
