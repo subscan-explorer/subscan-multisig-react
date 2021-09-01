@@ -34,6 +34,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
       kton: '',
     },
     rpc: 'wss://kusama.api.onfinality.io/public-ws',
+
     // rpc: 'wss://kusama.elara.patract.io',
     // rpc: 'wss://kusama-rpc.polkadot.io',
     api: {
