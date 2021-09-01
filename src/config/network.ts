@@ -33,8 +33,8 @@ export const NETWORK_CONFIG: NetworkConfig = {
       ring: '',
       kton: '',
     },
-    // rpc: 'wss://kusama.api.onfinality.io/public-ws',
-    rpc: 'wss://kusama.elara.patract.io',
+    rpc: 'wss://kusama.api.onfinality.io/public-ws',
+    // rpc: 'wss://kusama.elara.patract.io',
     // rpc: 'wss://kusama-rpc.polkadot.io',
     api: {
       subql: 'https://api.subquery.network/sq/darwinia-network/kusama',
