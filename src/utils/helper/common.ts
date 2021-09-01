@@ -27,7 +27,7 @@ export function asUTCString(timestamp: string): string {
 }
 
 // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-export function empty(...args: any[]) {
+export function empty(...args: any[]): any {
   // nothing to do
 }
 

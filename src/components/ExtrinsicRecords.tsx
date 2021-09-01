@@ -6,7 +6,7 @@ import { isNumber } from 'lodash';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { TRANSFERS_COUNT_QUERY, TRANSFERS_QUERY } from '../config';
+import { TRANSFERS_QUERY } from '../config';
 import { useApi } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
 import { IExtrinsic, parseArgs } from '../utils';
@@ -68,8 +68,8 @@ function Confirmed({ account, multiAddress }: ConfirmedProps) {
       const { signerId, isSuccess } = target ?? {};
       const multisigArgs = parseArgs(api, target);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const callHash = multisigArgs.find((item: any) => item.name === 'call')?.value;
-      const callData = api?.registry.createType('Call', callHash) as unknown as Call;
+      const argsHash = multisigArgs.find((item: any) => item.name === 'call')?.value;
+      const callData = api?.registry.createType('Call', argsHash) as unknown as Call;
       const meta = api?.tx[callData.section][callData.method].meta.toJSON();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { height, index } = multisigArgs.find((item: any) => item.name === 'maybe_timepoint')?.value;
@@ -88,7 +88,7 @@ function Confirmed({ account, multiAddress }: ConfirmedProps) {
         ],
         status: isSuccess ? 'executed' : 'pending',
         created_at: timestamp,
-        when: { height: isNumber(height) ? height : +height.replace(',', ''), index: +index },
+        when: { height: isNumber(height) ? height : +height.replace(/,/g, ''), index: +index },
         depositor: '',
       };
     });
@@ -102,13 +102,7 @@ function Confirmed({ account, multiAddress }: ConfirmedProps) {
 export function ExtrinsicRecords() {
   const { t } = useTranslation();
   const { account: multiAddress } = useParams<{ account: string }>();
-  const { multisigAccount, inProgress } = useMultisigContext();
-  const { data } = useQuery<{ transfers: { totalCount: number } }>(TRANSFERS_COUNT_QUERY, {
-    variables: {
-      account: multiAddress,
-    },
-    skipCache: true,
-  });
+  const { multisigAccount, inProgress, confirmedAccount } = useMultisigContext();
 
   return (
     <Tabs>
@@ -131,7 +125,7 @@ export function ExtrinsicRecords() {
         tab={
           <Space>
             <span>{t('multisig.Confirmed Extrinsic')}</span>
-            <span>{data?.transfers.totalCount ?? 0}</span>
+            <span>{confirmedAccount}</span>
           </Space>
         }
         key="confirmed"

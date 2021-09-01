@@ -1,20 +1,15 @@
-import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
-import { StatusContext } from '@polkadot/react-components';
-import { PartialQueueTxExtrinsic } from '@polkadot/react-components/Status/types';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import { Call } from '@polkadot/types/interfaces';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
-import { Button, Collapse, Descriptions, Empty, Form, Modal, Progress, Select, Space, Table, Typography } from 'antd';
+import { Button, Collapse, Empty, Progress, Space, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { intersection } from 'lodash';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { useApi, useFee, useIsInjected, useMultiApprove } from '../hooks';
+import { useApi, useIsInjected } from '../hooks';
 import { AddressPair, Entry, TxActionType } from '../model';
-import { txDoc, txMethod, txMethodDescription } from '../utils';
 import { ArgObj, Args } from './Args';
 import { genExpandIcon } from './expandIcon';
-import { Fee } from './Fee';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
 import { TxApprove } from './TxApprove';
@@ -24,18 +19,10 @@ export interface EntriesProps {
   source: Entry[];
   account: KeyringAddress;
   isConfirmed?: boolean;
-  isOnlyPolkadotModal?: boolean;
 }
 
-interface Operation {
-  type: TxActionType;
-  entry: Entry | null;
-  accounts: string[];
-}
-
-const { Title, Text } = Typography;
+const { Title } = Typography;
 const { Panel } = Collapse;
-const DEFAULT_OPERATION: Operation = { entry: null, type: 'pending', accounts: [] };
 
 const renderMethod = (data: Call | undefined | null) => {
   const call = data?.toHuman();
@@ -61,13 +48,10 @@ const renderMemberStatus = (entry: Entry, pair: KeyringJson) => {
   );
 };
 
-export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = true }: EntriesProps) {
+export function Entries({ source, isConfirmed, account }: EntriesProps) {
   const { t } = useTranslation();
   const isInjected = useIsInjected();
   const { network } = useApi();
-  const [operation, setOperation] = useState<Operation>(DEFAULT_OPERATION);
-  const { queueExtrinsic } = useContext(StatusContext);
-  const [extrinsic, setExtrinsic] = useState<PartialQueueTxExtrinsic | null>(null);
   const renderAction = useCallback(
     // eslint-disable-next-line complexity
     (row: Entry) => {
@@ -111,7 +95,7 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
                 </Button>
               );
             } else if (action === 'approve') {
-              return <TxApprove key={action} entry={row} txSpy={setExtrinsic} onOperation={setOperation} />;
+              return <TxApprove key={action} entry={row} />;
             } else {
               return <TxCancel key={action} entry={row} />;
             }
@@ -215,7 +199,7 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
 
       <Space direction="vertical" className="lg:hidden block">
         {source.map((data) => {
-          const { address, callHash, callData, approvals } = data;
+          const { address, hash, callData, approvals } = data;
           const approvedCount = approvals.length || 0;
           const threshold = (account.meta.threshold as number) || 1;
 
@@ -225,13 +209,19 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
                 header={
                   <Space direction="vertical" className="w-full mb-4">
                     <Typography.Text className="mr-4" copyable>
-                      {callHash}
+                      {hash}
                     </Typography.Text>
 
-                    <Typography.Text>{renderMethod(callData)}</Typography.Text>
+                    <div className="flex items-center">
+                      <Typography.Text>{renderMethod(callData)}</Typography.Text>
 
-                    {/* eslint-disable-next-line no-magic-numbers */}
-                    <Progress percent={parseInt(String((approvedCount / threshold) * 100), 10)} steps={threshold} />
+                      <Progress
+                        /* eslint-disable-next-line no-magic-numbers */
+                        percent={parseInt(String((approvedCount / threshold) * 100), 10)}
+                        steps={threshold}
+                        className="ml-4"
+                      />
+                    </div>
                   </Space>
                 }
                 key={address}
@@ -246,158 +236,6 @@ export function Entries({ source, isConfirmed, account, isOnlyPolkadotModal = tr
 
         {!source.length && <Empty />}
       </Space>
-
-      {/* By default we use polkadot approve workflow only, components below would not display */}
-      {!isOnlyPolkadotModal && (
-        <OperationModals
-          operation={operation}
-          queueTx={extrinsic}
-          onTxChange={(tx, accountId) => {
-            const queueTx: PartialQueueTxExtrinsic = {
-              extrinsic: tx,
-              accountId,
-              txSuccessCb: () => setExtrinsic(null),
-            };
-
-            queueExtrinsic(queueTx);
-            setExtrinsic(queueTx);
-          }}
-        />
-      )}
-    </>
-  );
-}
-
-/* ---------------------------Custom extrinsic operation modals----------------- */
-
-interface OperationModalsProps {
-  operation?: Operation;
-  queueTx?: PartialQueueTxExtrinsic | null;
-  onCancel?: () => void;
-  onTxChange?: (tx: SubmittableExtrinsic, account: string) => void;
-}
-
-function OperationModals({ operation, queueTx, onCancel, onTxChange }: OperationModalsProps) {
-  const { t } = useTranslation();
-  const { api } = useApi();
-  const { fee } = useFee();
-  const [getApproveTx] = useMultiApprove();
-  const { queueExtrinsic } = useContext(StatusContext);
-
-  return (
-    <>
-      <Modal
-        destroyOnClose
-        title={t('multisig.cancel')}
-        visible={operation && !!operation.entry && operation.type === 'cancel'}
-        footer={[
-          <Button type="default" onClick={onCancel} key="cancel">
-            {t('cancel')}
-          </Button>,
-          <Button
-            type="primary"
-            disabled={fee === 'calculating'}
-            onClick={() => {
-              if (queueTx) {
-                queueExtrinsic(queueTx);
-              }
-            }}
-            key="confirm"
-          >
-            {t('submit')}
-          </Button>,
-        ]}
-      >
-        <Descriptions column={1}>
-          <Descriptions.Item label={t('pending_hash')}>
-            <Typography.Text copyable>{operation?.entry?.callHash}</Typography.Text>
-          </Descriptions.Item>
-          <Descriptions.Item label={t('account')}>{operation?.entry?.depositor}</Descriptions.Item>
-          <Descriptions.Item label={t('fee')}>
-            <Fee extrinsic={queueTx?.extrinsic}></Fee>
-          </Descriptions.Item>
-        </Descriptions>
-      </Modal>
-
-      <Modal
-        title={t('multisig.approval')}
-        visible={!!operation && !!operation.entry && operation.type === 'approve'}
-        destroyOnClose
-        style={{ minWidth: 800 }}
-        onCancel={onCancel}
-        footer={[
-          <Button onClick={onCancel} key="cancel">
-            {t('cancel')}
-          </Button>,
-          <Button
-            type="primary"
-            key="approve"
-            onClick={() => {
-              if (queueTx) {
-                queueExtrinsic(queueTx);
-              }
-            }}
-          >
-            {t('submit')}
-          </Button>,
-        ]}
-      >
-        <Form>
-          <Form.Item label={t('pending_hash')}>
-            <Text copyable>{operation?.entry?.callHash}</Text>
-          </Form.Item>
-
-          <Form.Item label={t('account')}>
-            <Select
-              onChange={(value: string) => {
-                if (operation && operation.entry && onTxChange) {
-                  getApproveTx(operation.entry, value).then((tx) => {
-                    onTxChange(tx, value);
-                  });
-                }
-              }}
-            >
-              {operation?.accounts.map((addr) => (
-                <Select.Option value={addr} key={addr}>
-                  {addr}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item label={t('multisig.from_chain')}>
-            {/* TODO support edit */}
-            <Text code>{operation?.entry?.callData?.toString()}</Text>
-          </Form.Item>
-        </Form>
-
-        <Descriptions layout="vertical" column={1}>
-          <Descriptions.Item
-            label={
-              <Title level={5}>
-                {t('multisig.sending_transaction', {
-                  transaction: txMethod(operation?.entry?.callData, api),
-                })}
-              </Title>
-            }
-          >
-            {txDoc(operation?.entry?.callData)}
-          </Descriptions.Item>
-          {txMethodDescription(operation?.entry?.callData, api).map(({ name, type, value }) => (
-            <Descriptions.Item label={<Typography.Title level={5}>{`${name} ${type}`}</Typography.Title>} key={name}>
-              {value}
-            </Descriptions.Item>
-          ))}
-        </Descriptions>
-
-        <Descriptions column={1}>
-          <Descriptions.Item label={t('fee')}>
-            <Fee></Fee>
-          </Descriptions.Item>
-        </Descriptions>
-
-        <Typography.Text>{t('multisig.approval_tip')}</Typography.Text>
-      </Modal>
     </>
   );
 }

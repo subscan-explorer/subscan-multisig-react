@@ -2,11 +2,10 @@ import { ArrowDownOutlined, ArrowUpOutlined, DeleteOutlined } from '@ant-design/
 import keyring from '@polkadot/ui-keyring';
 import { KeyringJson } from '@polkadot/ui-keyring/types';
 import { Button, message, Modal, Popconfirm, Space, Statistic, Typography } from 'antd';
-import { useQuery } from 'graphql-hooks';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory, useParams } from 'react-router-dom';
-import { TRANSFERS_COUNT_QUERY } from '../config';
+import { useHistory } from 'react-router-dom';
+import { LONG_DURATION } from '../config';
 import { useApi, useIsInjected } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
 import { ExtrinsicLaunch } from './ExtrinsicLaunch';
@@ -20,25 +19,25 @@ export function WalletState() {
   const { t } = useTranslation();
   const history = useHistory();
   const { network } = useApi();
-  const { account } = useParams<{ account: string }>();
-  const { multisigAccount, setMultisigAccount, inProgress, queryInProgress } = useMultisigContext();
+  const {
+    multisigAccount,
+    setMultisigAccount,
+    inProgress,
+    queryInProgress,
+    confirmedAccount,
+    refreshConfirmedAccount,
+  } = useMultisigContext();
   const [isAccountsDisplay, setIsAccountsDisplay] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isExtrinsicDisplay, setIsExtrinsicDisplay] = useState(false);
   const isExtensionAccount = useIsInjected();
-  const { data } = useQuery<{ transfers: { totalCount: number } }>(TRANSFERS_COUNT_QUERY, {
-    variables: {
-      account,
-    },
-    skipCache: true,
-  });
   const states = useMemo<{ label: string; count: number | undefined }[]>(
     () => [
       {
         label: 'multisig.In Progress',
         count: inProgress.length,
       },
-      { label: 'multisig.Confirmed Extrinsic', count: data?.transfers.totalCount ?? 0 },
+      { label: 'multisig.Confirmed Extrinsic', count: confirmedAccount },
       {
         label: 'multisig.Threshold',
         count: multisigAccount?.meta.threshold as number,
@@ -49,7 +48,7 @@ export function WalletState() {
         count: (multisigAccount?.meta.who as any)?.length as number,
       },
     ],
-    [multisigAccount, data, inProgress]
+    [inProgress.length, confirmedAccount, multisigAccount?.meta.threshold, multisigAccount?.meta.who]
   );
   const renameWallet = useCallback(
     ({ name }: { name: string }) => {
@@ -86,6 +85,13 @@ export function WalletState() {
       message.error(error.message);
     }
   }, [multisigAccount?.address, t, history]);
+
+  useEffect(() => {
+    const id = setInterval(() => refreshConfirmedAccount(), LONG_DURATION);
+
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Space direction="vertical" className="w-full">

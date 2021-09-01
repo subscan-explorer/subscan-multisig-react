@@ -78,7 +78,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     rpc: 'wss://pangolin-rpc.darwinia.network/',
     api: {
-      subql: 'http://t3.hkg.itering.com:3000',
+      subql: 'https://api.subquery.network/sq/darwinia-network/pangolin',
     },
     donate: {
       address: '2rbREPAhkptwCtdvU5eSGnHgFiyPcehdkXuGqFF916oYCJ7s',
@@ -98,7 +98,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     rpc: 'wss://crab-rpc.darwinia.network',
     api: {
-      subql: 'https://api.subquery.network/sq/wuminzhe/crab',
+      subql: 'https://api.subquery.network/sq/darwinia-network/crab',
     },
     donate: {
       address: '5FVFSCANyotNxJM4Crm1LQfsmNQSw3p8H7CRbegN7d5Ex91y',
