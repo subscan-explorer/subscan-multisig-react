@@ -92,7 +92,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     fullName: 'Crab Mainnet',
     ss58Prefix: 42,
-    token: { native: 'CRING' },
+    token: { native: 'CRAB' },
     erc20: {
       ring: '0x588abe3F7EE935137102C5e2B8042788935f4CB0',
       kton: '0xbfE9E136270cE46A2A6a8E8D54718BdAEBEbaA3D',
