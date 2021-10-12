@@ -33,7 +33,7 @@
     "@polkadot/api": "^4.17.1",
     "@polkadot/api-contract": "^4.17.1",
     "@polkadot/apps-config": "^0.94.1",
-    "@polkadot/extension-dapp": "^0.38.8",
+    "@polkadot/extension-dapp": "^0.40.3",
     "@polkadot/metadata": "^4.17.1",
     "@polkadot/react-identicon": "^0.83.1",
     "@polkadot/types": "^4.17.1",
