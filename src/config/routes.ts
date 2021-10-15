@@ -6,7 +6,7 @@ import { Wallet } from '../pages/Wallet';
 export enum Path {
   root = '/',
   wallet = '/wallet',
-  extrinsic = '/extrinsic',
+  extrinsic = '/account',
 }
 
 export const routes: RouteProps[] = [
@@ -22,7 +22,7 @@ export const routes: RouteProps[] = [
   },
   {
     exact: true,
-    path: '/extrinsic/:account',
+    path: '/account/:account',
     children: Extrinsic,
   },
   {
@@ -32,7 +32,7 @@ export const routes: RouteProps[] = [
   },
   {
     exact: true,
-    path: '/noData',
-    children: null,
+    path: '*',
+    children: Home,
   },
 ];

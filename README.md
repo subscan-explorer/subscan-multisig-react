@@ -164,7 +164,7 @@ Only the initiator has the authority to cancel the multi-sig extrinsic. Click "C
 ### Install
 
 ```bash
-yarn && yarn serve
+yarn && yarn start:dev
 ```
 
 ### Test
