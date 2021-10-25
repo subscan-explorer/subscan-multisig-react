@@ -46,7 +46,6 @@ function VoteThresholdParam({
 
   const defaultValue =
     value instanceof registry.createClass('VoteThreshold') ? value.toNumber() : bnToBn(value as number).toNumber();
-    // value instanceof ClassOf(registry, 'VoteThreshold') ? value.toNumber() : bnToBn(value as number).toNumber();
 
   return (
     <Bare className={className}>
