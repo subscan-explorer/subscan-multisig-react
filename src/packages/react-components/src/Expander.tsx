@@ -47,7 +47,7 @@ function splitParts(value: string): string[] {
 }
 
 function formatMeta(meta?: Meta): React.ReactNode | null {
-  if (!meta || !meta.documentation.length) {
+  if (!meta || !meta.documentation || !meta.documentation.length) {
     return null;
   }
 
