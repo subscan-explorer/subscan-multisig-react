@@ -20,10 +20,11 @@ export function TxApprove({ entry, txSpy, onOperation }: TxOperationComponentPro
   const { accounts, api } = useApi();
   const [getApproveTx] = useMultiApprove();
   const { queueExtrinsic } = useContext(StatusContext);
-  const [getUnapprovedInjectedList] = useUnapprovedAccounts();
+  // const [getUnapprovedInjectedList] = useUnapprovedAccounts();
   const { setIsPageLock, queryInProgress, refreshConfirmedAccount } = useMultisigContext();
-  const unapprovedAddresses = getUnapprovedInjectedList(entry);
-  const availableAccounts = (accounts ?? []).filter((extAddr) => unapprovedAddresses.includes(extAddr.address));
+  // const unapprovedAddresses = getUnapprovedInjectedList(entry);
+  // const availableAccounts = (accounts ?? []).filter((extAddr) => unapprovedAddresses.includes(extAddr.address));
+  const availableAccounts = (accounts ?? []).filter((extAddr) => extAddr.address);
   const handleApprove = useCallback(
     (accountId: string, target: Entry) => {
       setIsPageLock(true);

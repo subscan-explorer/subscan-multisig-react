@@ -81,7 +81,6 @@ export function useUnapprovedAccounts() {
       const multisigPairAddresses = (multisigAccount?.meta.addressPair as any[])?.map((item) => item.address);
       const extensionInPairs = intersection(extensionAddresses, multisigPairAddresses);
       const approvedExtensionAddresses = intersection(extensionInPairs, data.approvals);
-
       return difference(extensionInPairs, approvedExtensionAddresses);
     },
     [accounts, multisigAccount?.meta.addressPair]
