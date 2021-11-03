@@ -5,7 +5,7 @@ import { useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { validateMessages } from '../config';
 import i18n from '../config/i18n';
-import { useApi, useMultiApprove, useUnapprovedAccounts } from '../hooks';
+import { useApi, useMultiApprove } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
 import { Entry, TxOperationComponentProps } from '../model';
 import { StatusContext } from '../packages/react-components/src';
