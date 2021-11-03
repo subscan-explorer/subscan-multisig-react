@@ -79,11 +79,14 @@ export function useUnapprovedAccounts() {
 
       const extensionAddresses = accounts?.map((item) => convertToSS58(item.address, networkConfig.ss58Prefix)) || [];
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const multisigPairAddresses = (multisigAccount?.meta.addressPair as any[])?.map(
-        (item) => convertToSS58(item.address, networkConfig.ss58Prefix) as string
+      const multisigPairAddresses = (multisigAccount?.meta.addressPair as any[])?.map((item) =>
+        convertToSS58(item.address, networkConfig.ss58Prefix)
       );
       const extensionInPairs = intersection(extensionAddresses, multisigPairAddresses);
-      const approvedExtensionAddresses = intersection(extensionInPairs, data.approvals);
+      const approvedExtensionAddresses = intersection(
+        extensionInPairs,
+        data.approvals.map((item) => convertToSS58(item, networkConfig.ss58Prefix))
+      );
       return difference(extensionInPairs, approvedExtensionAddresses);
     },
     [accounts, multisigAccount?.meta.addressPair]
