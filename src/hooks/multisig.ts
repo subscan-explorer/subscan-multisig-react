@@ -4,6 +4,7 @@ import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { difference, intersection } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { convertToSS58 } from '../utils';
 import { Entry } from '../model';
 import { useApi } from './api';
 
@@ -68,7 +69,7 @@ export function useMultisig(acc?: string) {
 }
 
 export function useUnapprovedAccounts() {
-  const { accounts } = useApi();
+  const { accounts, networkConfig } = useApi();
   const { multisigAccount } = useMultisig();
   const getUnapprovedInjectedList = useCallback(
     (data: Entry | null) => {
@@ -76,9 +77,11 @@ export function useUnapprovedAccounts() {
         return [];
       }
 
-      const extensionAddresses = accounts?.map((item) => item.address) || [];
+      const extensionAddresses = accounts?.map((item) => convertToSS58(item.address, networkConfig.ss58Prefix)) || [];
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const multisigPairAddresses = (multisigAccount?.meta.addressPair as any[])?.map((item) => item.address);
+      const multisigPairAddresses = (multisigAccount?.meta.addressPair as any[])?.map(
+        (item) => convertToSS58(item.address, networkConfig.ss58Prefix) as string
+      );
       const extensionInPairs = intersection(extensionAddresses, multisigPairAddresses);
       const approvedExtensionAddresses = intersection(extensionInPairs, data.approvals);
       return difference(extensionInPairs, approvedExtensionAddresses);

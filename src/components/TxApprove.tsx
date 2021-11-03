@@ -5,26 +5,28 @@ import { useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { validateMessages } from '../config';
 import i18n from '../config/i18n';
-import { useApi, useMultiApprove } from '../hooks';
+import { useApi, useMultiApprove, useUnapprovedAccounts } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
 import { Entry, TxOperationComponentProps } from '../model';
 import { StatusContext } from '../packages/react-components/src';
 import { PartialQueueTxExtrinsic } from '../packages/react-components/src/Status/types';
-import { makeSure } from '../utils';
+import { convertToSS58, makeSure } from '../utils';
 
 const { info } = Modal;
 
 export function TxApprove({ entry, txSpy, onOperation }: TxOperationComponentProps) {
   const { t } = useTranslation();
   const [form] = useForm();
-  const { accounts, api } = useApi();
+  const { accounts, api, networkConfig } = useApi();
   const [getApproveTx] = useMultiApprove();
   const { queueExtrinsic } = useContext(StatusContext);
-  // const [getUnapprovedInjectedList] = useUnapprovedAccounts();
+  const [getUnapprovedInjectedList] = useUnapprovedAccounts();
   const { setIsPageLock, queryInProgress, refreshConfirmedAccount } = useMultisigContext();
-  // const unapprovedAddresses = getUnapprovedInjectedList(entry);
-  // const availableAccounts = (accounts ?? []).filter((extAddr) => unapprovedAddresses.includes(extAddr.address));
-  const availableAccounts = (accounts ?? []).filter((extAddr) => extAddr.address);
+  const unapprovedAddresses = getUnapprovedInjectedList(entry);
+
+  const availableAccounts = (accounts ?? []).filter((extAddr) =>
+    unapprovedAddresses.includes(convertToSS58(extAddr.address, networkConfig.ss58Prefix))
+  );
   const handleApprove = useCallback(
     (accountId: string, target: Entry) => {
       setIsPageLock(true);
