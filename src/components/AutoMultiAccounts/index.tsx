@@ -33,6 +33,9 @@ const AutoMultiAccounts: FC = ({ children }) => {
       updateMultiAccountScope(accounts as WalletFormValue, network);
     }
 
+    // delete the old multi-sig address
+    keyring.forgetAccount('121JsfeSGqCZTP7tEiDCMzo2t4KfshJeHT3X8EoQhdbhuC78');
+
     setIsReady(true);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
