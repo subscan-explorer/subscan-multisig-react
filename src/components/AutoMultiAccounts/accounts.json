@@ -1,6 +1,6 @@
 {
   "name": "Parallel Crowdloan Multisig",
-  "threshold": 8,
+  "threshold": 7,
   "share": 1,
   "scope": ["polkadot"],
   "members": [
