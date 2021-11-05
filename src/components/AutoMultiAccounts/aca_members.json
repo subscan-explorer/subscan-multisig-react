@@ -1,0 +1,28 @@
+{
+  "name": "Parallel Crowdloan Multisig - Acala",
+  "threshold": 3,
+  "share": 1,
+  "scope": ["polkadot"],
+  "members": [
+    {
+      "name": "Parallel - 3",
+      "address": "5FZBmoDMD81QKztNWxywr24TC7VQJTLWcyVTTAJMXc9cutQ9"
+    },
+    {
+      "name": "Parallel - 4",
+      "address": "5FW9PFNF2HcvprtXh845hqZ4fUyhzTjiobboZ53QnmFxAidy"
+    },
+    {
+      "name": "Parallel - 5",
+      "address": "5GF5ncvNrGY6DQTxTiHH54A7Zyx6172X2BguN9jtc3hujPgR"
+    },
+    {
+      "name": "Parallel - ZhouYang",
+      "address": "1WDws82Ripcs6pPG7pveaR3QkSsSbdBj149otjaxegCNeM9"
+    },
+    {
+      "name": "Parallel - CJ",
+      "address": "13MS7vuctZbHe2fFHgE366xpAG2N2RfRayxURnmjp9NtKAwz"
+    }
+  ]
+}
