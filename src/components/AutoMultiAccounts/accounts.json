@@ -5,51 +5,51 @@
   "scope": ["polkadot"],
   "members": [
     {
-      "name": "1",
+      "name": "Yaoqi - Parity Technologies",
       "address": "14mwSGdhdrAA3pGoKSX1tWguFREswWucAsr7kcHbdsf7fU7Q"
     },
     {
-      "name": "2",
+      "name": "167rjWHghVwBJ52mz8sNkqr5bKu5vpchbc9CBoieBhVX714h",
       "address": "167rjWHghVwBJ52mz8sNkqr5bKu5vpchbc9CBoieBhVX714h"
     },
     {
-      "name": "3",
+      "name": "Kenny - Manta",
       "address": "5EZhmGs5Quo9RVT8GuKiK8u7iGi2s7hZfJhXhAHRu5oY9U8m"
     },
     {
-      "name": "4",
+      "name": "Sota - Astar",
       "address": "13VyvkXX3dYyeT7oAmaipZYNHzFJXofC5V8eqMuzd1isXY84"
     },
     {
-      "name": "5",
+      "name": "Hanwen - Litentry",
       "address": "12EhrWGTAEEjETcQhwvus22bYMoDC7iDsnyroD2gSdM9EsK7"
     },
     {
-      "name": "6",
+      "name": "Ingo - Kilt",
       "address": "1Yp7yxdZi7bo12MYaJZpjYiJHoePvFoDs9fRHCKX9iMnjZr"
     },
     {
-      "name": "7",
+      "name": "Sam - SubQuery",
       "address": "15rb4HVycC1KLHsdaSdV1x2TJAmUkD7PhubmhL3PnGv7RiGY"
     },
     {
-      "name": "8",
+      "name": "Chris - Mr.Block",
       "address": "5ChZXPbJSgTu4Msq6eXmytsBYPS7BqKrGPjefkjWmqZE9utU"
     },
     {
-      "name": "9",
+      "name": "Parallel - 3",
       "address": "5FZBmoDMD81QKztNWxywr24TC7VQJTLWcyVTTAJMXc9cutQ9"
     },
     {
-      "name": "10",
+      "name": "Parallel - 4",
       "address": "5FW9PFNF2HcvprtXh845hqZ4fUyhzTjiobboZ53QnmFxAidy"
     },
     {
-      "name": "11",
+      "name": "Parallel - 5",
       "address": "5GF5ncvNrGY6DQTxTiHH54A7Zyx6172X2BguN9jtc3hujPgR"
     },
     {
-      "name": "12",
+      "name": "Parallel - 6",
       "address": "5HTnkMSPmFGK85xMv5wm2dgDmL3rfVkKDUe61TGT1K9AtnGC"
     }
   ]
