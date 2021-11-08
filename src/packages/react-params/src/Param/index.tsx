@@ -1,4 +1,3 @@
-/* eslint-disable complexity */
 // Copyright 2017-2021 @polkadot/react-params authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,19 +7,6 @@ import React, { useMemo } from 'react';
 import type { Props } from '../types';
 import findComponent from './findComponent';
 import Static from './Static';
-
-function formatJSON(input: string): string {
-  return (
-    input
-      .replace(/"/g, '')
-      .replace(/\\/g, '')
-      .replace(/:Null/g, '')
-      .replace(/:/g, ': ')
-      // .replace(/{/g, '{ ')
-      // .replace(/}/g, ' }')
-      .replace(/,/g, ', ')
-  );
-}
 
 function Param({
   className = '',
@@ -39,17 +25,8 @@ function Param({
   const Component = useMemo(() => findComponent(registry, type, overrides), [registry, type, overrides]);
 
   const label = useMemo(
-    () =>
-      formatJSON(
-        isUndefined(name)
-          ? `${isDisabled && isInOption ? 'Option<' : ''}${encodeTypeDef(registry, type)}${
-              isDisabled && isInOption ? '>' : ''
-            }`
-          : `${name}: ${isDisabled && isInOption ? 'Option<' : ''}${encodeTypeDef(registry, type)}${
-              isDisabled && isInOption ? '>' : ''
-            }`
-      ),
-    [isDisabled, isInOption, name, registry, type]
+    () => (isUndefined(name) ? encodeTypeDef(type) : `${name}: ${encodeTypeDef(type)}`),
+    [name, type]
   );
 
   if (!Component) {

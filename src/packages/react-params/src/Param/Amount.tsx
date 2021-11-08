@@ -5,7 +5,7 @@ import type BN from 'bn.js';
 
 import React, { useCallback, useMemo } from 'react';
 
-// import { ClassOf } from '@polkadot/types/create';
+import { ClassOf } from '@polkadot/types/create';
 import { bnToBn, formatNumber, isUndefined } from '@polkadot/util';
 import { Input, InputNumber } from '../../../react-components/src';
 import type { Props } from '../types';
@@ -27,7 +27,7 @@ function Amount({
   const defaultValue = useMemo(
     () =>
       isDisabled
-        ? value instanceof registry.createClass('AccountIndex')
+        ? value instanceof ClassOf(registry, 'AccountIndex')
           ? value.toString()
           : formatNumber(value as number)
         : bnToBn((value as number) || 0).toString(),

@@ -6,7 +6,7 @@ import type { Signer, SignerResult } from '@polkadot/api/types';
 import type { Hash } from '@polkadot/types/interfaces';
 import type { Registry, SignerPayloadJSON } from '@polkadot/types/types';
 
-// import { ClassOf } from '@polkadot/types/create';
+import { ClassOf } from '@polkadot/types/create';
 import type {
   QueueTxMessageSetStatus,
   QueueTxPayloadAdd,
@@ -41,8 +41,7 @@ export default class ApiSigner implements Signer {
   public update(id: number, result: Hash | SubmittableResult): void {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    if (result instanceof this.#registry.createClass('Hash')) {
-      // if (result instanceof ClassOf(this.#registry, 'Hash')) {
+    if (result instanceof ClassOf(this.#registry, 'Hash')) {
       this.#queueSetTxStatus(id, 'sent', result.toHex());
     } else {
       this.#queueSetTxStatus(id, result.status.type.toLowerCase() as QueueTxStatus, status);

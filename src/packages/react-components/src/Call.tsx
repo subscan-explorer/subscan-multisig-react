@@ -4,8 +4,7 @@
 
 import { Params } from '@polkadot/react-params';
 import { FormatBalance } from '@polkadot/react-query';
-// import { Enum, GenericCall, getTypeDef } from '@polkadot/types';
-import { Enum, getTypeDef } from '@polkadot/types';
+import { Enum, GenericCall, getTypeDef } from '@polkadot/types';
 import type { ExtrinsicSignature } from '@polkadot/types/interfaces';
 import type { Codec, IExtrinsic, IMethod, TypeDef } from '@polkadot/types/types';
 import type BN from 'bn.js';
@@ -57,8 +56,7 @@ function getRawSignature(value: IExtrinsic): ExtrinsicSignature | undefined {
 }
 
 function extractState(value: IExtrinsic | IMethod, withHash?: boolean, withSignature?: boolean): Extracted {
-  const params = value.meta.args.map(
-    // const params = GenericCall.filterOrigin(value.meta).map(
+  const params = GenericCall.filterOrigin(value.meta).map(
     ({ name, type }): Param => ({
       name: name.toString(),
       type: getTypeDef(type.toString()),

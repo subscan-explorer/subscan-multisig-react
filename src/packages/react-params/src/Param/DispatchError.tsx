@@ -36,10 +36,10 @@ function ErrorDisplay(props: Props): React.ReactElement<Props> {
       if (value.isModule) {
         try {
           const mod = value.asModule;
-          const { docs, name, section } = mod.registry.findMetaError(mod);
+          const { documentation, name, section } = mod.registry.findMetaError(mod);
 
           return setDetails({
-            details: docs.join(', '),
+            details: documentation.join(', '),
             type: `${section}.${name}`,
           });
         } catch (error) {

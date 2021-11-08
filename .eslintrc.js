@@ -35,7 +35,7 @@ module.exports = {
   },
   rules: {
     // prettier rules
-    'prettier/prettier': 'warn',
+    'prettier/prettier': 'error',
     // @typescript-eslint rules
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/explicit-member-accessibility': [

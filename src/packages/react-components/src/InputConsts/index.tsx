@@ -1,7 +1,7 @@
 // Copyright 2017-2021 @polkadot/react-components authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ConstantCodec } from '@polkadot/types/metadata/decorate/types';
+import type { ConstantCodec } from '@polkadot/metadata/decorate/types';
 
 import React, { useCallback, useState } from 'react';
 
@@ -58,7 +58,7 @@ function InputConsts({
       }
 
       const { method, section } = newValue;
-      const meta = (api.consts[section][method] as unknown as ConstantCodec).meta;
+      const meta = (api.consts[section][method] as ConstantCodec).meta;
       const updated = { meta, method, section };
 
       setValue(updated);
