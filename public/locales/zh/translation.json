@@ -80,6 +80,7 @@
     "delete": "确认删除吗？"
   },
   "multisig": {
+    "Crowdloan Extrinsic": "众贷交易",
     "Confirmed Extrinsic": "已确认",
     "In Progress": "待确认",
     "Members": "成员数",
