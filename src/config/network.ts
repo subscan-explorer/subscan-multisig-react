@@ -13,7 +13,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
       ring: '',
       kton: '',
     },
-    rpc: 'wss://polkadot.api.onfinality.io/public-ws',
+    rpc: 'wss://pub.elara.patract.io/polkadot',
     api: {
       subql: 'https://api.subquery.network/sq/darwinia-network/polkadot',
     },
