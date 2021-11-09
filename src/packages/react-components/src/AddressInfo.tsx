@@ -256,6 +256,7 @@ function createBalanceItems(
   }
 ): React.ReactNode {
   const allItems: React.ReactNode[] = [];
+  const deriveBalances = balancesAll as DeriveBalancesAll;
 
   // eslint-disable-next-line
   !withBalanceToggle &&
@@ -285,38 +286,49 @@ function createBalanceItems(
         />
       </React.Fragment>
     );
-  balanceDisplay.vested &&
-    (balancesAll as DeriveBalancesAll)?.isVesting &&
+  if (balanceDisplay.vested && deriveBalances?.isVesting) {
+    const allVesting = deriveBalances.vesting.filter(({ endBlock }) => bestNumber.lt(endBlock));
+
     allItems.push(
       <React.Fragment key={2}>
         <Label label={t<string>('vested')} />
         <FormatBalance
-          className="result"
+          className='result'
           formatIndex={formatIndex}
-          label={<Icon icon="info-circle" tooltip={`${address}-vested-trigger`} />}
-          value={(balancesAll as DeriveBalancesAll).vestedBalance}
+          labelPost={
+            <Icon
+              icon='info-circle'
+              tooltip={`${address}-vested-trigger`}
+            />
+          }
+          value={deriveBalances.vestedBalance}
         >
           <Tooltip
             text={
               <>
                 <div>
-                  {formatBalance((balancesAll as DeriveBalancesAll).vestedClaimable, { forceUnit: '-' })}
-                  <div className="faded">{t('available to be unlocked')}</div>
+                  {formatBalance(deriveBalances.vestedClaimable, { forceUnit: '-' })}
+                  <div className='faded'>{t('available to be unlocked')}</div>
                 </div>
-                {bestNumber.lt((balancesAll as DeriveBalancesAll).vestingEndBlock) && (
-                  <>
+                {allVesting.map(({ endBlock, locked, perBlock, vested }, index) => (
+                  <div
+                    className='inner'
+                    key={`item:${index}`}
+                  >
                     <div>
-                      <BlockToTime value={(balancesAll as DeriveBalancesAll).vestingEndBlock.sub(bestNumber)} />
-                      <div className="faded">
-                        {t('until block')} {formatNumber((balancesAll as DeriveBalancesAll).vestingEndBlock)}
-                      </div>
+                      {formatBalance(vested, { forceUnit: '-' })}
+                      <div className='faded'>{t('of {{locked}} vested', { replace: { locked: formatBalance(locked, { forceUnit: '-' }) } })}</div>
                     </div>
                     <div>
-                      {formatBalance((balancesAll as DeriveBalancesAll).vestingPerBlock)}
-                      <div className="faded">{t('per block')}</div>
+                      <BlockToTime value={endBlock.sub(bestNumber)} />
+                      <div className='faded'>{t('until block')} {formatNumber(endBlock)}</div>
                     </div>
-                  </>
-                )}
+                    <div>
+                      {formatBalance(perBlock)}
+                      <div className='faded'>{t('per block')}</div>
+                    </div>
+                  </div>
+                ))}
               </>
             }
             trigger={`${address}-vested-trigger`}
@@ -324,6 +336,7 @@ function createBalanceItems(
         </FormatBalance>
       </React.Fragment>
     );
+  }
   balanceDisplay.locked &&
     balancesAll &&
     (isAllLocked || (balancesAll as DeriveBalancesAll).lockedBalance?.gtn(0)) &&
