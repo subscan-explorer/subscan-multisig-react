@@ -12,7 +12,10 @@
     "importHelpers": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "lib": ["es2018", "dom"],
+    "lib": [
+      "es2018",
+      "dom"
+    ],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
@@ -22,7 +25,13 @@
     "sourceMap": true,
     "strict": true,
     "target": "es2015",
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": [
+      "node_modules/@types"
+    ]
   },
-  "include": ["src", "src/global.d.ts", "src/packages"]
+  "include": [
+    "src",
+    "src/global.d.ts",
+    "src/packages"
+  ]
 }

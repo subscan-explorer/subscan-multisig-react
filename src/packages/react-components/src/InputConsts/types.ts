@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { StorageEntryBase } from '@polkadot/api/types';
-import type { ModuleConstantMetadataLatest } from '@polkadot/types/interfaces';
+import type { PalletConstantMetadataLatest } from '@polkadot/types/interfaces';
 import type { AnyTuple } from '@polkadot/types/types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -14,5 +14,5 @@ export interface ConstValueBase {
 }
 
 export interface ConstValue extends ConstValueBase {
-  meta: ModuleConstantMetadataLatest;
+  meta: PalletConstantMetadataLatest;
 }
