@@ -47,6 +47,7 @@ function Confirmed({ account, multiAddress }: ConfirmedProps) {
       limit: 10,
     },
   });
+
   const extrinsic = useMemo(() => {
     if (!data?.transfers || !api) {
       return [];
@@ -72,7 +73,8 @@ function Confirmed({ account, multiAddress }: ConfirmedProps) {
       const callData = api?.registry.createType('Call', argsHash) as unknown as Call;
       const meta = api?.tx[callData.section][callData.method].meta.toJSON();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { height, index } = multisigArgs.find((item: any) => item.name === 'maybe_timepoint')?.value;
+      const maybeTimepointArg = multisigArgs.find((item: any) => item.name === 'maybeTimepoint')?.value;
+      const { height, index } = maybeTimepointArg || {};
 
       return {
         callData,
@@ -83,7 +85,7 @@ function Confirmed({ account, multiAddress }: ConfirmedProps) {
         address: fromId,
         approvals: [
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...multisigArgs.find((item: any) => item.name === 'other_signatories')?.value.slice(1), // 第1个是多签账号
+          ...multisigArgs.find((item: any) => item.name === 'otherSignatories')?.value.slice(1), // 第1个是多签账号
           signerId,
         ],
         status: isSuccess ? 'executed' : 'pending',
