@@ -21,8 +21,9 @@ export interface EntriesProps {
   isConfirmed?: boolean;
 }
 
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
 const { Panel } = Collapse;
+const CALL_DATA_LENGTH = 25;
 
 const renderMethod = (data: Call | undefined | null) => {
   const call = data?.toHuman();
@@ -108,11 +109,20 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
 
   const columns: ColumnsType<Entry> = [
     {
-      title: t(!isConfirmed ? 'call_hash' : 'block_hash'),
-      dataIndex: 'hash',
+      title: t(!isConfirmed ? 'call_data' : 'block_hash'),
+      dataIndex: !isConfirmed ? 'hexCallData' : 'hash',
+      width: 300,
       align: 'center',
-      render(hash: string) {
-        return !isConfirmed ? hash : <SubscanLink block={hash} />;
+      render(data: string) {
+        return !isConfirmed ? (
+          <>
+            <Paragraph copyable={{ text: data }}>
+              {data && data.length > CALL_DATA_LENGTH ? `${data.substring(0, CALL_DATA_LENGTH)}...` : data}
+            </Paragraph>
+          </>
+        ) : (
+          <SubscanLink block={data} />
+        );
       },
     },
     {

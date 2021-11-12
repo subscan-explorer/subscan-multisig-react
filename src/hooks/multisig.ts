@@ -1,6 +1,7 @@
 import { AnyJson } from '@polkadot/types/types';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
+import { u8aToHex } from '@polkadot/util';
 import { difference, intersection } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -39,9 +40,10 @@ export function useMultisig(acc?: string) {
 
       try {
         const callData = api.registry.createType('Call', call[0]);
+        const hexCallData = u8aToHex(callData.toU8a());
         const meta = api?.tx[callData?.section][callData.method].meta.toJSON();
 
-        return { ...result[index], callData, meta, hash: result[index].callHash };
+        return { ...result[index], callData, meta, hash: result[index].callHash, hexCallData };
       } catch (_) {
         return { ...result[index], callData: null, meta: {}, hash: result[index].callHash };
       }
