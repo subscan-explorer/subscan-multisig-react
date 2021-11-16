@@ -3,7 +3,7 @@ import { Call } from '@polkadot/types/interfaces';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
 import { Button, Collapse, Empty, Progress, Space, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { intersection } from 'lodash';
+import { intersection, isEmpty } from 'lodash';
 import { useCallback } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useApi, useIsInjected } from '../hooks';
@@ -21,8 +21,9 @@ export interface EntriesProps {
   isConfirmed?: boolean;
 }
 
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
 const { Panel } = Collapse;
+const CALL_DATA_LENGTH = 25;
 
 const renderMethod = (data: Call | undefined | null) => {
   const call = data?.toHuman();
@@ -108,11 +109,22 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
 
   const columns: ColumnsType<Entry> = [
     {
-      title: t(!isConfirmed ? 'call_hash' : 'block_hash'),
-      dataIndex: 'hash',
+      title: t(!isConfirmed ? 'call_data' : 'block_hash'),
+      dataIndex: !isConfirmed ? 'hexCallData' : 'hash',
+      width: 300,
       align: 'center',
-      render(hash: string) {
-        return !isConfirmed ? hash : <SubscanLink block={hash} />;
+      render(data: string) {
+        return !isConfirmed ? (
+          <>
+            <Paragraph copyable={!isEmpty(data) && { text: data }}>
+              {!isEmpty(data)
+                ? `${data.substring(0, CALL_DATA_LENGTH)}${data.length > CALL_DATA_LENGTH ? '...' : ''}`
+                : '-'}
+            </Paragraph>
+          </>
+        ) : (
+          <SubscanLink block={data} />
+        );
       },
     },
     {
