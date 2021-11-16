@@ -72,8 +72,10 @@ function Confirmed({ account, multiAddress }: ConfirmedProps) {
       const argsHash = multisigArgs.find((item: any) => item.name === 'call')?.value;
       const callData = api?.registry.createType('Call', argsHash) as unknown as Call;
       const meta = api?.tx[callData.section][callData.method].meta.toJSON();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const maybeTimepointArg = multisigArgs.find((item: any) => item.name === 'maybeTimepoint')?.value;
+      const maybeTimepointArg = multisigArgs.find(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (item: any) => item.name === 'maybeTimepoint' || item.name === 'maybe_timepoint'
+      )?.value;
       const { height, index } = maybeTimepointArg || {};
 
       return {
@@ -84,8 +86,10 @@ function Confirmed({ account, multiAddress }: ConfirmedProps) {
         callHash: null,
         address: fromId,
         approvals: [
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...multisigArgs.find((item: any) => item.name === 'otherSignatories')?.value.slice(1), // 第1个是多签账号
+          ...multisigArgs
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .find((item: any) => item.name === 'otherSignatories' || item.name === 'other_signatories')
+            ?.value?.slice(1), // 第1个是多签账号
           signerId,
         ],
         status: isSuccess ? 'executed' : 'pending',
