@@ -3,7 +3,7 @@ import { Call } from '@polkadot/types/interfaces';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
 import { Button, Collapse, Empty, Progress, Space, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { intersection } from 'lodash';
+import { intersection, isEmpty } from 'lodash';
 import { useCallback } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useApi, useIsInjected } from '../hooks';
@@ -116,8 +116,10 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
       render(data: string) {
         return !isConfirmed ? (
           <>
-            <Paragraph copyable={{ text: data }}>
-              {data && data.length > CALL_DATA_LENGTH ? `${data.substring(0, CALL_DATA_LENGTH)}...` : data}
+            <Paragraph copyable={!isEmpty(data) && { text: data }}>
+              {!isEmpty(data)
+                ? `${data.substring(0, CALL_DATA_LENGTH)}${data.length > CALL_DATA_LENGTH ? '...' : ''}`
+                : '-'}
             </Paragraph>
           </>
         ) : (
