@@ -116,8 +116,6 @@ export function ExtrinsicRecords() {
   });
 
   const handleChangeTab = (key: string) => {
-    // eslint-disable-next-line no-console
-    console.log('handleChangeTab', key);
     setTabKey(key);
     refreshData(key);
   };
