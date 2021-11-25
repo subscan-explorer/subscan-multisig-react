@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { ReloadOutlined } from '@ant-design/icons';
 import { Call } from '@polkadot/types/interfaces';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { Space, Spin, Tabs } from 'antd';
@@ -36,17 +38,11 @@ const { TabPane } = Tabs;
 interface ConfirmedProps {
   multiAddress: string;
   account: KeyringAddress | null;
+  data: TransfersQueryRes | undefined;
 }
 
-function Confirmed({ account, multiAddress }: ConfirmedProps) {
+function Confirmed({ data, account }: ConfirmedProps) {
   const { api } = useApi();
-  const { data } = useQuery<TransfersQueryRes>(TRANSFERS_QUERY, {
-    variables: {
-      account: multiAddress,
-      offset: 0,
-      limit: 10,
-    },
-  });
 
   const extrinsic = useMemo(() => {
     if (!data?.transfers || !api) {
@@ -108,36 +104,65 @@ function Confirmed({ account, multiAddress }: ConfirmedProps) {
 export function ExtrinsicRecords() {
   const { t } = useTranslation();
   const { account: multiAddress } = useParams<{ account: string }>();
-  const { multisigAccount, inProgress, confirmedAccount } = useMultisigContext();
+  const { multisigAccount, inProgress, confirmedAccount, queryInProgress } = useMultisigContext();
+  const [tabKey, setTabKey] = useState('inProgress');
+
+  const { data, refetch: refetchConfimed } = useQuery<TransfersQueryRes>(TRANSFERS_QUERY, {
+    variables: {
+      account: multiAddress,
+      offset: 0,
+      limit: 10,
+    },
+  });
+
+  const handleChangeTab = (key: string) => {
+    setTabKey(key);
+    refreshData(key);
+  };
+
+  const refreshData = (key: string) => {
+    if (key === 'inProgress') {
+      queryInProgress();
+    } else if (key === 'confirmed') {
+      refetchConfimed();
+    }
+  };
 
   return (
-    <Tabs>
-      <TabPane
-        tab={
-          <Space>
-            <span>{t('multisig.In Progress')}</span>
-            <span>{inProgress.length}</span>
-          </Space>
-        }
-        key="inProgress"
-      >
-        {multisigAccount?.address ? (
-          <Entries source={inProgress} account={multisigAccount} />
-        ) : (
-          <Spin className="w-full mt-4" />
-        )}
-      </TabPane>
-      <TabPane
-        tab={
-          <Space>
-            <span>{t('multisig.Confirmed Extrinsic')}</span>
-            <span>{confirmedAccount}</span>
-          </Space>
-        }
-        key="confirmed"
-      >
-        <Confirmed account={multisigAccount} multiAddress={multiAddress} />
-      </TabPane>
-    </Tabs>
+    <div>
+      <ReloadOutlined
+        onClick={() => {
+          refreshData(tabKey);
+        }}
+      />
+      <Tabs activeKey={tabKey} onChange={handleChangeTab}>
+        <TabPane
+          tab={
+            <Space>
+              <span>{t('multisig.In Progress')}</span>
+              <span>{inProgress.length}</span>
+            </Space>
+          }
+          key="inProgress"
+        >
+          {multisigAccount?.address ? (
+            <Entries source={inProgress} account={multisigAccount} />
+          ) : (
+            <Spin className="w-full mt-4" />
+          )}
+        </TabPane>
+        <TabPane
+          tab={
+            <Space>
+              <span>{t('multisig.Confirmed Extrinsic')}</span>
+              <span>{confirmedAccount}</span>
+            </Space>
+          }
+          key="confirmed"
+        >
+          <Confirmed data={data} account={multisigAccount} multiAddress={multiAddress} />
+        </TabPane>
+      </Tabs>
+    </div>
   );
 }

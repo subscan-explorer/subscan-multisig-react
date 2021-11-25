@@ -10,7 +10,6 @@ import { Option } from '@polkadot/react-components/InputAddress/types';
 import { BalanceFree } from '@polkadot/react-query';
 import { keyring } from '@polkadot/ui-keyring';
 import { KeyringSectionOption } from '@polkadot/ui-keyring/options/types';
-import { u8aToHex } from '@polkadot/util';
 import { flatten } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,8 +29,10 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
   const [accountId, setAccountId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [extrinsic, setExtrinsic] = useState<SubmittableExtrinsic<'promise'> | null>(null);
+  const [hexCallData, setHexCallData] = useState('0x');
   const { multisigAccount } = useMultisig();
   const isExtensionAccount = useIsInjected();
+
   const options = useMemo<KeyringSectionOption[]>(
     () =>
       ((multisigAccount?.meta?.addressPair as AddressPair[]) ?? []).map(({ address, ...others }) => ({
@@ -71,6 +72,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
       // @ts-ignore
       const multiTx = module?.asMulti(...args);
 
+      setHexCallData(ext.method.toHex());
       return setExtrinsic(() => multiTx || null);
     },
     [accountId, api?.query.multisig, api?.tx.multisig, multisigAccount]
@@ -78,15 +80,15 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
 
   const _onExtrinsicError = useCallback((err?: Error | null) => setError(err ? err.message : null), []);
 
-  const [extrinsicHex, extrinsicHash] = useMemo((): [string, string] => {
+  const [extrinsicHash] = useMemo((): [string] => {
     if (!extrinsic) {
-      return ['0x', '0x'];
+      return ['0x'];
     }
 
     const u8a = extrinsic.method.toU8a();
 
     // don't use the built-in hash, we only want to convert once
-    return [u8aToHex(u8a), extrinsic.registry.hash(u8a).toHex()];
+    return [extrinsic.registry.hash(u8a).toHex()];
   }, [extrinsic]);
 
   const createMultiItem = useCallback(
@@ -142,7 +144,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
         onChange={_onExtrinsicChange}
         onError={_onExtrinsicError}
       />
-      <Output isDisabled isTrimmed label="encoded call data" value={extrinsicHex} withCopy />
+      <Output isDisabled isTrimmed label="encoded call data" value={hexCallData} withCopy />
       <Output isDisabled label="encoded call hash" value={extrinsicHash} withCopy />
       {error && !extrinsic && <MarkError content={error} />}
       <Button.Group>
