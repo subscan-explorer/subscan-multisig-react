@@ -75,7 +75,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
       logoWithText: '/image/pangolin-logo.svg',
     },
     fullName: 'Pangolin Testnet',
-    ss58Prefix: 18,
+    ss58Prefix: 42,
     token: { native: 'PRING' },
     erc20: {
       ring: '0xfe098c5eeDec594271618922B2F3364F0f8b1785',
