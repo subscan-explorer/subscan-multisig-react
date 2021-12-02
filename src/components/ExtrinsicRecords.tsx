@@ -8,21 +8,20 @@ import { isNumber } from 'lodash';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { TRANSFERS_QUERY } from '../config';
+import { EXECUTED_MULTISIGS_QUERY } from '../config';
 import { useApi } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
 import { IExtrinsic, parseArgs } from '../utils';
 import { Entries } from './Entries';
 
-interface TransfersQueryRes {
-  transfers: { totalCount: number; nodes: Transfer[] };
+interface ExecutedMultisigsQueryRes {
+  executedMultisigs: { totalCount: number; nodes: ExecutedMultisig[] };
 }
 
-interface Transfer {
-  fromId: string;
-  toId: string;
-  amount: string;
+interface ExecutedMultisig {
+  multisigAccountId: string;
   timestamp: string;
+  extrinsicIdx: string;
   block: {
     id: string;
     extrinsics: {
@@ -38,23 +37,24 @@ const { TabPane } = Tabs;
 interface ConfirmedProps {
   multiAddress: string;
   account: KeyringAddress | null;
-  data: TransfersQueryRes | undefined;
+  data: ExecutedMultisigsQueryRes | undefined;
 }
 
 function Confirmed({ data, account }: ConfirmedProps) {
   const { api } = useApi();
 
   const extrinsic = useMemo(() => {
-    if (!data?.transfers || !api) {
+    if (!data?.executedMultisigs || !api) {
       return [];
     }
 
-    const { nodes } = data?.transfers;
+    const { nodes } = data?.executedMultisigs;
 
     return nodes.map((node) => {
       const {
-        fromId,
+        multisigAccountId,
         timestamp,
+        extrinsicIdx,
         block: {
           id: blockHash,
           extrinsics: { nodes: exNodes },
@@ -80,7 +80,8 @@ function Confirmed({ data, account }: ConfirmedProps) {
         meta,
         hash: blockHash,
         callHash: null,
-        address: fromId,
+        address: multisigAccountId,
+        extrinsicIdx,
         approvals: [
           ...multisigArgs
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -94,7 +95,7 @@ function Confirmed({ data, account }: ConfirmedProps) {
         depositor: '',
       };
     });
-  }, [api, data?.transfers]);
+  }, [api, data?.executedMultisigs]);
 
   return account ? <Entries source={extrinsic} account={account} isConfirmed /> : <Spin className="w-full mt-4" />;
 }
@@ -107,7 +108,7 @@ export function ExtrinsicRecords() {
   const { multisigAccount, inProgress, confirmedAccount, queryInProgress } = useMultisigContext();
   const [tabKey, setTabKey] = useState('inProgress');
 
-  const { data, refetch: refetchConfimed } = useQuery<TransfersQueryRes>(TRANSFERS_QUERY, {
+  const { data, refetch: refetchConfimed } = useQuery<ExecutedMultisigsQueryRes>(EXECUTED_MULTISIGS_QUERY, {
     variables: {
       account: multiAddress,
       offset: 0,

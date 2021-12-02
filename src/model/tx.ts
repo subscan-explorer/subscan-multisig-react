@@ -14,6 +14,7 @@ export interface Entry {
   address: string;
   callHash: string | null;
   blockHash?: string;
+  extrinsicIdx?: string;
   callData: Call | null;
   meta: Record<string, AnyJson> | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

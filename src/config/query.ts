@@ -1,19 +1,18 @@
-export const TRANSFERS_COUNT_QUERY = `
-  query transfers($account: String!) {
-    transfers(filter: { fromId: { equalTo: $account } }) {
+export const EXECUTED_MULTISIGS_COUNT_QUERY = `
+  query executedMultisigs($account: String!) {
+    executedMultisigs(filter: { multisigAccountId: { equalTo: $account } }) {
       totalCount
     }
   }
 `;
-export const TRANSFERS_QUERY = `
-  query transfers($account: String!, $offset: Int, $limit: Int) {
-    transfers(offset: $offset, last: $limit, filter: { fromId: { equalTo: $account } }, orderBy: TIMESTAMP_DESC) {
+export const EXECUTED_MULTISIGS_QUERY = `
+  query executedMultisigs($account: String!, $offset: Int, $limit: Int) {
+    executedMultisigs(offset: $offset, last: $limit, filter: { multisigAccountId: { equalTo: $account } }, orderBy: TIMESTAMP_DESC) {
       totalCount
       nodes {
-        toId
-        fromId
-        amount
+        multisigAccountId
         timestamp
+        extrinsicIdx
 
         block {
           id
