@@ -22,7 +22,7 @@ export function useMultisig(acc?: string) {
 
     const multisig = keyring.getAccount(acc ?? account);
     // Use different ss58 addresses
-    (multisig?.meta.addressPair as KeyringJson[]).forEach((key) => {
+    (multisig?.meta.addressPair as KeyringJson[])?.forEach((key) => {
       key.address = convertToSS58(key.address, NETWORK_CONFIG[network].ss58Prefix);
     });
 

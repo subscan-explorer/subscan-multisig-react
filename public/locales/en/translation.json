@@ -93,7 +93,8 @@
     "from_chain": "Call Data (scanned from the chain storage)",
     "index": "Multi-sig",
     "intro": "Subscan Multi-sig is the most easy-to-use and secure way to manage Multi-sig wallets and extrinsics",
-    "sending_transaction": "Sending transaction {{transaction}}"
+    "sending_transaction": "Sending transaction {{transaction}}",
+    "estimate_reserve": "Estimate reserve balance"
   },
   "name": "Name",
   "network": "Network",

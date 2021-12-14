@@ -92,7 +92,8 @@
     "from_chain": "Call Data (从链存储中读取)",
     "index": "多签钱包",
     "intro": "Subscan Multi-sig 安全便捷的多签钱包管理和交易工具",
-    "sending_transaction": "发送交易 {{transaction}}"
+    "sending_transaction": "发送交易 {{transaction}}",
+    "estimate_reserve": "发起本交易预计需要保留"
   },
   "name": "名称",
   "network": "网络",
