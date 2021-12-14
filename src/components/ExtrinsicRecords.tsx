@@ -1,11 +1,9 @@
-import { useState } from 'react';
 import { ReloadOutlined } from '@ant-design/icons';
-import { Call } from '@polkadot/types/interfaces';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { Space, Spin, Tabs } from 'antd';
 import { useQuery } from 'graphql-hooks';
 import { isNumber } from 'lodash';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { EXECUTED_MULTISIGS_QUERY } from '../config';
@@ -50,6 +48,7 @@ function Confirmed({ data, account }: ConfirmedProps) {
 
     const { nodes } = data?.executedMultisigs;
 
+    // eslint-disable-next-line complexity
     return nodes.map((node) => {
       const {
         multisigAccountId,
@@ -66,8 +65,15 @@ function Confirmed({ data, account }: ConfirmedProps) {
       const multisigArgs = parseArgs(api, target);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const argsHash = multisigArgs.find((item: any) => item.name === 'call')?.value;
-      const callData = api?.registry.createType('Call', argsHash) as unknown as Call;
-      const meta = api?.tx[callData.section][callData.method].meta.toJSON();
+      let callData;
+      let meta;
+      try {
+        callData = api?.registry.createType('Call', argsHash);
+        meta = api?.tx[callData.section][callData?.method].meta.toJSON();
+      } catch (err) {
+        callData = null;
+        meta = null;
+      }
       const maybeTimepointArg = multisigArgs.find(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (item: any) => item.name === 'maybeTimepoint' || item.name === 'maybe_timepoint'
