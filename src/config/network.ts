@@ -172,7 +172,7 @@ const networkSimple: Record<string, NetworkSimpleInfo> = {
     hasLink: true,
   },
   pangolin: {
-    prefix: 18,
+    prefix: 42,
     network: 'pangolin',
     hasLink: true,
   },
