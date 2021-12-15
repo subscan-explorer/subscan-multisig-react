@@ -58,7 +58,7 @@ export function useMultisig(acc?: string) {
 
     setMultisigAccount(multisig || null);
     setInProgress(calls || []);
-  }, [api, acc, account]);
+  }, [api, acc, account, network]);
 
   useEffect(() => {
     if (networkStatus !== 'success') {

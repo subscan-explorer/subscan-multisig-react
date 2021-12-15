@@ -123,6 +123,7 @@
     "index": "状态",
     "pending": "等待批准"
   },
+  "save": "保存",
   "submit": "提交",
   "submit the following extrinsic": "提交下面的外部信息",
   "submit_extrinsic": "发起交易",
@@ -158,5 +159,9 @@
       "share": "将此账号用于其它网络",
       "threshold": "多签生效至少需要获得的签名数"
     }
+  },
+  "contact": {
+    "Invalid Address": "请输入正确的地址",
+    "Add External Address": "将外部账号加入联系人列表"
   }
 }

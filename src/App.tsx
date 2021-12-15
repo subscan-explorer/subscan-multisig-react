@@ -1,15 +1,14 @@
-import { DownOutlined } from '@ant-design/icons';
 import { getSystemColor } from '@polkadot/apps-config';
 import GlobalStyle from '@polkadot/react-components/styles';
 import { useApi as usePolkaApi } from '@polkadot/react-hooks';
-import BaseIdentityIcon from '@polkadot/react-identicon';
 import { BlockAuthors, Events } from '@polkadot/react-query';
 import Signer from '@polkadot/react-signer';
-import { Alert, Button, Dropdown, Layout, Menu, Typography } from 'antd';
+import { Alert, Button, Dropdown, Layout, Menu } from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Route, Switch } from 'react-router-dom';
+import { HeadAccounts } from './components/HeadAccounts';
 import { Footer } from './components/Footer';
 import { DownIcon } from './components/icons';
 import Status from './components/Status';
@@ -28,7 +27,7 @@ const genHeaderLinkStyle = (classes: TemplateStringsArray, network: Network) => 
 
 function App() {
   const { t } = useTranslation();
-  const { networkStatus, network, networkConfig, accounts } = useApi();
+  const { networkStatus, network, networkConfig } = useApi();
   const { systemChain, systemName, specName, isDevelopment, apiError } = usePolkaApi();
   const polkaLogo = useMemo(
     () => (networkStatus === 'success' ? '/image/polka-check.png' : '/image/polka-cross.png'),
@@ -65,36 +64,7 @@ function App() {
               {t('explorer')}
             </span>
 
-            <Dropdown
-              overlay={
-                <Menu className="truncate" style={{ maxWidth: '80vw' }}>
-                  {accounts?.map((item) => (
-                    <Menu.Item key={item.address} className="header-account-list">
-                      <BaseIdentityIcon
-                        theme="substrate"
-                        size={24}
-                        className="md:mr-2 rounded-full border border-solid border-gray-100"
-                        value={item.address}
-                      />
-                      <div className="flex flex-col leading-5">
-                        <b>{item.meta?.name}</b>
-                        <span className="hidden md:inline opacity-60">{item.address}</span>
-                        <Typography.Text className="inline md:hidden opacity-60" copyable>
-                          {/* eslint-disable-next-line no-magic-numbers */}
-                          {item.address.slice(0, 20) + '...'}
-                        </Typography.Text>
-                      </div>
-                    </Menu.Item>
-                  ))}
-                </Menu>
-              }
-              placement="bottomCenter"
-              arrow
-            >
-              <span className={headerLinkStyle}>
-                {t('accounts')} <DownOutlined />
-              </span>
-            </Dropdown>
+            <HeadAccounts />
 
             <Dropdown
               overlay={

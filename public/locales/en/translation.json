@@ -124,6 +124,7 @@
     "index": "Status",
     "pending": "Pending"
   },
+  "save": "Save",
   "submit": "Submit",
   "submit the following extrinsic": "submit the following extrinsic",
   "submit_extrinsic": "Initiate Extrinsic",
@@ -159,6 +160,10 @@
       "share": "Share this account between different networks",
       "threshold": "Minimum approvals required to validate the multi-sig transaction"
     }
+  },
+  "contact": {
+    "Invalid Address": "Please input valid address",
+    "Add External Address": "Add external address to contact"
   },
   "zh": "中文"
 }
