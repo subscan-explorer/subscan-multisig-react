@@ -161,7 +161,10 @@
       "threshold": "Minimum approvals required to validate the multi-sig transaction"
     }
   },
+  "My Account": "My Account",
+  "Contact Account": "Contact",
   "contact": {
+    "Add Contact": "Add Contact",
     "Invalid Address": "Please input valid address",
     "Add External Address": "Add external address to contact"
   },

@@ -160,7 +160,10 @@
       "threshold": "多签生效至少需要获得的签名数"
     }
   },
+  "My Account": "本地账号",
+  "Contact Account": "联系人",
   "contact": {
+    "Add Contact": "添加联系人",
     "Invalid Address": "请输入正确的地址",
     "Add External Address": "将外部账号加入联系人列表"
   }

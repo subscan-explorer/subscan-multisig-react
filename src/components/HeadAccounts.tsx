@@ -40,7 +40,7 @@ export const HeadAccounts = () => {
         onVisibleChange={setPopoverVisible}
         content={
           <Tabs defaultActiveKey="1" style={{ width: '550px' }}>
-            <TabPane tab="My Account" key="1">
+            <TabPane tab={t('My Account')} key="1">
               <div className="truncate" style={{ maxWidth: '550px' }}>
                 {accounts?.map((item) => (
                   <AccountItem key={item.address} address={item.address} name={item.meta?.name} type="injected" />
@@ -48,7 +48,7 @@ export const HeadAccounts = () => {
               </div>
             </TabPane>
 
-            <TabPane tab="Contact" key="2">
+            <TabPane tab={t('Contact Account')} key="2">
               <div className="truncate" style={{ maxWidth: '550px' }}>
                 {contacts?.map((item) => (
                   <AccountItem
@@ -71,7 +71,7 @@ export const HeadAccounts = () => {
                   >
                     <PlusCircleFilled className="highlight--color md:mr-1" />
 
-                    <Typography.Text>Add Contact</Typography.Text>
+                    <Typography.Text>{t('contact.Add Contact')}</Typography.Text>
                   </div>
                 </div>
               </div>
