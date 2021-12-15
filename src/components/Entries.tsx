@@ -19,6 +19,7 @@ export interface EntriesProps {
   source: Entry[];
   account: KeyringAddress;
   isConfirmed?: boolean;
+  loading?: boolean;
 }
 
 const { Title, Paragraph } = Typography;
@@ -49,7 +50,7 @@ const renderMemberStatus = (entry: Entry, pair: KeyringJson) => {
   );
 };
 
-export function Entries({ source, isConfirmed, account }: EntriesProps) {
+export function Entries({ source, isConfirmed, account, loading }: EntriesProps) {
   const { t } = useTranslation();
   const isInjected = useIsInjected();
   const { network } = useApi();
@@ -206,6 +207,7 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
   return (
     <>
       <Table
+        loading={loading}
         dataSource={source}
         columns={columns}
         rowKey={(record) => record.callHash ?? (record.blockHash as string)}

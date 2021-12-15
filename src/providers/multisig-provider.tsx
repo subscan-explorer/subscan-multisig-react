@@ -16,6 +16,7 @@ export const MultisigContext = createContext<{
   queryInProgress: () => Promise<void>;
   refreshConfirmedAccount: () => void;
   setIsPageLock: (lock: boolean) => void;
+  loadingInProgress: boolean;
 }>({
   inProgress: [],
   multisigAccount: null,
@@ -24,6 +25,7 @@ export const MultisigContext = createContext<{
   queryInProgress: () => Promise.resolve(),
   setIsPageLock: empty,
   refreshConfirmedAccount: empty,
+  loadingInProgress: false,
 });
 
 export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) => {

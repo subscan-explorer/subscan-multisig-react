@@ -15,10 +15,13 @@ export function useMultisig(acc?: string) {
   const { api, networkStatus, network } = useApi();
   const { account } = useParams<{ account: string }>();
   const [inProgress, setInProgress] = useState<Entry[]>([]);
+  const [loadingInProgress, setLoadingInProgress] = useState(false);
   const queryInProgress = useCallback(async () => {
     if (!api) {
       return;
     }
+
+    setLoadingInProgress(true);
 
     const multisig = keyring.getAccount(acc ?? account);
     // Use different ss58 addresses
@@ -58,6 +61,7 @@ export function useMultisig(acc?: string) {
 
     setMultisigAccount(multisig || null);
     setInProgress(calls || []);
+    setLoadingInProgress(false);
   }, [api, acc, account, network]);
 
   useEffect(() => {
@@ -73,6 +77,7 @@ export function useMultisig(acc?: string) {
     multisigAccount,
     setMultisigAccount,
     queryInProgress,
+    loadingInProgress,
   };
 }
 

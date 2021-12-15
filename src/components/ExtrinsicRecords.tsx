@@ -36,9 +36,10 @@ interface ConfirmedProps {
   multiAddress: string;
   account: KeyringAddress | null;
   data: ExecutedMultisigsQueryRes | undefined;
+  loading: boolean;
 }
 
-function Confirmed({ data, account }: ConfirmedProps) {
+function Confirmed({ data, account, loading }: ConfirmedProps) {
   const { api } = useApi();
 
   const extrinsic = useMemo(() => {
@@ -103,7 +104,11 @@ function Confirmed({ data, account }: ConfirmedProps) {
     });
   }, [api, data?.executedMultisigs]);
 
-  return account ? <Entries source={extrinsic} account={account} isConfirmed /> : <Spin className="w-full mt-4" />;
+  return account ? (
+    <Entries source={extrinsic} account={account} isConfirmed loading={loading} />
+  ) : (
+    <Spin className="w-full mt-4" />
+  );
 }
 
 /* -----------------------------------extrinsic tabs------------------------------------ */
@@ -111,10 +116,14 @@ function Confirmed({ data, account }: ConfirmedProps) {
 export function ExtrinsicRecords() {
   const { t } = useTranslation();
   const { account: multiAddress } = useParams<{ account: string }>();
-  const { multisigAccount, inProgress, confirmedAccount, queryInProgress } = useMultisigContext();
+  const { multisigAccount, inProgress, confirmedAccount, queryInProgress, loadingInProgress } = useMultisigContext();
   const [tabKey, setTabKey] = useState('inProgress');
 
-  const { data, refetch: refetchConfimed } = useQuery<ExecutedMultisigsQueryRes>(EXECUTED_MULTISIGS_QUERY, {
+  const {
+    data,
+    refetch: refetchConfimed,
+    loading: loadingConfirmed,
+  } = useQuery<ExecutedMultisigsQueryRes>(EXECUTED_MULTISIGS_QUERY, {
     variables: {
       account: multiAddress,
       offset: 0,
@@ -124,10 +133,6 @@ export function ExtrinsicRecords() {
 
   const handleChangeTab = (key: string) => {
     setTabKey(key);
-    refreshData(key);
-  };
-
-  const refreshData = (key: string) => {
     if (key === 'inProgress') {
       queryInProgress();
     } else if (key === 'confirmed') {
@@ -135,13 +140,14 @@ export function ExtrinsicRecords() {
     }
   };
 
+  const refreshData = () => {
+    queryInProgress();
+    refetchConfimed();
+  };
+
   return (
     <div>
-      <ReloadOutlined
-        onClick={() => {
-          refreshData(tabKey);
-        }}
-      />
+      <ReloadOutlined onClick={refreshData} />
       <Tabs activeKey={tabKey} onChange={handleChangeTab}>
         <TabPane
           tab={
@@ -153,7 +159,7 @@ export function ExtrinsicRecords() {
           key="inProgress"
         >
           {multisigAccount?.address ? (
-            <Entries source={inProgress} account={multisigAccount} />
+            <Entries source={inProgress} account={multisigAccount} loading={loadingInProgress} />
           ) : (
             <Spin className="w-full mt-4" />
           )}
@@ -167,7 +173,7 @@ export function ExtrinsicRecords() {
           }
           key="confirmed"
         >
-          <Confirmed data={data} account={multisigAccount} multiAddress={multiAddress} />
+          <Confirmed data={data} loading={loadingConfirmed} account={multisigAccount} multiAddress={multiAddress} />
         </TabPane>
       </Tabs>
     </div>

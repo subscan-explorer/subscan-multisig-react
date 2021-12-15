@@ -63,7 +63,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     rpc: 'wss://rpc.darwinia.network',
     api: {
       // subql: 'https://api.subquery.network/sq/darwinia-network/darwinia',
-      subql: 'https://api.subquery.network/sq/vzxh/multisig-darwinia',
+      subql: 'https://api.subquery.network/sq/itering/multisig-darwinia__aXRlc',
     },
     donate: {
       address: '2rbREPAhkptwCtdvU5eSGnHgFiyPcehdkXuGqFF916oYCJ7s',
@@ -84,7 +84,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     rpc: 'wss://pangolin-rpc.darwinia.network/',
     api: {
       // subql: 'https://api.subquery.network/sq/darwinia-network/pangolin',
-      subql: 'https://api.subquery.network/sq/itering/subscan-multisig-pangolin',
+      subql: 'https://api.subquery.network/sq/itering/multisig-pangolin',
     },
     donate: {
       address: '2rbREPAhkptwCtdvU5eSGnHgFiyPcehdkXuGqFF916oYCJ7s',
@@ -105,7 +105,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     rpc: 'wss://crab-rpc.darwinia.network',
     api: {
       // subql: 'https://api.subquery.network/sq/darwinia-network/crab',
-      subql: 'https://api.subquery.network/sq/vzxh/subscan-multisig-crab-test',
+      subql: 'https://api.subquery.network/sq/itering/multisig-crab__aXRlc',
     },
     donate: {
       address: '5FVFSCANyotNxJM4Crm1LQfsmNQSw3p8H7CRbegN7d5Ex91y',
