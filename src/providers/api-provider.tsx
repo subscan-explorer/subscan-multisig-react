@@ -1,5 +1,5 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { typesBundle, typesChain } from '@polkadot/apps-config';
+import { typesChain } from '@polkadot/apps-config';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 import type { InjectedExtension } from '@polkadot/extension-inject/types';
 import React, { createContext, Dispatch, useCallback, useEffect, useReducer, useState } from 'react';
@@ -107,7 +107,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
     const provider = new WsProvider(url);
     const nApi = new ApiPromise({
       provider,
-      typesBundle,
+      // typesBundle,
       typesChain,
     });
 

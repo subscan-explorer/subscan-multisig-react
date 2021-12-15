@@ -2,6 +2,7 @@
 // Copyright 2017-2021 @polkadot/react-components authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { withMulti, withObservable } from '@polkadot/react-api/hoc';
 import { keyring } from '@polkadot/ui-keyring';
 import { createOptionItem } from '@polkadot/ui-keyring/options/item';
 import type {
@@ -11,10 +12,10 @@ import type {
   KeyringSectionOptions,
 } from '@polkadot/ui-keyring/options/types';
 import { isNull, isUndefined } from '@polkadot/util';
+import { Observable } from '@polkadot/x-rxjs';
 import React from 'react';
 import store from 'store';
 import styled from 'styled-components';
-import { withMulti, withObservable } from '@polkadot/react-api/hoc';
 import Dropdown from '../Dropdown';
 import Static from '../Static';
 import { getAddressName } from '../util';
@@ -318,7 +319,7 @@ export const PureInputAddress = styled(InputAddress)`
 
 const ExportedComponent = withMulti(
   PureInputAddress,
-  withObservable(keyring.keyringOption.optionsSubject, {
+  withObservable(keyring.keyringOption.optionsSubject as unknown as Observable<unknown>, {
     propName: 'optionsAll',
     transform: (optionsAll: KeyringOptions): Record<string, (Option | React.ReactNode)[]> =>
       Object.entries(optionsAll).reduce(

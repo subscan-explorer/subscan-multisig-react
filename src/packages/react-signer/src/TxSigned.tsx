@@ -6,26 +6,23 @@
 // Copyright 2017-2021 @polkadot/react-signer authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ApiPromise } from '@polkadot/api';
 import type { SignerOptions } from '@polkadot/api/submittable/types';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
+import { web3FromSource } from '@polkadot/extension-dapp';
 import type { KeyringPair } from '@polkadot/keyring/types';
 import type { Option } from '@polkadot/types';
 import type { Multisig, Timepoint } from '@polkadot/types/interfaces';
 import type { Ledger } from '@polkadot/ui-keyring';
-
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import styled from 'styled-components';
-
-import { ApiPromise } from '@polkadot/api';
-import { web3FromSource } from '@polkadot/extension-dapp';
 import { keyring } from '@polkadot/ui-keyring';
 import { assert, BN_ZERO } from '@polkadot/util';
 import { addressEq } from '@polkadot/util-crypto';
-import { useApi, useLedger, useToggle } from '../../react-hooks/src';
+import type { HexString } from '@polkadot/util/types';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { Button, ErrorBoundary, Modal, Output, StatusContext, Toggle } from '../../react-components/src';
 import type { QueueTx, QueueTxMessageSetStatus } from '../../react-components/src/Status/types';
-import type { AddressFlags, AddressProxy, QrState } from './types';
-
+import { useApi, useLedger, useToggle } from '../../react-hooks/src';
 import Address from './Address';
 import Qr from './Qr';
 import { AccountSigner, LedgerSigner, QrSigner } from './signers';
@@ -33,6 +30,7 @@ import SignFields from './SignFields';
 import Tip from './Tip';
 import Transaction from './Transaction';
 import { useTranslation } from './translate';
+import type { AddressFlags, AddressProxy, QrState } from './types';
 import { cacheUnlock, extractExternal, handleTxResults } from './util';
 
 interface Props {
@@ -272,7 +270,7 @@ function TxSigned({ className, currentItem, requestAddress }: Props): React.Reac
   }, [api, currentItem, senderInfo]);
 
   const _addQrSignature = useCallback(
-    ({ signature }: { signature: string }) =>
+    ({ signature }: { signature: HexString }) =>
       qrResolve &&
       qrResolve({
         id: ++qrId,

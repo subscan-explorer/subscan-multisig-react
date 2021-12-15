@@ -1,12 +1,10 @@
 // Copyright 2017-2021 @polkadot/react-hooks authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { typesBundle, typesChain } from '@polkadot/apps-config';
+import { typesChain } from '@polkadot/apps-config';
 import { isString } from '@polkadot/util';
-
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMountedRef } from './useIsMountedRef';
 
 function disconnect(api: ApiPromise | null): void {
@@ -46,7 +44,7 @@ export function useApiUrl(url?: string | string[]): ApiPromise | null {
       (isString(url) || url.length) &&
       ApiPromise.create({
         provider: new WsProvider(url),
-        typesBundle,
+        // typesBundle,
         typesChain,
       })
         .then(_setApi)

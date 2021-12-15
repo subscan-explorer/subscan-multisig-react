@@ -2,7 +2,7 @@
 // Copyright 2017-2021 @polkadot/react-hooks authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { RpcPromiseResult } from '@polkadot/api/types';
+import type { PromiseRpcResult } from '@polkadot/api/types';
 import type { AnyFunction, Codec } from '@polkadot/types/types';
 import { isNull, isUndefined } from '@polkadot/util';
 import { useEffect, useRef, useState } from 'react';
@@ -27,7 +27,7 @@ interface QueryTrackFn {
   };
 }
 
-type TrackFn = RpcPromiseResult<AnyFunction> | QueryTrackFn;
+type TrackFn = PromiseRpcResult<AnyFunction> | QueryTrackFn;
 
 export interface Tracker {
   isActive: boolean;
