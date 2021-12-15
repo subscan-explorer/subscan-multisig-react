@@ -29,7 +29,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@fortawesome/react-fontawesome": "^0.1.14",
     "@metamask/jazzicon": "^2.0.0",
-    "@darwinia/types": "^1.1.5",
+    "@darwinia/types": "2.6.100-2",
     "@polkadot/api": "6.12.1",
     "@polkadot/types": "6.12.1",
     "@polkadot/types-known": "6.12.1",
@@ -76,7 +76,7 @@
     "semantic-ui-react": "^2.0.3",
     "store": "^2.0.12",
     "styled-components": "^5.3.0",
-    "typescript": "^4.1.2",
+    "typescript": "4.5.4",
     "web-vitals": "^1.0.1"
   },
   "devDependencies": {
@@ -130,9 +130,11 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+      "chrome >= 67",
+      "edge >= 79",
+      "firefox >= 68",
+      "opera >= 54",
+      "safari >= 14"
     ],
     "development": [
       "last 1 chrome version",

@@ -71,8 +71,10 @@ export function WalletState() {
             },
           });
         }
-      } catch (error) {
-        message.error(error.message);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          message.error(error.message);
+        }
       }
     },
     [multisigAccount, t, setMultisigAccount]
@@ -81,8 +83,10 @@ export function WalletState() {
     try {
       keyring.forgetAccount(multisigAccount?.address as string);
       message.success(t('success')).then(() => history.goBack());
-    } catch (error) {
-      message.error(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        message.error(error.message);
+      }
     }
   }, [multisigAccount?.address, t, history]);
 

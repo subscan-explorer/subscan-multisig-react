@@ -96,11 +96,12 @@ async function signAndSend(
         unsubscribe();
       })
     );
-  } catch (error) {
-    console.error('signAndSend: error:', error);
-    queueSetTxStatus(currentItem.id, 'error', {}, error);
-
-    currentItem.txFailedCb && currentItem.txFailedCb(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('signAndSend: error:', error);
+      queueSetTxStatus(currentItem.id, 'error', {}, error);
+    }
+    currentItem.txFailedCb && currentItem.txFailedCb(null);
   }
 }
 
@@ -117,11 +118,13 @@ async function signAsync(
     await tx.signAsync(pairOrAddress, options);
 
     return tx.toJSON();
-  } catch (error) {
-    console.error('signAsync: error:', error);
-    queueSetTxStatus(id, 'error', undefined, error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('signAsync: error:', error);
+      queueSetTxStatus(id, 'error', undefined, error);
+    }
 
-    txFailedCb(error);
+    txFailedCb(null);
   }
 
   return null;
