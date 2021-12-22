@@ -39,9 +39,9 @@ export const HeadAccounts = () => {
         visible={popoverVisible}
         onVisibleChange={setPopoverVisible}
         content={
-          <Tabs defaultActiveKey="1" style={{ width: '80vw' }}>
+          <Tabs defaultActiveKey="1">
             <TabPane tab={t('My Account')} key="1">
-              <div className="truncate" style={{ maxWidth: '80vw' }}>
+              <div className="truncate">
                 {accounts?.map((item) => (
                   <AccountItem key={item.address} address={item.address} name={item.meta?.name} type="injected" />
                 ))}
@@ -49,7 +49,7 @@ export const HeadAccounts = () => {
             </TabPane>
 
             <TabPane tab={t('Contact Account')} key="2">
-              <div className="truncate" style={{ maxWidth: '80vw' }}>
+              <div className="truncate">
                 {contacts?.map((item) => (
                   <AccountItem
                     key={item.address}
@@ -116,28 +116,32 @@ const AccountItem = (props: {
   };
 
   return (
-    <div className="header-account-list flex items-center md:pt-2">
-      <BaseIdentityIcon
-        theme="substrate"
-        size={24}
-        className="md:mx-4 rounded-full border border-solid border-gray-100"
-        value={props.address}
-      />
+    <div className="header-account-list flex items-center justify-between md:pt-2 w-200">
+      <div className=" flex items-center justify-between ">
+        <BaseIdentityIcon
+          theme="substrate"
+          size={24}
+          className="md:mx-4 rounded-full border border-solid border-gray-100"
+          value={props.address}
+        />
 
-      <div className="flex flex-col leading-5" style={{ width: '70vw' }}>
-        <b>{props.name}</b>
+        <div className="flex flex-col leading-5">
+          <b>{props.name}</b>
 
-        <span className="hidden md:inline opacity-60">{props.address}</span>
+          <span className="hidden md:inline opacity-60">{props.address}</span>
 
-        <Typography.Text className="inline md:hidden opacity-60" copyable>
-          {/* eslint-disable-next-line no-magic-numbers */}
-          {props.address.slice(0, 20) + '...'}
-        </Typography.Text>
+          <Typography.Text className="inline md:hidden opacity-60" copyable>
+            {/* eslint-disable-next-line no-magic-numbers */}
+            {props.address.slice(0, 20) + '...'}
+          </Typography.Text>
+        </div>
       </div>
 
-      {props.type === 'contact' && (
-        <Button icon={<DeleteOutlined />} type="text" shape="circle" onClick={deleteContact} />
-      )}
+      <div className="w-10">
+        {props.type === 'contact' && (
+          <Button icon={<DeleteOutlined />} type="text" shape="circle" onClick={deleteContact} />
+        )}
+      </div>
     </div>
   );
 };
