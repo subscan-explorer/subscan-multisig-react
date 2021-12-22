@@ -92,8 +92,7 @@ function Confirmed({ data, account, loading }: ConfirmedProps) {
         approvals: [
           ...multisigArgs
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .find((item: any) => item.name === 'otherSignatories' || item.name === 'other_signatories')
-            ?.value?.slice(1), // 第1个是多签账号
+            .find((item: any) => item.name === 'otherSignatories' || item.name === 'other_signatories')?.value,
           signerId,
         ],
         status: isSuccess ? 'executed' : 'pending',
