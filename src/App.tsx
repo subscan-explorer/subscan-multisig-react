@@ -40,9 +40,6 @@ function App() {
   );
   const headerLinkStyle = useMemo(() => genHeaderLinkStyle`${network}`, [network]);
 
-  // eslint-disable-next-line no-console
-  console.log('xxxxx', location);
-
   return (
     <>
       <GlobalStyle uiHighlight={uiHighlight} />
