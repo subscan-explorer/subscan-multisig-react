@@ -61,6 +61,7 @@ function ExtrinsicDisplay({
     setValues([]);
   }, [extrinsic]);
 
+  // eslint-disable-next-line complexity
   useEffect((): void => {
     const isValid = values.reduce(
       (isValid, value): boolean => isValid && !isUndefined(value) && !isUndefined(value.value) && value.isValid,
@@ -73,9 +74,11 @@ function ExtrinsicDisplay({
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         method = extrinsic.fn(...values.map(({ value }): any => value));
-      } catch (error) {
-        // eslint-disable-next-line
-        onError && onError(error);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          // eslint-disable-next-line
+          onError && onError(error);
+        }
       }
     } else {
       // eslint-disable-next-line

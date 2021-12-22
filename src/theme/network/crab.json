@@ -6,5 +6,9 @@
   "@card-radius": "@project-radius-base",
   "@layout-header-background": "#ec3783",
   "@project-main-bg": "#ec3783",
-  "@project-radius-base": "12px"
+  "@project-radius-base": "12px",
+  "@tabs-active-color": "@project-main-bg",
+  "@tabs-highlight-color": "@project-main-bg",
+  "@tabs-hover-color": "@project-main-bg",
+  "@tabs-ink-bar-color": "@project-main-bg"
 }

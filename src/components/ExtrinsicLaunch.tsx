@@ -10,12 +10,15 @@ import { Option } from '@polkadot/react-components/InputAddress/types';
 import { BalanceFree } from '@polkadot/react-query';
 import { keyring } from '@polkadot/ui-keyring';
 import { KeyringSectionOption } from '@polkadot/ui-keyring/options/types';
+import { Typography } from 'antd';
 import { flatten } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApi, useIsInjected, useMultisig } from '../hooks';
 import { AddressPair } from '../model';
 import { extractExternal } from '../utils';
+
+const { Text } = Typography;
 
 interface Props {
   className?: string;
@@ -30,8 +33,17 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
   const [error, setError] = useState<string | null>(null);
   const [extrinsic, setExtrinsic] = useState<SubmittableExtrinsic<'promise'> | null>(null);
   const [hexCallData, setHexCallData] = useState('0x');
+  const [reserveAmount, setReserveAmount] = useState(0);
   const { multisigAccount } = useMultisig();
   const isExtensionAccount = useIsInjected();
+
+  const [depositBase, depositFactor] = useMemo(() => {
+    return [api?.consts.multisig.depositBase.toJSON(), api?.consts.multisig.depositFactor.toJSON()];
+  }, [api]);
+
+  const [chainDecimal, chainToken] = useMemo(() => {
+    return [api?.registry.chainDecimals[0], api?.registry.chainTokens[0]];
+  }, [api]);
 
   const options = useMemo<KeyringSectionOption[]>(
     () =>
@@ -51,6 +63,9 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
     // eslint-disable-next-line complexity
     async (ext?: SubmittableExtrinsic<'promise'>) => {
       if (!ext) {
+        return setExtrinsic(null);
+      }
+      if (!multisigAccount) {
         return setExtrinsic(null);
       }
 
@@ -73,9 +88,23 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
       const multiTx = module?.asMulti(...args);
 
       setHexCallData(ext.method.toHex());
+
+      // Estimate reserve amount
+      try {
+        if (chainDecimal) {
+          setReserveAmount(
+            // eslint-disable-next-line no-magic-numbers
+            (depositBase * 2 + depositFactor * threshold + (depositFactor * (ext.method.toHex().length + 31)) / 32) /
+              Math.pow(10, chainDecimal)
+          );
+        }
+      } catch (err) {
+        setReserveAmount(0);
+      }
+
       return setExtrinsic(() => multiTx || null);
     },
-    [accountId, api?.query.multisig, api?.tx.multisig, multisigAccount]
+    [accountId, api?.query.multisig, api?.tx.multisig, multisigAccount, chainDecimal, depositBase, depositFactor]
   );
 
   const _onExtrinsicError = useCallback((err?: Error | null) => setError(err ? err.message : null), []);
@@ -145,24 +174,33 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
         onError={_onExtrinsicError}
       />
       <Output isDisabled isTrimmed label="encoded call data" value={hexCallData} withCopy />
+
       <Output isDisabled label="encoded call hash" value={extrinsicHash} withCopy />
+
       {error && !extrinsic && <MarkError content={error} />}
-      <Button.Group>
-        <TxButton
-          extrinsic={extrinsic}
-          icon="sign-in-alt"
-          isUnsigned
-          label={t<string>('Submit Unsigned')}
-          withSpinner
-        />
-        <TxButton
-          accountId={accountId}
-          extrinsic={extrinsic}
-          icon="sign-in-alt"
-          label={t<string>('Submit Transaction')}
-          onSuccess={onTxSuccess}
-        />
-      </Button.Group>
+
+      <div className="flex items-center justify-between">
+        <Text style={{ color: 'rgba(78,78,78,0.6)', marginLeft: '20px' }}>
+          {t('multisig.estimate_reserve')} {reserveAmount} {chainToken}
+        </Text>
+
+        <Button.Group>
+          <TxButton
+            extrinsic={extrinsic}
+            icon="sign-in-alt"
+            isUnsigned
+            label={t<string>('Submit Unsigned')}
+            withSpinner
+          />
+          <TxButton
+            accountId={accountId}
+            extrinsic={extrinsic}
+            icon="sign-in-alt"
+            label={t<string>('Submit Transaction')}
+            onSuccess={onTxSuccess}
+          />
+        </Button.Group>
+      </div>
     </div>
   );
 }

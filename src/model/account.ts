@@ -29,6 +29,12 @@ export interface WalletFormValue {
   members: Member[];
   share: ShareScope;
   scope?: Network[];
+  rememberExternal: boolean;
+}
+
+export interface ContactFormValue {
+  name: string;
+  address: string;
 }
 
 export interface StoredScope {

@@ -92,7 +92,8 @@
     "from_chain": "Call Data (从链存储中读取)",
     "index": "多签钱包",
     "intro": "Subscan Multi-sig 安全便捷的多签钱包管理和交易工具",
-    "sending_transaction": "发送交易 {{transaction}}"
+    "sending_transaction": "发送交易 {{transaction}}",
+    "estimate_reserve": "发起本交易预计需要保留"
   },
   "name": "名称",
   "network": "网络",
@@ -122,6 +123,7 @@
     "index": "状态",
     "pending": "等待批准"
   },
+  "save": "保存",
   "submit": "提交",
   "submit the following extrinsic": "提交下面的外部信息",
   "submit_extrinsic": "发起交易",
@@ -157,5 +159,12 @@
       "share": "将此账号用于其它网络",
       "threshold": "多签生效至少需要获得的签名数"
     }
+  },
+  "My Account": "本地账号",
+  "Contact Account": "联系人",
+  "contact": {
+    "Add Contact": "添加联系人",
+    "Invalid Address": "请输入正确的地址",
+    "Add External Address": "将外部账号加入联系人列表"
   }
 }

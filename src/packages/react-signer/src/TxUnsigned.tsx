@@ -33,9 +33,11 @@ async function send(
         unsubscribe();
       })
     );
-  } catch (error) {
-    console.error('send: error:', error);
-    queueSetTxStatus(currentItem.id, 'error', {}, error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('send: error:', error);
+      queueSetTxStatus(currentItem.id, 'error', {}, error);
+    }
 
     // eslint-disable-next-line
     currentItem.txFailedCb && currentItem.txFailedCb(null);

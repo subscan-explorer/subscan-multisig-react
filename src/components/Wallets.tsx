@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { CaretRightOutlined, GlobalOutlined } from '@ant-design/icons';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import keyring from '@polkadot/ui-keyring';
@@ -7,10 +8,11 @@ import { ColumnsType } from 'antd/lib/table';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
+import { NETWORK_CONFIG } from '../config';
 import { Path } from '../config/routes';
 import { useApi, useIsInjected } from '../hooks';
 import { Chain } from '../providers';
-import { accuracyFormat, isInCurrentScope } from '../utils';
+import { accuracyFormat, convertToSS58, isInCurrentScope } from '../utils';
 import { genExpandIcon } from './expandIcon';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
@@ -166,9 +168,11 @@ export function Wallets() {
 
       setMultisigAccounts(
         accounts.map((item, index) => {
+          (item.meta.addressPair as KeyringJson[]).forEach((key) => {
+            key.address = convertToSS58(key.address, NETWORK_CONFIG[network].ss58Prefix);
+          });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const source = (balances as any)[index] as unknown as any;
-
           return {
             ...item,
             value: source.data.free.toString(),

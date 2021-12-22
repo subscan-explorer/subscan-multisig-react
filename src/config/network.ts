@@ -16,7 +16,8 @@ export const NETWORK_CONFIG: NetworkConfig = {
     // rpc: 'wss://pub.elara.patract.io/polkadot',
     rpc: 'wss://rpc.polkadot.io',
     api: {
-      subql: 'https://api.subquery.network/sq/darwinia-network/polkadot',
+      // subql: 'https://api.subquery.network/sq/darwinia-network/polkadot',
+      subql: 'https://api.subquery.network/sq/vzxh/subscan-multisig-polkadot-test',
     },
     donate: {
       address: '14RYaXRSqb9rPqMaAVp1UZW2czQ6dMNGMbvukwfifi6m8ZgZ',
@@ -39,7 +40,8 @@ export const NETWORK_CONFIG: NetworkConfig = {
     // rpc: 'wss://kusama.elara.patract.io',
     // rpc: 'wss://kusama-rpc.polkadot.io',
     api: {
-      subql: 'https://api.subquery.network/sq/darwinia-network/kusama',
+      // subql: 'https://api.subquery.network/sq/darwinia-network/kusama',
+      subql: 'https://api.subquery.network/sq/vzxh/subscan-multisig-ksm-test',
     },
     donate: {
       address: 'Fzs6WWFcAuJhxAVyZa4EN2suxggjidJjV3AzJxKbRHjh2Jc',
@@ -60,7 +62,8 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     rpc: 'wss://rpc.darwinia.network',
     api: {
-      subql: 'https://api.subquery.network/sq/darwinia-network/darwinia',
+      // subql: 'https://api.subquery.network/sq/darwinia-network/darwinia',
+      subql: 'https://api.subquery.network/sq/itering/multisig-darwinia__aXRlc',
     },
     donate: {
       address: '2rbREPAhkptwCtdvU5eSGnHgFiyPcehdkXuGqFF916oYCJ7s',
@@ -72,7 +75,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
       logoWithText: '/image/pangolin-logo.svg',
     },
     fullName: 'Pangolin Testnet',
-    ss58Prefix: 18,
+    ss58Prefix: 42,
     token: { native: 'PRING' },
     erc20: {
       ring: '0xfe098c5eeDec594271618922B2F3364F0f8b1785',
@@ -80,7 +83,8 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     rpc: 'wss://pangolin-rpc.darwinia.network/',
     api: {
-      subql: 'https://api.subquery.network/sq/darwinia-network/pangolin',
+      // subql: 'https://api.subquery.network/sq/darwinia-network/pangolin',
+      subql: 'https://api.subquery.network/sq/itering/multisig-pangolin',
     },
     donate: {
       address: '2rbREPAhkptwCtdvU5eSGnHgFiyPcehdkXuGqFF916oYCJ7s',
@@ -100,7 +104,8 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     rpc: 'wss://crab-rpc.darwinia.network',
     api: {
-      subql: 'https://api.subquery.network/sq/darwinia-network/crab',
+      // subql: 'https://api.subquery.network/sq/darwinia-network/crab',
+      subql: 'https://api.subquery.network/sq/itering/multisig-crab__aXRlc',
     },
     donate: {
       address: '5FVFSCANyotNxJM4Crm1LQfsmNQSw3p8H7CRbegN7d5Ex91y',
@@ -167,7 +172,7 @@ const networkSimple: Record<string, NetworkSimpleInfo> = {
     hasLink: true,
   },
   pangolin: {
-    prefix: 18,
+    prefix: 42,
     network: 'pangolin',
     hasLink: true,
   },

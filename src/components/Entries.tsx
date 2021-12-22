@@ -19,6 +19,7 @@ export interface EntriesProps {
   source: Entry[];
   account: KeyringAddress;
   isConfirmed?: boolean;
+  loading?: boolean;
 }
 
 const { Title, Paragraph } = Typography;
@@ -49,7 +50,7 @@ const renderMemberStatus = (entry: Entry, pair: KeyringJson) => {
   );
 };
 
-export function Entries({ source, isConfirmed, account }: EntriesProps) {
+export function Entries({ source, isConfirmed, account, loading }: EntriesProps) {
   const { t } = useTranslation();
   const isInjected = useIsInjected();
   const { network } = useApi();
@@ -109,11 +110,19 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
 
   const columns: ColumnsType<Entry> = [
     {
-      title: t(!isConfirmed ? 'call_data' : 'block_hash'),
-      dataIndex: !isConfirmed ? 'hexCallData' : 'hash',
+      title: t(!isConfirmed ? 'call_data' : 'extrinsic_index'),
+      dataIndex: !isConfirmed ? 'hexCallData' : 'extrinsicIdx',
       width: 300,
       align: 'center',
+      // eslint-disable-next-line complexity
       render(data: string) {
+        let extrinsicHeight = '';
+        let extrinsicIndex = '';
+        if (isConfirmed && data.split('-').length > 1) {
+          extrinsicHeight = data.split('-')[0];
+          extrinsicIndex = data.split('-')[1];
+        }
+
         return !isConfirmed ? (
           <>
             <Paragraph copyable={!isEmpty(data) && { text: data }}>
@@ -123,7 +132,7 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
             </Paragraph>
           </>
         ) : (
-          <SubscanLink block={data} />
+          <SubscanLink extrinsic={{ height: extrinsicHeight, index: extrinsicIndex }}>{data}</SubscanLink>
         );
       },
     },
@@ -198,6 +207,7 @@ export function Entries({ source, isConfirmed, account }: EntriesProps) {
   return (
     <>
       <Table
+        loading={loading}
         dataSource={source}
         columns={columns}
         rowKey={(record) => record.callHash ?? (record.blockHash as string)}

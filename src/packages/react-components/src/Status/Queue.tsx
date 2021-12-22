@@ -93,7 +93,7 @@ function extractEvents(result?: SubmittableResult): ActionStatus[] {
       .map(({ event: { data, method, section } }): ActionStatusPartial => {
         if (section === 'system' && method === 'ExtrinsicFailed') {
           const [dispatchError] = data as unknown as ITuple<[DispatchError]>;
-          let message = dispatchError.type;
+          let message: string = dispatchError.type;
 
           if (dispatchError.isModule) {
             try {

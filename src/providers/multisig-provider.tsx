@@ -3,7 +3,7 @@ import { Spin } from 'antd';
 import { useManualQuery } from 'graphql-hooks';
 import { createContext, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { TRANSFERS_COUNT_QUERY } from '../config';
+import { EXECUTED_MULTISIGS_COUNT_QUERY } from '../config';
 import { useMultisig } from '../hooks';
 import { Entry } from '../model';
 import { empty } from '../utils';
@@ -16,6 +16,7 @@ export const MultisigContext = createContext<{
   queryInProgress: () => Promise<void>;
   refreshConfirmedAccount: () => void;
   setIsPageLock: (lock: boolean) => void;
+  loadingInProgress: boolean;
 }>({
   inProgress: [],
   multisigAccount: null,
@@ -24,16 +25,20 @@ export const MultisigContext = createContext<{
   queryInProgress: () => Promise.resolve(),
   setIsPageLock: empty,
   refreshConfirmedAccount: empty,
+  loadingInProgress: false,
 });
 
 export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) => {
   const [isPageLocked, setIsPageLock] = useState<boolean>(false);
   const value = useMultisig();
   const { account } = useParams<{ account: string }>();
-  const [fetchData, { data }] = useManualQuery<{ transfers: { totalCount: number } }>(TRANSFERS_COUNT_QUERY, {
-    variables: { account },
-    skipCache: true,
-  });
+  const [fetchData, { data }] = useManualQuery<{ executedMultisigs: { totalCount: number } }>(
+    EXECUTED_MULTISIGS_COUNT_QUERY,
+    {
+      variables: { account },
+      skipCache: true,
+    }
+  );
   const refreshConfirmedAccount = useCallback(
     () => fetchData({ variables: { account }, skipCache: true }),
     [account, fetchData]
@@ -49,7 +54,7 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
       value={{
         ...value,
         setIsPageLock,
-        confirmedAccount: data?.transfers.totalCount ?? 0,
+        confirmedAccount: data?.executedMultisigs.totalCount ?? 0,
         refreshConfirmedAccount,
       }}
     >

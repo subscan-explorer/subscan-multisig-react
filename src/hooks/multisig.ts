@@ -1,24 +1,34 @@
 import { AnyJson } from '@polkadot/types/types';
 import keyring from '@polkadot/ui-keyring';
-import { KeyringAddress } from '@polkadot/ui-keyring/types';
+import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
 import { u8aToHex } from '@polkadot/util';
 import { difference, intersection } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { NETWORK_CONFIG } from '../config';
+import { convertToSS58 } from '../utils';
 import { Entry } from '../model';
 import { useApi } from './api';
 
 export function useMultisig(acc?: string) {
   const [multisigAccount, setMultisigAccount] = useState<KeyringAddress | null>(null);
-  const { api, networkStatus } = useApi();
+  const { api, networkStatus, network } = useApi();
   const { account } = useParams<{ account: string }>();
   const [inProgress, setInProgress] = useState<Entry[]>([]);
+  const [loadingInProgress, setLoadingInProgress] = useState(false);
   const queryInProgress = useCallback(async () => {
     if (!api) {
       return;
     }
 
+    setLoadingInProgress(true);
+
     const multisig = keyring.getAccount(acc ?? account);
+    // Use different ss58 addresses
+    (multisig?.meta.addressPair as KeyringJson[])?.forEach((key) => {
+      key.address = convertToSS58(key.address, NETWORK_CONFIG[network].ss58Prefix);
+    });
+
     const data = await api.query.multisig.multisigs.entries(multisig?.address);
     const result: Pick<Entry, 'when' | 'depositor' | 'approvals' | 'address' | 'callHash'>[] = data?.map((entry) => {
       const [address, callHash] = entry[0].toHuman() as string[];
@@ -51,7 +61,8 @@ export function useMultisig(acc?: string) {
 
     setMultisigAccount(multisig || null);
     setInProgress(calls || []);
-  }, [api, acc, account]);
+    setLoadingInProgress(false);
+  }, [api, acc, account, network]);
 
   useEffect(() => {
     if (networkStatus !== 'success') {
@@ -66,6 +77,7 @@ export function useMultisig(acc?: string) {
     multisigAccount,
     setMultisigAccount,
     queryInProgress,
+    loadingInProgress,
   };
 }
 

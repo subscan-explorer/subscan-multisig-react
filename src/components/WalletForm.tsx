@@ -17,6 +17,7 @@ import {
   Select,
   Tag,
   Tooltip,
+  Checkbox,
 } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
 import { format } from 'date-fns';
@@ -25,9 +26,10 @@ import { Trans, useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
 import { NETWORKS, validateMessages } from '../config';
 import i18n from '../config/i18n';
-import { useApi } from '../hooks';
+import { useApi, useContacts } from '../hooks';
 import { Network, ShareScope, WalletFormValue } from '../model';
-import { convertToSS58, getMainColor, findMultiAccount, updateMultiAccountScope } from '../utils';
+import { InjectedAccountWithMeta } from '../model/account';
+import { convertToSS58, findMultiAccount, getMainColor, updateMultiAccountScope } from '../utils';
 
 interface LabelWithTipProps {
   name: string;
@@ -87,17 +89,30 @@ function confirmToAdd(accountExist: KeyringAddress, confirm: () => void) {
 export function WalletForm() {
   const { t } = useTranslation();
   const { accounts, networkConfig, api, network } = useApi();
+  const { contacts } = useContacts();
   const [form] = useForm();
   const history = useHistory();
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
   const [shareScope, setShareScope] = useState<ShareScope>(ShareScope.all);
-  const options = useMemo<{ label: string; value: string }[]>(
-    () =>
-      accounts
-        ?.map(({ address, meta }) => ({ label: meta?.name ? `${meta?.name} - ${address}` : address, value: address }))
-        .filter(({ value }) => !selectedAccounts.includes(value)) || [],
-    [accounts, selectedAccounts]
-  );
+  const options = useMemo<{ label: string; value: string }[]>(() => {
+    const accountOptions = accounts?.map(({ address, meta }) => ({
+      label: meta?.name ? `${meta?.name} - ${address}` : address,
+      value: address,
+    }));
+    const contactOptions = contacts?.map(({ address, meta }) => ({
+      label: meta?.name ? `${meta?.name} - ${address}` : address,
+      value: address,
+    }));
+    const composeOptions: { label: string; value: string }[] = [];
+    if (accountOptions) {
+      composeOptions.push(...accountOptions);
+    }
+    if (contactOptions) {
+      composeOptions.push(...contactOptions);
+    }
+
+    return composeOptions.filter(({ value }) => !selectedAccounts.includes(value)) || [];
+  }, [accounts, contacts, selectedAccounts]);
   const updateSelectedAccounts = (namePath?: (string | number)[]) => {
     const selected: {
       name: string;
@@ -128,14 +143,38 @@ export function WalletForm() {
           { name: '', address: '' },
           { name: '', address: '' },
         ],
+        rememberExternal: true,
       }}
       onFinish={async (values: WalletFormValue) => {
-        const { members, name, threshold } = values;
+        const { members, name, threshold, rememberExternal } = values;
         const signatories = members.map(({ address }) => address);
         const addressPair = members.map(({ address, ...other }) => ({
           ...other,
           address: encodeAddress(address, networkConfig.ss58Prefix),
         }));
+        // Add external address to contact list.
+        const addExternalToContact = () => {
+          members.forEach((item) => {
+            const account = accounts?.find((accountItem) => {
+              return accountItem.address === item.address;
+            });
+            const contact = contacts?.find((contactItem) => {
+              return contactItem.address === item.address;
+            });
+
+            if (!account && !contact) {
+              try {
+                keyring.saveAddress(item.address, {
+                  name: item.name,
+                });
+              } catch (err: unknown) {
+                if (err instanceof Error) {
+                  message.error(err.message);
+                }
+              }
+            }
+          });
+        };
         const exec = () => {
           try {
             keyring.addMultisig(signatories, threshold, {
@@ -144,11 +183,17 @@ export function WalletForm() {
               genesisHash: api?.genesisHash.toHex(),
             });
 
+            if (rememberExternal) {
+              addExternalToContact();
+            }
+
             updateMultiAccountScope(values, network);
             message.success(t('success'));
             history.push('/');
-          } catch (error) {
-            message.error(t(error.message));
+          } catch (error: unknown) {
+            if (error instanceof Error) {
+              message.error(t(error.message));
+            }
           }
         };
 
@@ -247,7 +292,13 @@ export function WalletForm() {
                     <AutoComplete
                       options={options}
                       onChange={(addr) => {
-                        const account = accounts?.find((item) => item.address === addr);
+                        let account: KeyringAddress | InjectedAccountWithMeta | undefined = accounts?.find(
+                          (item) => item.address === addr
+                        );
+
+                        if (!account) {
+                          account = contacts?.find((item) => item.address === addr);
+                        }
 
                         if (!account) {
                           return;
@@ -314,6 +365,10 @@ export function WalletForm() {
           </>
         )}
       </Form.List>
+
+      <Form.Item label={null} name="rememberExternal" valuePropName="checked">
+        <Checkbox>{t('contact.Add External Address')}</Checkbox>
+      </Form.Item>
 
       <Form.Item>
         <div className="w-full grid grid-cols-2 items-center gap-8">

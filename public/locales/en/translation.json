@@ -93,7 +93,8 @@
     "from_chain": "Call Data (scanned from the chain storage)",
     "index": "Multi-sig",
     "intro": "Subscan Multi-sig is the most easy-to-use and secure way to manage Multi-sig wallets and extrinsics",
-    "sending_transaction": "Sending transaction {{transaction}}"
+    "sending_transaction": "Sending transaction {{transaction}}",
+    "estimate_reserve": "Estimate reserve balance"
   },
   "name": "Name",
   "network": "Network",
@@ -123,6 +124,7 @@
     "index": "Status",
     "pending": "Pending"
   },
+  "save": "Save",
   "submit": "Submit",
   "submit the following extrinsic": "submit the following extrinsic",
   "submit_extrinsic": "Initiate Extrinsic",
@@ -158,6 +160,13 @@
       "share": "Share this account between different networks",
       "threshold": "Minimum approvals required to validate the multi-sig transaction"
     }
+  },
+  "My Account": "My Account",
+  "Contact Account": "Contact",
+  "contact": {
+    "Add Contact": "Add Contact",
+    "Invalid Address": "Please input valid address",
+    "Add External Address": "Add external address to contact"
   },
   "zh": "中文"
 }
