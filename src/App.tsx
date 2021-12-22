@@ -40,6 +40,9 @@ function App() {
   );
   const headerLinkStyle = useMemo(() => genHeaderLinkStyle`${network}`, [network]);
 
+  // eslint-disable-next-line no-console
+  console.log('xxxxx', location);
+
   return (
     <>
       <GlobalStyle uiHighlight={uiHighlight} />
@@ -74,8 +77,7 @@ function App() {
                       key={item.name}
                       onClick={() => {
                         if (item.name !== network) {
-                          location.hash = encodeURIComponent(`n=${item.name}`);
-                          location.reload();
+                          location.replace(`/#${encodeURIComponent(`n=${item.name}`)}`);
                         }
                       }}
                     >
