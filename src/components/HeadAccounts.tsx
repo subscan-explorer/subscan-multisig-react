@@ -39,9 +39,9 @@ export const HeadAccounts = () => {
         visible={popoverVisible}
         onVisibleChange={setPopoverVisible}
         content={
-          <Tabs defaultActiveKey="1" style={{ width: '550px' }}>
+          <Tabs defaultActiveKey="1" style={{ width: '80vw' }}>
             <TabPane tab={t('My Account')} key="1">
-              <div className="truncate" style={{ maxWidth: '550px' }}>
+              <div className="truncate" style={{ maxWidth: '80vw' }}>
                 {accounts?.map((item) => (
                   <AccountItem key={item.address} address={item.address} name={item.meta?.name} type="injected" />
                 ))}
@@ -49,7 +49,7 @@ export const HeadAccounts = () => {
             </TabPane>
 
             <TabPane tab={t('Contact Account')} key="2">
-              <div className="truncate" style={{ maxWidth: '550px' }}>
+              <div className="truncate" style={{ maxWidth: '80vw' }}>
                 {contacts?.map((item) => (
                   <AccountItem
                     key={item.address}
@@ -124,7 +124,7 @@ const AccountItem = (props: {
         value={props.address}
       />
 
-      <div className="flex flex-col leading-5" style={{ width: '450px' }}>
+      <div className="flex flex-col leading-5" style={{ width: '70vw' }}>
         <b>{props.name}</b>
 
         <span className="hidden md:inline opacity-60">{props.address}</span>
