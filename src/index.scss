@@ -49,6 +49,13 @@ body {
   outline: none;
 }
 
+.main-layout {
+  .ant-layout-header {
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+}
+
 .header-account-list {
   position: relative;
   padding-bottom: 10px;
