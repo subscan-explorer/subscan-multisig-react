@@ -1,6 +1,7 @@
 import { Api as PolkaApiProvider } from '@polkadot/react-api';
 import Queue from '@polkadot/react-components/Status/Queue';
 import React, { Suspense } from 'react';
+import {} from 'less';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 import 'semantic-ui-css/semantic.min.css';
