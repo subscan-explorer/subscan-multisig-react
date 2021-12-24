@@ -17,7 +17,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     rpc: 'wss://rpc.polkadot.io',
     api: {
       // subql: 'https://api.subquery.network/sq/darwinia-network/polkadot',
-      subql: 'https://api.subquery.network/sq/vzxh/subscan-multisig-polkadot-test',
+      subql: 'https://api.subquery.network/sq/itering/multisig-polkadot',
     },
     donate: {
       address: '14RYaXRSqb9rPqMaAVp1UZW2czQ6dMNGMbvukwfifi6m8ZgZ',
@@ -41,7 +41,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     // rpc: 'wss://kusama-rpc.polkadot.io',
     api: {
       // subql: 'https://api.subquery.network/sq/darwinia-network/kusama',
-      subql: 'https://api.subquery.network/sq/vzxh/subscan-multisig-ksm-test',
+      subql: 'https://api.subquery.network/sq/itering/multisig-ksm',
     },
     donate: {
       address: 'Fzs6WWFcAuJhxAVyZa4EN2suxggjidJjV3AzJxKbRHjh2Jc',
