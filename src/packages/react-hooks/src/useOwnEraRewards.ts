@@ -4,7 +4,7 @@
 
 import type { ApiPromise } from '@polkadot/api';
 import type { DeriveEraPoints, DeriveEraRewards, DeriveStakerReward } from '@polkadot/api-derive/types';
-import type { EraIndex } from '@polkadot/types/interfaces';
+import type { EraIndex, Balance } from '@polkadot/types/interfaces';
 import { BN_ZERO } from '@polkadot/util';
 import { useEffect, useState } from 'react';
 import type { StakerState } from './types';
@@ -60,7 +60,7 @@ function getValRewards(
         const reward = eraPoints.validators[stashId].mul(eraRewards.eraReward).div(eraPoints.eraPoints);
 
         if (!reward.isZero()) {
-          const total = api.createType('Balance', reward);
+          const total = api.createType<Balance>('Balance', reward);
 
           if (!allRewards[stashId]) {
             allRewards[stashId] = [];

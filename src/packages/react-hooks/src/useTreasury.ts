@@ -24,7 +24,7 @@ interface Result {
 export function useTreasury(): Result {
   const { api } = useApi();
   const [result, setResult] = useState<Result>({
-    spendPeriod: api.consts.treasury ? api.consts.treasury.spendPeriod : BN_ZERO,
+    spendPeriod: api.consts.treasury ? (api.consts.treasury.spendPeriod as unknown as BN) : BN_ZERO,
   });
 
   const treasuryBalance = useCall<DeriveBalancesAccount>(api.derive.balances?.account, [TREASURY_ACCOUNT]);
@@ -36,8 +36,8 @@ export function useTreasury(): Result {
 
     setResult(({ spendPeriod }) => ({
       burn:
-        treasuryBalance?.freeBalance.gtn(0) && !api.consts.treasury.burn.isZero()
-          ? api.consts.treasury.burn.mul(treasuryBalance.freeBalance).div(BN_MILLION)
+        treasuryBalance?.freeBalance.gtn(0) && !(api.consts.treasury.burn as unknown as BN).isZero()
+          ? (api.consts.treasury.burn as unknown as BN).mul(treasuryBalance.freeBalance).div(BN_MILLION)
           : BN_ZERO,
       spendPeriod,
       value: treasuryBalance?.freeBalance.gtn(0) ? treasuryBalance.freeBalance : undefined,

@@ -11,7 +11,6 @@ export { useAvailableSlashes } from './useAvailableSlashes';
 export { useBestHash } from './useBestHash';
 export { useBestNumber } from './useBestNumber';
 export { useBlockTime } from './useBlockTime';
-export { useBlocksPerDays } from './useBlocksPerDays';
 export { useCacheKey } from './useCacheKey';
 export { useCall } from './useCall';
 export { useCallMulti } from './useCallMulti';

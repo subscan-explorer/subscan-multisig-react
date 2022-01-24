@@ -46,3 +46,11 @@ export function getMainColor(network: Network) {
 
   return res ? res[0] : '#ccc';
 }
+
+export function toShortString(str: string, maxLength: number): string {
+  if (str.length <= maxLength) {
+    return str;
+  }
+  // eslint-disable-next-line no-magic-numbers
+  return `${str.substring(0, maxLength / 2)}...${str.substring(str.length - maxLength / 2)}`;
+}

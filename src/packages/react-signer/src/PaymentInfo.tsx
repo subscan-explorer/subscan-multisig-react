@@ -60,7 +60,7 @@ function PaymentInfo({ accountId, className = '', extrinsic }: Props): React.Rea
     !api.tx.balances?.transfer.is(extrinsic) &&
     balances?.accountId.eq(accountId) &&
     (balances.availableBalance.lte(dispatchInfo.partialFee) ||
-      balances.freeBalance.sub(dispatchInfo.partialFee).lte(api.consts.balances.existentialDeposit));
+      balances.freeBalance.sub(dispatchInfo.partialFee).lte(api.consts.balances.existentialDeposit as unknown as BN));
 
   return (
     <>

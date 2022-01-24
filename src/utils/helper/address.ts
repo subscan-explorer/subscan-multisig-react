@@ -22,7 +22,7 @@ export function dvmAddressToAccountId(address: string | null | undefined): Accou
 
   // eslint-disable-next-line no-magic-numbers
   data.set(numberToU8a(checksum), 31);
-  const accountId = registry.createType('AccountId', data);
+  const accountId = registry.createType<AccountId>('AccountId', data);
 
   return accountId;
 }

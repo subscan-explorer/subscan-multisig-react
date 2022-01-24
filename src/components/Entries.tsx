@@ -6,6 +6,7 @@ import { ColumnsType } from 'antd/lib/table';
 import { intersection, isEmpty } from 'lodash';
 import { useCallback } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import { toShortString } from '../utils';
 import { useApi, useIsInjected } from '../hooks';
 import { AddressPair, Entry, TxActionType } from '../model';
 import { ArgObj, Args } from './Args';
@@ -127,7 +128,8 @@ export function Entries({ source, isConfirmed, account, loading }: EntriesProps)
           <>
             <Paragraph copyable={!isEmpty(data) && { text: data }}>
               {!isEmpty(data)
-                ? `${data.substring(0, CALL_DATA_LENGTH)}${data.length > CALL_DATA_LENGTH ? '...' : ''}`
+                ? // ? `${data.substring(0, CALL_DATA_LENGTH)}${data.length > CALL_DATA_LENGTH ? '...' : ''}`
+                  toShortString(data, CALL_DATA_LENGTH)
                 : '-'}
             </Paragraph>
           </>

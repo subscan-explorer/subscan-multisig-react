@@ -25,7 +25,7 @@ export { default as ChainLock } from './ChainLock';
 export { default as Chart } from './Chart';
 export { default as Checkbox } from './Checkbox';
 export { default as Columar } from './Columar';
-export { default as ConvictionDropdown } from './ConvictionDropdown';
+// export { default as ConvictionDropdown } from './ConvictionDropdown';
 export { default as CopyButton } from './CopyButton';
 export { default as CryptoType } from './CryptoType';
 export { default as Digits } from './Digits';
@@ -92,7 +92,7 @@ export { default as ToggleGroup } from './ToggleGroup';
 export { default as Tooltip } from './Tooltip';
 export { default as TxButton } from './TxButton';
 export { default as VoteAccount } from './VoteAccount';
-export { default as VoteValue } from './VoteValue';
+// export { default as VoteValue } from './VoteValue';
 export { default as TextArea } from './TextArea';
 
 export { default as media } from './media';

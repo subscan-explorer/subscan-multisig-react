@@ -1,5 +1,6 @@
 import { DownloadOutlined } from '@ant-design/icons';
 import { TypeRegistry } from '@polkadot/types';
+import { ChainProperties } from '@polkadot/types/interfaces';
 import { encodeAddress } from '@polkadot/util-crypto';
 import { Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
@@ -52,7 +53,9 @@ function formatAddressValue(value: string | string[], chain: Chain) {
     if (value.length < 12 && /^\d+$/.test(value)) {
       const registry = new TypeRegistry();
 
-      registry.setChainProperties(registry.createType('ChainProperties', { ss58Format: +chain.ss58Format }));
+      registry.setChainProperties(
+        registry.createType('ChainProperties', { ss58Format: +chain.ss58Format }) as ChainProperties
+      );
 
       const ss58 = registry.createType('AccountIndex', +value).toString();
 

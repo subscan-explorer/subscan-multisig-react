@@ -36,6 +36,35 @@ const options = {
 const themePlugin = new AntDesignThemePlugin(options);
 
 module.exports = {
+  babel: {
+    presets: [
+      [
+        '@babel/preset-env',
+        {
+          modules: false, // 对ES6的模块文件不做转化，以便使用tree shaking、sideEffects等
+          useBuiltIns: 'entry', // browserslist环境不支持的所有垫片都导入
+          // https://babeljs.io/docs/en/babel-preset-env#usebuiltins
+          // https://github.com/zloirock/core-js/blob/master/docs/2019-03-19-core-js-3-babel-and-a-look-into-the-future.md
+          corejs: {
+            version: 3, // 使用core-js@3
+            proposals: true,
+          },
+        },
+      ],
+    ],
+    plugins: [
+      // 配置 babel-plugin-import
+      // ['import', { libraryName: 'antd', libraryDirectory: 'es', style: true }, 'antd'],
+      // 配置解析器
+      // ['@babel/plugin-proposal-decorators', { legacy: true }],
+      // ['@babel/plugin-proposal-class-properties', { loose: true }],
+      // ['babel-plugin-styled-components', { displayName: true }],
+    ],
+    loaderOptions: {},
+    loaderOptions: (babelLoaderOptions, { env, paths }) => {
+      return babelLoaderOptions;
+    },
+  },
   style: {
     postcss: {
       plugins: [require('tailwindcss'), require('autoprefixer')],
@@ -59,6 +88,10 @@ module.exports = {
         test: /\.mjs$/,
         include: /node_modules/,
         type: 'javascript/auto',
+      });
+      webpackConfig.module.rules.push({
+        test: /\.js$/,
+        loader: require.resolve('@open-wc/webpack-import-meta-loader'),
       });
       const config = alias(configPaths(path.join(__dirname, './tsconfig.paths.json')))(webpackConfig);
 

@@ -16,9 +16,9 @@ export function useBlocksPerDays(days = 1): BN {
   return useMemo(
     () =>
       A_DAY.muln(days).div(
-        api.consts.babe?.expectedBlockTime ||
+        (api.consts.babe?.expectedBlockTime as unknown as BN) ||
           api.consts.difficulty?.targetBlockTime ||
-          api.consts.timestamp?.minimumPeriod.muln(2) ||
+          (api.consts.timestamp?.minimumPeriod as unknown as BN).muln(2) ||
           DEFAULT_TIME
       ),
     [api, days]
