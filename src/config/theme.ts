@@ -8,10 +8,13 @@ import darwiniaDark from '../theme/network/dark/darwinia.json';
 import kusamaDark from '../theme/network/dark/kusama.json';
 import pangolinDark from '../theme/network/dark/pangolin.json';
 import polkadotDark from '../theme/network/dark/polkadot.json';
+import acalaDark from '../theme/network/dark/acala.json';
+
 import darwinia from '../theme/network/darwinia.json';
 import kusama from '../theme/network/kusama.json';
 import pangolin from '../theme/network/pangolin.json';
 import polkadot from '../theme/network/polkadot.json';
+import acala from '../theme/network/acala.json';
 
 export const NETWORK_LIGHT_THEME: NetworkConfig<{ [key in keyof typeof darwinia]: string }> = {
   crab,
@@ -19,6 +22,7 @@ export const NETWORK_LIGHT_THEME: NetworkConfig<{ [key in keyof typeof darwinia]
   kusama,
   pangolin,
   polkadot,
+  acala,
 };
 
 export const SKIN_THEME = {
@@ -33,6 +37,7 @@ export const NETWORK_DARK_THEME: NetworkConfig<{ [key in keyof typeof darwiniaDa
   kusama: kusamaDark,
   pangolin: pangolinDark,
   polkadot: polkadotDark,
+  acala: acalaDark,
 };
 
 export enum THEME {

@@ -69,26 +69,26 @@ function App() {
             <Dropdown
               overlay={
                 <Menu>
-                  {networks.map((item) => (
-                    <Menu.Item
-                      key={item.name}
-                      onClick={() => {
-                        if (item.name !== network) {
-                          if (location.pathname === '/') {
-                            location.hash = `${encodeURIComponent(`n=${item.name}`)}`;
+                  {networks
+                    .filter((v, _i) => v.fullName === 'Polkadot' || v.fullName === 'Kusama' || v.fullName === 'Acala')
+                    .map((item) => (
+                      <Menu.Item
+                        key={item.name}
+                        onClick={() => {
+                          if (item.name !== network) {
+                            location.hash = encodeURIComponent(`n=${item.name}`);
                             location.reload();
                           } else {
                             location.replace(`/#${encodeURIComponent(`n=${item.name}`)}`);
                           }
-                        }
-                      }}
-                    >
-                      <div className="flex items-center gap-4">
-                        <img src={item.facade.logo} className="w-8 h-8" />
-                        <span>{item.fullName}</span>
-                      </div>
-                    </Menu.Item>
-                  ))}
+                        }}
+                      >
+                        <div className="flex items-center gap-4">
+                          <img src={item.facade.logo} className="w-8 h-8" />
+                          <span>{item.fullName}</span>
+                        </div>
+                      </Menu.Item>
+                    ))}
                 </Menu>
               }
               placement="bottomCenter"
