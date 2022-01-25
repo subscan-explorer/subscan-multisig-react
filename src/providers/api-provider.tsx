@@ -32,7 +32,7 @@ const cacheNetwork = (network: Network): void => {
 };
 
 const initialState: StoreState = {
-  network: getInitialSetting<Network>('network', 'pangolin'),
+  network: getInitialSetting<Network>('network', 'polkadot'),
   accounts: null,
   networkStatus: 'pending',
 };
@@ -138,6 +138,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
 
     (async () => {
       const newAccounts = await web3Accounts();
+      console.warn(`found ${newAccounts.length} newAccounts`);
       const chainState = await api.rpc.system.properties();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { tokenDecimals, tokenSymbol, ss58Format } = chainState?.toHuman() as any;

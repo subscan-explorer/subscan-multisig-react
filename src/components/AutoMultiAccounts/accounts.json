@@ -2,7 +2,7 @@
   "name": "Parallel Crowdloan Multisig",
   "threshold": 7,
   "share": 1,
-  "scope": ["polkadot"],
+  "scope": ["polkadot", "kusama", "acala"],
   "members": [
     {
       "name": "Yaoqi - Parity Technologies",

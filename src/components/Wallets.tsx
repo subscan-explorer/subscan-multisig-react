@@ -12,7 +12,7 @@ import { NETWORK_CONFIG } from '../config';
 import { Path } from '../config/routes';
 import { useApi, useIsInjected } from '../hooks';
 import { Chain } from '../providers';
-import { accuracyFormat, convertToSS58, isInCurrentScope } from '../utils';
+import { accuracyFormat, convertToSS58 } from '../utils';
 import { genExpandIcon } from './expandIcon';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
@@ -30,7 +30,12 @@ const renderAddress = (address: string) => <Link to={Path.extrinsic + '/' + addr
 const renderBalances = (account: KeyringAddress, chain: Chain) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { value, kton } = account as any;
-  const { tokens } = chain;
+  let { tokens } = chain;
+  const { ss58Format } = chain;
+  if (ss58Format === '10') {
+    tokens = tokens.filter((token) => token.symbol === 'ACA');
+  }
+
   return tokens.map(({ decimal, symbol }) => {
     let amount = '';
 
@@ -158,9 +163,7 @@ export function Wallets() {
     setIsCalculating(true);
 
     (async () => {
-      const accounts = keyring
-        .getAccounts()
-        .filter((account) => account.meta.isMultisig && isInCurrentScope(account.publicKey, network));
+      const accounts = keyring.getAccounts().filter((account) => account.meta.isMultisig);
       const balances = await api?.query.system.account.multi(accounts.map(({ address }) => address));
       const entries = await Promise.all(
         accounts.map(async ({ address }) => await api?.query.multisig.multisigs.entries(address))
