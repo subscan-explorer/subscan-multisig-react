@@ -55,7 +55,7 @@ function VoteValue({ accountId, autoFocus, isCouncil, onChange }: Props): React.
       allBalances.accountId.eq(accountId) &&
       setValue((state) =>
         state.selectedId !== accountId
-          ? getValues(accountId, isCouncil, allBalances, api.consts.balances.existentialDeposit)
+          ? getValues(accountId, isCouncil, allBalances, api.consts.balances.existentialDeposit as unknown as BN)
           : state
       );
   }, [allBalances, accountId, api, isCouncil]);

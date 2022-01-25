@@ -30,13 +30,13 @@
     "@fortawesome/react-fontawesome": "^0.1.14",
     "@metamask/jazzicon": "^2.0.0",
     "@darwinia/types": "2.6.100-2",
-    "@polkadot/api": "6.12.1",
-    "@polkadot/types": "6.12.1",
-    "@polkadot/types-known": "6.12.1",
-    "@polkadot/api-contract": "6.12.1",
+    "@polkadot/api": "7.5.1",
+    "@polkadot/types": "7.5.1",
+    "@polkadot/types-known": "7.5.1",
+    "@polkadot/api-contract": "7.5.1",
     "@polkadot/util": "8.1.2",
     "@polkadot/metadata": "4.17.1",
-    "@polkadot/apps-config": "0.94.1",
+    "@polkadot/apps-config": "0.102.1",
     "@polkadot/extension-dapp": "0.42.2",
     "@polkadot/react-identicon": "0.87.5",
     "@polkadot/ui-keyring": "0.87.5",
@@ -86,6 +86,7 @@
     "@cypress/react": "^5.9.1",
     "@cypress/webpack-dev-server": "^1.4.0",
     "@darwinia/lints": "^1.0.0",
+    "@open-wc/webpack-import-meta-loader": "^0.4.7",
     "@tailwindcss/postcss7-compat": "^2.0.4",
     "@types/codeflask": "^1.4.2",
     "@types/less": "^3.0.3",
@@ -127,7 +128,7 @@
     "tailwindcss-aspect-ratio": "^3.0.0"
   },
   "resolutions": {
-    "@polkadot/types": "6.12.1"
+    "@polkadot/types": "7.5.1"
   },
   "browserslist": {
     "production": [

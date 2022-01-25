@@ -45,7 +45,7 @@ export default class ApiSigner implements Signer {
       // if (result instanceof ClassOf(this.#registry, 'Hash')) {
       this.#queueSetTxStatus(id, 'sent', result.toHex());
     } else {
-      this.#queueSetTxStatus(id, result.status.type.toLowerCase() as QueueTxStatus, status);
+      this.#queueSetTxStatus(id, (result as SubmittableResult).status.type.toLowerCase() as QueueTxStatus, status);
     }
   }
 }

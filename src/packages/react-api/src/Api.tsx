@@ -106,7 +106,9 @@ async function retrieve(api: ApiPromise, injectedPromise: Promise<InjectedExtens
     await Promise.all([
       api.rpc.system.properties(),
       api.rpc.system.chain(),
-      api.rpc.system.chainType ? api.rpc.system.chainType() : Promise.resolve(registry.createType('ChainType', 'Live')),
+      api.rpc.system.chainType
+        ? api.rpc.system.chainType()
+        : Promise.resolve(registry.createType('ChainType', 'Live') as ChainType),
       api.rpc.system.name(),
       api.rpc.system.version(),
       getInjectedAccounts(injectedPromise),
@@ -118,7 +120,7 @@ async function retrieve(api: ApiPromise, injectedPromise: Promise<InjectedExtens
       ss58Format: api.consts.system?.ss58Prefix || chainProperties.ss58Format,
       tokenDecimals: chainProperties.tokenDecimals,
       tokenSymbol: chainProperties.tokenSymbol,
-    }),
+    }) as ChainProperties,
     systemChain: (systemChain || '<unknown>').toString(),
     systemChainType,
     systemName: systemName.toString(),
@@ -145,7 +147,9 @@ async function loadOnReady(
   const isDevelopment = systemChainType.isDevelopment || systemChainType.isLocal || isTestChain(systemChain);
 
   // explicitly override the ss58Format as specified
-  registry.setChainProperties(registry.createType('ChainProperties', { ss58Format, tokenDecimals, tokenSymbol }));
+  registry.setChainProperties(
+    registry.createType('ChainProperties', { ss58Format, tokenDecimals, tokenSymbol }) as ChainProperties
+  );
 
   // first setup the UI helpers
   formatBalance.setDefaults({

@@ -33,7 +33,9 @@ function createOptions(api: ApiPromise, t: TFunction, blockTime: number): { text
         replace: {
           lock,
           period: (
-            bnLock.mul(api.consts.democracy.enactmentPeriod.muln(blockTime).div(BN_THOUSAND)).toNumber() / SEC_DAY
+            bnLock
+              .mul((api.consts.democracy.enactmentPeriod as unknown as BN).muln(blockTime).div(BN_THOUSAND))
+              .toNumber() / SEC_DAY
           ).toFixed(2),
           value,
         },

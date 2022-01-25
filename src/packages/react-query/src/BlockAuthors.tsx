@@ -60,8 +60,8 @@ function BlockAuthorsBase({ children }: Props): React.ReactElement<Props> {
         // subscribe to all validators
         api.query.session &&
           api.query.session
-            .validators((validatorIds): void => {
-              setValidators(validatorIds.map((validatorId) => validatorId.toString()));
+            .validators((validatorIds: any): void => {
+              setValidators(validatorIds.map((validatorId: any) => validatorId.toString()));
             })
             .catch(console.error);
 

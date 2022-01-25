@@ -38,7 +38,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
   const isExtensionAccount = useIsInjected();
 
   const [depositBase, depositFactor] = useMemo(() => {
-    return [api?.consts.multisig.depositBase.toJSON(), api?.consts.multisig.depositFactor.toJSON()];
+    return [Number(api?.consts.multisig.depositBase.toJSON()), Number(api?.consts.multisig.depositFactor.toJSON())];
   }, [api]);
 
   const [chainDecimal, chainToken] = useMemo(() => {

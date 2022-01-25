@@ -17,7 +17,7 @@ export function useWeightFee(weight: BN | number, apiOverride?: ApiPromise | nul
   return useMemo(
     () =>
       isUndefined(apiOverride) || apiOverride
-        ? ((apiOverride || api).consts.transactionPayment?.weightToFee || []).reduce(
+        ? (((apiOverride || api).consts.transactionPayment?.weightToFee as unknown as any[]) || []).reduce(
             (acc, { coeffFrac, coeffInteger, degree, negative }: WeightToFeeCoefficient): BN => {
               const w = bnToBn(weight).pow(degree);
               const frac = coeffFrac.mul(w).div(BN_BILLION);

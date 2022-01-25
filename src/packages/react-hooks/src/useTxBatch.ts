@@ -75,7 +75,7 @@ export function useTxBatch(
               ? prev
               : Math.floor(
                   (api.consts.system.blockWeights
-                    ? api.consts.system.blockWeights.maxBlock
+                    ? (api.consts.system.blockWeights as any).maxBlock
                     : (api.consts.system.maximumBlockWeight as Weight)
                   )
                     .muln(64) // 65% of the block weight on a single extrinsic (64 for safety)

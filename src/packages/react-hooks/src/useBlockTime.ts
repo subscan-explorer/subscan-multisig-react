@@ -28,9 +28,9 @@ export function useBlockTime(blocks = BN_ONE, apiOverride?: ApiPromise | null): 
       a.consts.babe?.expectedBlockTime ||
       a.consts.difficulty?.targetBlockTime ||
       // eslint-disable-next-line no-magic-numbers
-      a.consts.timestamp?.minimumPeriod.muln(2) ||
+      (a.consts.timestamp?.minimumPeriod as unknown as BN).muln(2) ||
       DEFAULT_TIME;
-    const value = blockTime.mul(blocks).toNumber();
+    const value = (blockTime as unknown as BN).mul(blocks).toNumber();
     const prefix = value < 0 ? '+' : '';
     const time = extractTime(Math.abs(value));
     const { days, hours, minutes, seconds } = time;
@@ -46,6 +46,6 @@ export function useBlockTime(blocks = BN_ONE, apiOverride?: ApiPromise | null): 
       .slice(0, 2)
       .join(' ');
 
-    return [blockTime.toNumber(), `${prefix}${timeStr}`, time];
+    return [(blockTime as unknown as BN).toNumber(), `${prefix}${timeStr}`, time];
   }, [api, apiOverride, blocks, t]);
 }
