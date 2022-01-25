@@ -53,14 +53,14 @@ module.exports = {
       ],
     ],
     plugins: [
+      ['@babel/plugin-proposal-private-methods', { loose: true }],
       // 配置 babel-plugin-import
       // ['import', { libraryName: 'antd', libraryDirectory: 'es', style: true }, 'antd'],
       // 配置解析器
       // ['@babel/plugin-proposal-decorators', { legacy: true }],
-      // ['@babel/plugin-proposal-class-properties', { loose: true }],
+      ['@babel/plugin-proposal-class-properties', { loose: true }],
       // ['babel-plugin-styled-components', { displayName: true }],
     ],
-    loaderOptions: {},
     loaderOptions: (babelLoaderOptions, { env, paths }) => {
       return babelLoaderOptions;
     },
