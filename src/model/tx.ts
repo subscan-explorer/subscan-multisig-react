@@ -1,5 +1,4 @@
 import { AnyJson } from '@polkadot/types/types';
-import { Call } from '@polkadot/types/interfaces';
 import { PartialQueueTxExtrinsic } from '@polkadot/react-components/Status/types';
 
 export interface When {
@@ -15,7 +14,8 @@ export interface Entry {
   callHash: string | null;
   blockHash?: string;
   extrinsicIdx?: string;
-  callData: Call | null;
+  // callData: Call | null;
+  callDataJson: any;
   meta: Record<string, AnyJson> | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
