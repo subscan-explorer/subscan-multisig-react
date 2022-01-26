@@ -65,9 +65,7 @@ export function TxApprove({ entry, txSpy, onOperation }: TxOperationComponentPro
     ]
   );
 
-  if (availableAccounts.length === 1) {
-    return <Button onClick={() => handleApprove(availableAccounts[0].address, entry)}>{t('approve')}</Button>;
-  } else if (entry.callHash && entry.callData) {
+  if (entry.callHash && entry.callData) {
     return (
       <Popover
         content={
