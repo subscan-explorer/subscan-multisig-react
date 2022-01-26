@@ -126,7 +126,7 @@ export function Args({ args, className }: ArgsProps) {
           return value;
         }
 
-        return value;
+        return <div style={{ wordBreak: 'break-all' }}>{value}</div>;
       },
     },
   ];

@@ -20,6 +20,7 @@ interface ExecutedMultisig {
   multisigAccountId: string;
   timestamp: string;
   extrinsicIdx: string;
+  approvals: string[];
   block: {
     id: string;
     extrinsics: {
@@ -55,6 +56,7 @@ function Confirmed({ data, account, loading }: ConfirmedProps) {
         multisigAccountId,
         timestamp,
         extrinsicIdx,
+        approvals,
         block: {
           id: blockHash,
           extrinsics: { nodes: exNodes },
@@ -62,17 +64,26 @@ function Confirmed({ data, account, loading }: ConfirmedProps) {
       } = node;
 
       const target = exNodes.find((item) => item.section === 'multisig');
-      const { signerId, isSuccess } = target ?? {};
+      // const { signerId, isSuccess } = target ?? {};
+      const { isSuccess } = target ?? {};
       const multisigArgs = parseArgs(api, target);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const argsHash = multisigArgs.find((item: any) => item.name === 'call')?.value;
-      let callData;
+      let callDataJson;
       let meta;
       try {
-        callData = api?.registry.createType('Call', argsHash);
-        meta = api?.tx[callData.section][callData?.method].meta.toJSON();
+        if (typeof argsHash === 'string') {
+          callDataJson = api?.registry.createType('Call', argsHash).toHuman();
+          // eslint-disable-next-line no-console
+          console.log('callDataJson', callDataJson);
+        } else {
+          callDataJson = argsHash;
+        }
+        meta = api?.tx[callDataJson?.section][callDataJson?.method].meta.toJSON();
       } catch (err) {
-        callData = null;
+        // eslint-disable-next-line no-console
+        console.log('err', err);
+        callDataJson = {};
         meta = null;
       }
       const maybeTimepointArg = multisigArgs.find(
@@ -82,19 +93,20 @@ function Confirmed({ data, account, loading }: ConfirmedProps) {
       const { height, index } = maybeTimepointArg || {};
 
       return {
-        callData,
+        callDataJson,
         blockHash,
         meta,
         hash: blockHash,
         callHash: null,
         address: multisigAccountId,
         extrinsicIdx,
-        approvals: [
-          ...multisigArgs
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .find((item: any) => item.name === 'otherSignatories' || item.name === 'other_signatories')?.value,
-          signerId,
-        ],
+        approvals,
+        // approvals: [
+        //   ...multisigArgs
+        //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        //     .find((item: any) => item.name === 'otherSignatories' || item.name === 'other_signatories')?.value,
+        //   signerId,
+        // ],
         status: isSuccess ? 'executed' : 'pending',
         created_at: timestamp,
         when: { height: isNumber(height) ? height : +height.replace(/,/g, ''), index: +index },

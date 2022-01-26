@@ -1,14 +1,13 @@
 import BaseIdentityIcon from '@polkadot/react-identicon';
-import { Call } from '@polkadot/types/interfaces';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
 import { Button, Collapse, Empty, Progress, Space, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { intersection, isEmpty } from 'lodash';
 import { useCallback } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { toShortString } from '../utils';
 import { useApi, useIsInjected } from '../hooks';
-import { AddressPair, Entry, TxActionType } from '../model';
+import { AddressPair, Entry, TxActionType, Network } from '../model';
+import { toShortString } from '../utils';
 import { ArgObj, Args } from './Args';
 import { genExpandIcon } from './expandIcon';
 import { MemberList } from './Members';
@@ -27,17 +26,17 @@ const { Title, Paragraph } = Typography;
 const { Panel } = Collapse;
 const CALL_DATA_LENGTH = 25;
 
-const renderMethod = (data: Call | undefined | null) => {
-  const call = data?.toHuman();
+const renderMethod = (data: any | undefined | null) => {
+  // const call = data && data?.toHuman ? data?.toHuman() : data;
 
-  if (call) {
-    return call.section + '(' + call.method + ')';
+  if (data) {
+    return data.section + '(' + data.method + ')';
   } else {
     return '-';
   }
 };
 
-const renderMemberStatus = (entry: Entry, pair: KeyringJson) => {
+const renderMemberStatus = (entry: Entry, pair: KeyringJson, _network: Network) => {
   const { address } = pair;
   const { approvals, when } = entry;
   const approved = approvals.includes(address);
@@ -47,6 +46,12 @@ const renderMemberStatus = (entry: Entry, pair: KeyringJson) => {
       <Trans>status.approved</Trans>
     </SubscanLink>
   ) : (
+    // <CheckCircleFilled
+    //   style={{
+    //     fontSize: '20px',
+    //     color: getMainColor(network),
+    //   }}
+    // />
     <Trans>status.pending</Trans>
   );
 };
@@ -140,7 +145,7 @@ export function Entries({ source, isConfirmed, account, loading }: EntriesProps)
     },
     {
       title: t('actions'),
-      dataIndex: 'callData',
+      dataIndex: 'callDataJson',
       align: 'center',
       render: renderMethod,
     },
@@ -176,13 +181,13 @@ export function Entries({ source, isConfirmed, account, loading }: EntriesProps)
       },
       {
         key: 'status',
-        render: (_, pair) => renderMemberStatus(entry, pair),
+        render: (_, pair) => renderMemberStatus(entry, pair, network),
       },
     ];
-    const callDataJson = entry.callData?.toJSON() ?? {};
+    // const callDataJson = entry.callData?.toJSON() ?? {};
     const args: Required<ArgObj>[] = ((entry.meta?.args ?? []) as Required<ArgObj>[]).map((arg) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const value = (callDataJson.args as any)[arg?.name ?? ''];
+      const value = (entry.callDataJson?.args as any)[arg?.name ?? ''];
 
       return { ...arg, value };
     });
@@ -252,7 +257,7 @@ export function Entries({ source, isConfirmed, account, loading }: EntriesProps)
                 extra={renderAction(data)}
                 className="overflow-hidden mb-4"
               >
-                <MemberList data={account} statusRender={(pair) => renderMemberStatus(data, pair)} />
+                <MemberList data={account} statusRender={(pair) => renderMemberStatus(data, pair, network)} />
               </Panel>
             </Collapse>
           );

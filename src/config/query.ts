@@ -13,6 +13,7 @@ export const EXECUTED_MULTISIGS_QUERY = `
         multisigAccountId
         timestamp
         extrinsicIdx
+        approvals
 
         block {
           id

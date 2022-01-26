@@ -41,7 +41,7 @@ export const HeadAccounts = () => {
         content={
           <Tabs defaultActiveKey="1">
             <TabPane tab={t('My Account')} key="1">
-              <div className="truncate">
+              <div className="truncate account-list">
                 {accounts?.map((item) => (
                   <AccountItem key={item.address} address={item.address} name={item.meta?.name} type="injected" />
                 ))}
@@ -50,15 +50,17 @@ export const HeadAccounts = () => {
 
             <TabPane tab={t('Contact Account')} key="2">
               <div className="truncate">
-                {contacts?.map((item) => (
-                  <AccountItem
-                    key={item.address}
-                    address={item.address}
-                    name={item.meta?.name}
-                    type="contact"
-                    refreshContacts={queryContacts}
-                  />
-                ))}
+                <div className="account-list">
+                  {contacts?.map((item) => (
+                    <AccountItem
+                      key={item.address}
+                      address={item.address}
+                      name={item.meta?.name}
+                      type="contact"
+                      refreshContacts={queryContacts}
+                    />
+                  ))}
+                </div>
 
                 <div className="flex justify-end md:mt-2">
                   <div

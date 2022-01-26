@@ -45,17 +45,18 @@ export function useMultisig(acc?: string) {
       const call = callInfo.toHuman() as AnyJson[];
 
       if (!call) {
-        return { ...result[index], callData: null, meta: {}, hash: result[index].callHash };
+        return { ...result[index], callDataJson: {}, meta: {}, hash: result[index].callHash };
       }
 
       try {
         const callData = api.registry.createType('Call', call[0]);
+        const callDataJson = callData.toHuman();
         const hexCallData = u8aToHex(callData.toU8a());
         const meta = api?.tx[callData?.section][callData.method].meta.toJSON();
 
-        return { ...result[index], callData, meta, hash: result[index].callHash, hexCallData };
+        return { ...result[index], callDataJson, meta, hash: result[index].callHash, hexCallData };
       } catch (_) {
-        return { ...result[index], callData: null, meta: {}, hash: result[index].callHash };
+        return { ...result[index], callDataJson: {}, meta: {}, hash: result[index].callHash };
       }
     });
 
