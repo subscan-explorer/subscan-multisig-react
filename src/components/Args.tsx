@@ -111,7 +111,7 @@ export function Args({ args, className }: ArgsProps) {
         }
 
         if (isBalanceType(type || name) || isCrabValue(name)) {
-          return formatBalance(value, +chain.tokens[0].decimal, { noDecimal: false }); // FIXME: decimal issue;
+          return formatBalance(value, +chain.tokens[0].decimal, { noDecimal: true, withThousandSplit: true }); // FIXME: decimal issue;
         }
 
         if (isDownloadType(value)) {

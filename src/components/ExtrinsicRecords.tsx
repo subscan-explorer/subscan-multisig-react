@@ -73,9 +73,9 @@ function Confirmed({ data, account, loading }: ConfirmedProps) {
       let meta;
       try {
         if (typeof argsHash === 'string') {
-          callDataJson = api?.registry.createType('Call', argsHash).toHuman();
-          // eslint-disable-next-line no-console
-          console.log('callDataJson', callDataJson);
+          const callData = api.registry.createType('Call', argsHash);
+          const { section, method } = api.registry.findMetaCall(callData.callIndex);
+          callDataJson = { ...callData.toJSON(), section, method };
         } else {
           callDataJson = argsHash;
         }
