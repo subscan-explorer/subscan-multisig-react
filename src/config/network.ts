@@ -16,7 +16,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     // rpc: 'wss://pub.elara.patract.io/polkadot',
     rpc: 'wss://rpc.polkadot.io',
     api: {
-      subql: 'https://api.subquery.network/sq/itering/multisig-polkadot',
+      subql: 'https://api.subquery.network/sq/itering/multisig_polkadot',
       // subql: 'http://localhost:3000',
     },
     donate: {
@@ -40,7 +40,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     // rpc: 'wss://kusama.elara.patract.io',
     // rpc: 'wss://kusama-rpc.polkadot.io',
     api: {
-      subql: 'https://api.subquery.network/sq/itering/multisig-ksm',
+      subql: 'https://api.subquery.network/sq/itering/multisig_ksm',
     },
     donate: {
       address: 'Fzs6WWFcAuJhxAVyZa4EN2suxggjidJjV3AzJxKbRHjh2Jc',
@@ -61,7 +61,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     rpc: 'wss://rpc.darwinia.network',
     api: {
-      subql: 'https://api.subquery.network/sq/itering/multisig-darwinia__aXRlc',
+      subql: 'https://api.subquery.network/sq/itering/multisig_darwinia',
     },
     donate: {
       address: '2rbREPAhkptwCtdvU5eSGnHgFiyPcehdkXuGqFF916oYCJ7s',
@@ -81,7 +81,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     rpc: 'wss://pangolin-rpc.darwinia.network/',
     api: {
-      subql: 'https://api.subquery.network/sq/itering/multisig-pangolin',
+      subql: 'https://api.subquery.network/sq/itering/multisig_pangolin',
     },
     donate: {
       address: '2rbREPAhkptwCtdvU5eSGnHgFiyPcehdkXuGqFF916oYCJ7s',
@@ -101,7 +101,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     rpc: 'wss://crab-rpc.darwinia.network',
     api: {
-      subql: 'https://api.subquery.network/sq/itering/multisig-crab__aXRlc',
+      subql: 'https://api.subquery.network/sq/itering/multisig_crab',
     },
     donate: {
       address: '5FVFSCANyotNxJM4Crm1LQfsmNQSw3p8H7CRbegN7d5Ex91y',
