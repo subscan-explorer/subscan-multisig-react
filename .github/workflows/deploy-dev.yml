@@ -1,0 +1,42 @@
+name: Deploy develop
+
+on:
+  pull_request:
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/checkout@v2
+        with:
+          repository: itering/actions
+          path: .github/actions
+          persist-credentials: false
+          ssh-key: "${{ secrets.ITERING_ACTIONS_DEPLOY_KEY }}"
+
+      - uses: ./.github/actions/smart-vercel
+        name: Deploy to Vercel
+        id: smart-vercel
+        with:
+          vercel_token: ${{ secrets.VERCEL_TOKEN }}
+          vercel_group: itering
+          preview_output: true
+
+      - uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          append: true
+          message: ${{ steps.smart-vercel.outputs.PREVIEW_OUTPUT }}
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: website
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: https://avatars.githubusercontent.com/u/14985020?s=48&v=4
+          SLACK_MESSAGE: '${{ steps.smart-vercel.outputs.PREVIEW_LINK }}'
+          SLACK_TITLE: Preview
+          SLACK_USERNAME: Vercel
+          SLACK_WEBHOOK: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
