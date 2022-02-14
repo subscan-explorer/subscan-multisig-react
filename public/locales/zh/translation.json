@@ -21,6 +21,8 @@
   "Transaction information": "交易信息",
   "There is an account configured by the same member and threshold. Confirm to replace it with a new account?": "已存在一个有相同成员及阈值的多签账号，确定使用新账号替换吗？",
   "View in Subscan explorer": "至 Subscan 浏览器查看",
+  "Export account config": "导出多签账户配置",
+  "import account": "从配置中导入",
   "about": "关于",
   "account": "账户",
   "accounts": "账户",

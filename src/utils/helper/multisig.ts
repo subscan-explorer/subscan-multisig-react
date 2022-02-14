@@ -126,6 +126,12 @@ export function updateMultiAccountScope(
   store.set(scopeKey(key), networks);
 }
 
+export function getMultiAccountScope(publicKey: Uint8Array): Network[] {
+  const scope: Network[] = store.get(scopeKey(publicKey));
+
+  return scope || [];
+}
+
 export function isInCurrentScope(publicKey: Uint8Array, network: Network): boolean {
   const scope: Network[] = store.get(scopeKey(publicKey)) ?? null;
 

@@ -21,6 +21,8 @@
   "Transaction information": "Transaction information",
   "There is an account configured by the same member and threshold. Confirm to replace it with a new account?": "There is an account configured by the same member and threshold. Confirm to replace it with a new account?",
   "View in Subscan explorer": "View in Subscan explorer",
+  "Export account config": "Export account config",
+  "import from config": "Import from config",
   "about": "About",
   "account": "Account",
   "accounts": "Accounts",
