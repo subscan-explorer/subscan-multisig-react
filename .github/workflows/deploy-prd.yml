@@ -34,7 +34,7 @@ jobs:
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_CHANNEL: subscan-multisig
+          SLACK_CHANNEL: subscan-general
           SLACK_COLOR: ${{ job.status }}
           SLACK_ICON: https://avatars.githubusercontent.com/u/14985020?s=48&v=4
           SLACK_MESSAGE: '${{ steps.smart-vercel.outputs.PREVIEW_LINK }}'
