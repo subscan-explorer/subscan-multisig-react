@@ -25,6 +25,8 @@ jobs:
           vercel_token: ${{ secrets.VERCEL_TOKEN }}
           vercel_group: itering
           preview_output: true
+          script_install: npm i
+          script_build: npm run build
 
       - uses: marocchino/sticky-pull-request-comment@v2
         with:

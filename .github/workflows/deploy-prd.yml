@@ -28,6 +28,8 @@ jobs:
           vercel_group: itering
           preview_output: true
           prod_mode: true
+          script_install: npm i
+          script_build: npm run build
 
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
