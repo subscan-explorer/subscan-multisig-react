@@ -82,6 +82,7 @@ module.exports = {
     plugins: {
       add: [themePlugin],
     },
+    // .
     // add mjs compatibility configuration
     configure: (webpackConfig) => {
       webpackConfig.module.rules.push({
