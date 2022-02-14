@@ -82,6 +82,7 @@
   "multisig": {
     "Confirmed Extrinsic": "已确认",
     "In Progress": "待确认",
+    "Cancelled Extrinsic": "已取消",
     "Members": "成员数",
     "Threshold": "阈值",
     "approval": "批准多签交易",

@@ -83,6 +83,7 @@
   "multisig": {
     "Confirmed Extrinsic": "Confirmed Extrinsic",
     "In Progress": "In Progress",
+    "Cancelled Extrinsic": "Cancelled Extrinsic",
     "Members": "Members",
     "Threshold": "Threshold",
     "approval": "Multi-sig approval",

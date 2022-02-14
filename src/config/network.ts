@@ -16,8 +16,8 @@ export const NETWORK_CONFIG: NetworkConfig = {
     // rpc: 'wss://pub.elara.patract.io/polkadot',
     rpc: 'wss://rpc.polkadot.io',
     api: {
-      subql: 'https://api.subquery.network/sq/itering/multisig_polkadot',
-      // subql: 'http://localhost:3000',
+      // subql: 'https://api.subquery.network/sq/itering/multisig_polkadot',
+      subql: 'https://api.subquery.network/sq/itering/multisig_polkadot__aXRlc',
     },
     donate: {
       address: '14RYaXRSqb9rPqMaAVp1UZW2czQ6dMNGMbvukwfifi6m8ZgZ',
@@ -40,7 +40,8 @@ export const NETWORK_CONFIG: NetworkConfig = {
     // rpc: 'wss://kusama.elara.patract.io',
     // rpc: 'wss://kusama-rpc.polkadot.io',
     api: {
-      subql: 'https://api.subquery.network/sq/itering/multisig_ksm',
+      // subql: 'https://api.subquery.network/sq/itering/multisig_ksm',
+      subql: 'https://api.subquery.network/sq/itering/multisig_ksm__aXRlc',
     },
     donate: {
       address: 'Fzs6WWFcAuJhxAVyZa4EN2suxggjidJjV3AzJxKbRHjh2Jc',
@@ -61,7 +62,8 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     rpc: 'wss://rpc.darwinia.network',
     api: {
-      subql: 'https://api.subquery.network/sq/itering/multisig_darwinia',
+      // subql: 'https://api.subquery.network/sq/itering/multisig_darwinia',
+      subql: 'https://api.subquery.network/sq/itering/multisig_darwinia__aXRlc',
     },
     donate: {
       address: '2rbREPAhkptwCtdvU5eSGnHgFiyPcehdkXuGqFF916oYCJ7s',
@@ -81,7 +83,8 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     rpc: 'wss://pangolin-rpc.darwinia.network/',
     api: {
-      subql: 'https://api.subquery.network/sq/itering/multisig_pangolin',
+      // subql: 'https://api.subquery.network/sq/itering/multisig_pangolin',
+      subql: 'https://api.subquery.network/sq/itering/multisig_pangolin__aXRlc',
     },
     donate: {
       address: '2rbREPAhkptwCtdvU5eSGnHgFiyPcehdkXuGqFF916oYCJ7s',
@@ -101,7 +104,8 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
     rpc: 'wss://crab-rpc.darwinia.network',
     api: {
-      subql: 'https://api.subquery.network/sq/itering/multisig_crab',
+      // subql: 'https://api.subquery.network/sq/itering/multisig_crab',
+      subql: 'https://api.subquery.network/sq/itering/multisig_crab__aXRlc',
     },
     donate: {
       address: '5FVFSCANyotNxJM4Crm1LQfsmNQSw3p8H7CRbegN7d5Ex91y',

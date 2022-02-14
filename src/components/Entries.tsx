@@ -19,6 +19,7 @@ export interface EntriesProps {
   source: Entry[];
   account: KeyringAddress;
   isConfirmed?: boolean;
+  isCancelled?: boolean;
   loading?: boolean;
 }
 
@@ -29,7 +30,7 @@ const CALL_DATA_LENGTH = 25;
 const renderMethod = (data: any | undefined | null) => {
   // const call = data && data?.toHuman ? data?.toHuman() : data;
 
-  if (data) {
+  if (data && data.section && data.method) {
     return data.section + '(' + data.method + ')';
   } else {
     return '-';
@@ -56,7 +57,8 @@ const renderMemberStatus = (entry: Entry, pair: KeyringJson, _network: Network) 
   );
 };
 
-export function Entries({ source, isConfirmed, account, loading }: EntriesProps) {
+// eslint-disable-next-line complexity
+export function Entries({ source, isConfirmed, isCancelled, account, loading }: EntriesProps) {
   const { t } = useTranslation();
   const isInjected = useIsInjected();
   const { network } = useApi();
@@ -116,20 +118,20 @@ export function Entries({ source, isConfirmed, account, loading }: EntriesProps)
 
   const columns: ColumnsType<Entry> = [
     {
-      title: t(!isConfirmed ? 'call_data' : 'extrinsic_index'),
-      dataIndex: !isConfirmed ? 'hexCallData' : 'extrinsicIdx',
+      title: t(isConfirmed || isCancelled ? 'extrinsic_index' : 'call_data'),
+      dataIndex: isConfirmed || isCancelled ? 'extrinsicIdx' : 'hexCallData',
       width: 300,
       align: 'center',
       // eslint-disable-next-line complexity
       render(data: string) {
         let extrinsicHeight = '';
         let extrinsicIndex = '';
-        if (isConfirmed && data.split('-').length > 1) {
+        if ((isConfirmed || isCancelled) && data.split('-').length > 1) {
           extrinsicHeight = data.split('-')[0];
           extrinsicIndex = data.split('-')[1];
         }
 
-        return !isConfirmed ? (
+        return !(isConfirmed || isCancelled) ? (
           <>
             <Paragraph copyable={!isEmpty(data) && { text: data }}>
               {!isEmpty(data)
