@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { CaretRightOutlined, GlobalOutlined } from '@ant-design/icons';
+import { CaretRightOutlined, GlobalOutlined, ExportOutlined } from '@ant-design/icons';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
@@ -8,11 +8,13 @@ import { ColumnsType } from 'antd/lib/table';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
+import { saveAs } from 'file-saver';
 import { NETWORK_CONFIG } from '../config';
 import { Path } from '../config/routes';
 import { useApi, useIsInjected } from '../hooks';
 import { Chain } from '../providers';
 import { accuracyFormat, convertToSS58, isInCurrentScope } from '../utils';
+import { getMultiAccountScope } from '../utils/helper/multisig';
 import { genExpandIcon } from './expandIcon';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
@@ -55,9 +57,22 @@ export function Wallets() {
   const [multisigAccounts, setMultisigAccounts] = useState<KeyringAddress[]>([]);
   const isExtensionAccount = useIsInjected();
   const [isCalculating, setIsCalculating] = useState<boolean>(true);
+
   const renderAction = useCallback(
     (row: KeyringAddress) => {
       const { address } = row;
+
+      const exportAccountConfig = () => {
+        const config = {
+          name: row.meta.name,
+          members: row.meta.addressPair as KeyringJson[],
+          threshold: row.meta.threshold,
+          scope: getMultiAccountScope(row.publicKey),
+        };
+
+        const blob = new Blob([JSON.stringify(config)], { type: 'text/plain;charset=utf-8' });
+        saveAs(blob, `${row.address}.json`);
+      };
 
       return (
         <Space size="middle">
@@ -79,6 +94,14 @@ export function Wallets() {
               className="flex items-center justify-center"
               onClick={() => window?.open(`https://${network}.subscan.io/account/${address}`, '__blank')}
               icon={<GlobalOutlined />}
+            ></Button>
+          </Tooltip>
+
+          <Tooltip overlay={t('Export account config')}>
+            <Button
+              className="flex items-center justify-center"
+              onClick={exportAccountConfig}
+              icon={<ExportOutlined />}
             ></Button>
           </Tooltip>
         </Space>

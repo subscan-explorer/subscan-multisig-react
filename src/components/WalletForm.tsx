@@ -18,6 +18,7 @@ import {
   Tag,
   Tooltip,
   Checkbox,
+  Upload,
 } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
 import { format } from 'date-fns';
@@ -27,7 +28,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { NETWORKS, validateMessages } from '../config';
 import i18n from '../config/i18n';
 import { useApi, useContacts } from '../hooks';
-import { Network, ShareScope, WalletFormValue } from '../model';
+import { Network, ShareScope, WalletFormValue, MultisigAccountConfig } from '../model';
 import { InjectedAccountWithMeta } from '../model/account';
 import { convertToSS58, findMultiAccount, getMainColor, updateMultiAccountScope } from '../utils';
 
@@ -113,6 +114,7 @@ export function WalletForm() {
 
     return composeOptions.filter(({ value }) => !selectedAccounts.includes(value)) || [];
   }, [accounts, contacts, selectedAccounts]);
+
   const updateSelectedAccounts = (namePath?: (string | number)[]) => {
     const selected: {
       name: string;
@@ -127,6 +129,48 @@ export function WalletForm() {
     }
 
     setSelectedAccounts(result);
+  };
+
+  const uploadProps = {
+    name: 'file',
+    headers: {
+      authorization: 'authorization-text',
+    },
+    onChange(info: any) {
+      if (info.file.status !== 'uploading') {
+        // console.log(info.file, info.fileList);
+      }
+      if (info.file.status === 'done') {
+        message.success(`${info.file.name} file uploaded successfully`);
+      } else if (info.file.status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+    customRequest(info: any) {
+      try {
+        const reader = new FileReader();
+
+        reader.onload = (e: any) => {
+          // eslint-disable-next-line no-console
+          console.log(e.target.result);
+
+          const config = JSON.parse(e.target.result) as MultisigAccountConfig;
+          const encodeMembers = config.members.map((member) => {
+            return {
+              name: member.name,
+              address: encodeAddress(member.address, networkConfig.ss58Prefix),
+            };
+          });
+          form.setFieldsValue({ threshold: config.threshold, name: config.name, members: encodeMembers });
+        };
+        reader.readAsText(info.file);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          // eslint-disable-next-line no-console
+          console.log('err:', err);
+        }
+      }
+    },
   };
 
   return (
@@ -207,6 +251,16 @@ export function WalletForm() {
       }}
       className="max-w-3xl mx-auto"
     >
+      <Form.Item>
+        <div className="w-full grid grid-cols-4 items-center gap-8">
+          <Upload {...uploadProps} showUploadList={false}>
+            <Button type="primary" size="middle" block className="flex justify-center items-center">
+              {t('import from config')}
+            </Button>
+          </Upload>
+        </div>
+      </Form.Item>
+
       <Form.Item
         name="name"
         label={<LabelWithTip name="name" tipMessage="wallet.tip.name" />}

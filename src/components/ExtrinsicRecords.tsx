@@ -6,22 +6,30 @@ import { isNumber } from 'lodash';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { EXECUTED_MULTISIGS_QUERY } from '../config';
+import { MULTISIG_RECORD_QUERY } from '../config';
 import { useApi } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
 import { IExtrinsic, parseArgs } from '../utils';
 import { Entries } from './Entries';
 
-interface ExecutedMultisigsQueryRes {
-  executedMultisigs: { totalCount: number; nodes: ExecutedMultisig[] };
+interface MultisigRecordsQueryRes {
+  multisigRecords: { totalCount: number; nodes: MultisigRecord[] };
 }
 
-interface ExecutedMultisig {
+interface MultisigRecord {
   multisigAccountId: string;
   timestamp: string;
-  extrinsicIdx: string;
+  createExtrinsicIdx: string;
+  confirmExtrinsicIdx: string;
+  cancelExtrinsicIdx: string;
   approvals: string[];
   block: {
+    id: string;
+    extrinsics: {
+      nodes: IExtrinsic[];
+    };
+  };
+  confirmBlock: {
     id: string;
     extrinsics: {
       nodes: IExtrinsic[];
@@ -33,39 +41,42 @@ const { TabPane } = Tabs;
 
 /* -----------------------------------Confirmed extrinsic------------------------------------ */
 
-interface ConfirmedProps {
+interface ConfirmedOrCancelledProps {
   multiAddress: string;
   account: KeyringAddress | null;
-  data: ExecutedMultisigsQueryRes | undefined;
+  nodes: MultisigRecord[];
+  isConfirmed: boolean;
   loading: boolean;
 }
 
-function Confirmed({ data, account, loading }: ConfirmedProps) {
+function ConfirmedOrCancelled({ nodes, account, loading, isConfirmed }: ConfirmedOrCancelledProps) {
   const { api } = useApi();
 
   const extrinsic = useMemo(() => {
-    if (!data?.executedMultisigs || !api) {
+    if (!api) {
       return [];
     }
-
-    const { nodes } = data?.executedMultisigs;
 
     // eslint-disable-next-line complexity
     return nodes.map((node) => {
       const {
         multisigAccountId,
         timestamp,
-        extrinsicIdx,
+        createExtrinsicIdx,
+        confirmExtrinsicIdx,
+        cancelExtrinsicIdx,
         approvals,
         block: {
-          id: blockHash,
-          extrinsics: { nodes: exNodes },
+          id: createBlockHash,
+          extrinsics: { nodes: createExNodes },
         },
       } = node;
 
-      const target = exNodes.find((item) => item.section === 'multisig');
+      const target = isConfirmed
+        ? node.confirmBlock.extrinsics.nodes.find((item) => item.section === 'multisig')
+        : createExNodes.find((item) => item.section === 'multisig');
       // const { signerId, isSuccess } = target ?? {};
-      const { isSuccess } = target ?? {};
+      // const { isSuccess } = target ?? {};
       const multisigArgs = parseArgs(api, target);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const argsHash = multisigArgs.find((item: any) => item.name === 'call')?.value;
@@ -82,24 +93,25 @@ function Confirmed({ data, account, loading }: ConfirmedProps) {
         meta = api?.tx[callDataJson?.section][callDataJson?.method].meta.toJSON();
       } catch (err) {
         // eslint-disable-next-line no-console
-        console.log('err', err);
+        // console.log('err', err);
         callDataJson = {};
         meta = null;
       }
-      const maybeTimepointArg = multisigArgs.find(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (item: any) => item.name === 'maybeTimepoint' || item.name === 'maybe_timepoint'
-      )?.value;
-      const { height, index } = maybeTimepointArg || {};
+      // const maybeTimepointArg = multisigArgs.find(
+      //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      //   (item: any) => item.name === 'maybeTimepoint' || item.name === 'maybe_timepoint' || item.name === 'timepoint'
+      // )?.value;
+      // const { height, index } = maybeTimepointArg || {};
+      const [height, index] = createExtrinsicIdx.split('-');
 
       return {
         callDataJson,
-        blockHash,
+        blockHash: createBlockHash,
         meta,
-        hash: blockHash,
+        hash: createBlockHash,
         callHash: null,
         address: multisigAccountId,
-        extrinsicIdx,
+        extrinsicIdx: isConfirmed ? confirmExtrinsicIdx : cancelExtrinsicIdx,
         approvals,
         // approvals: [
         //   ...multisigArgs
@@ -107,16 +119,22 @@ function Confirmed({ data, account, loading }: ConfirmedProps) {
         //     .find((item: any) => item.name === 'otherSignatories' || item.name === 'other_signatories')?.value,
         //   signerId,
         // ],
-        status: isSuccess ? 'executed' : 'pending',
+        status: isConfirmed ? 'executed' : 'cancelled',
         created_at: timestamp,
         when: { height: isNumber(height) ? height : +height.replace(/,/g, ''), index: +index },
         depositor: '',
       };
     });
-  }, [api, data?.executedMultisigs]);
+  }, [api, nodes, isConfirmed]);
 
   return account ? (
-    <Entries source={extrinsic} account={account} isConfirmed loading={loading} />
+    <Entries
+      source={extrinsic}
+      account={account}
+      isConfirmed={isConfirmed}
+      isCancelled={!isConfirmed}
+      loading={loading}
+    />
   ) : (
     <Spin className="w-full mt-4" />
   );
@@ -127,16 +145,31 @@ function Confirmed({ data, account, loading }: ConfirmedProps) {
 export function ExtrinsicRecords() {
   const { t } = useTranslation();
   const { account: multiAddress } = useParams<{ account: string }>();
-  const { multisigAccount, inProgress, confirmedAccount, queryInProgress, loadingInProgress } = useMultisigContext();
+  const { multisigAccount, inProgress, confirmedAccount, cancelledAccount, queryInProgress, loadingInProgress } =
+    useMultisigContext();
   const [tabKey, setTabKey] = useState('inProgress');
 
   const {
-    data,
+    data: confirmedData,
     refetch: refetchConfimed,
     loading: loadingConfirmed,
-  } = useQuery<ExecutedMultisigsQueryRes>(EXECUTED_MULTISIGS_QUERY, {
+  } = useQuery<MultisigRecordsQueryRes>(MULTISIG_RECORD_QUERY, {
     variables: {
       account: multiAddress,
+      status: 'confirmed',
+      offset: 0,
+      limit: 10,
+    },
+  });
+
+  const {
+    data: cancelledData,
+    refetch: refetchCancelled,
+    loading: loadingCancelled,
+  } = useQuery<MultisigRecordsQueryRes>(MULTISIG_RECORD_QUERY, {
+    variables: {
+      account: multiAddress,
+      status: 'cancelled',
       offset: 0,
       limit: 10,
     },
@@ -148,17 +181,22 @@ export function ExtrinsicRecords() {
       queryInProgress();
     } else if (key === 'confirmed') {
       refetchConfimed();
+    } else if (key === 'cancelled') {
+      refetchCancelled();
     }
   };
 
   const refreshData = () => {
     queryInProgress();
     refetchConfimed();
+    refetchCancelled();
   };
 
   return (
-    <div>
-      <ReloadOutlined onClick={refreshData} />
+    <div className="relative">
+      <div onClick={refreshData} className="lg:absolute lg:right-2 lg:top-2 cursor-pointer z-50">
+        <ReloadOutlined />
+      </div>
       <Tabs activeKey={tabKey} onChange={handleChangeTab}>
         <TabPane
           tab={
@@ -184,7 +222,30 @@ export function ExtrinsicRecords() {
           }
           key="confirmed"
         >
-          <Confirmed data={data} loading={loadingConfirmed} account={multisigAccount} multiAddress={multiAddress} />
+          <ConfirmedOrCancelled
+            nodes={confirmedData?.multisigRecords?.nodes || []}
+            loading={loadingConfirmed}
+            account={multisigAccount}
+            multiAddress={multiAddress}
+            isConfirmed
+          />
+        </TabPane>
+        <TabPane
+          tab={
+            <Space>
+              <span>{t('multisig.Cancelled Extrinsic')}</span>
+              <span>{cancelledAccount}</span>
+            </Space>
+          }
+          key="cancelled"
+        >
+          <ConfirmedOrCancelled
+            nodes={cancelledData?.multisigRecords?.nodes || []}
+            loading={loadingCancelled}
+            account={multisigAccount}
+            multiAddress={multiAddress}
+            isConfirmed={false}
+          />
         </TabPane>
       </Tabs>
     </div>

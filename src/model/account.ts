@@ -41,3 +41,12 @@ export interface StoredScope {
   publicKey: string;
   scope: Network[];
 }
+
+export interface MultisigAccountConfig {
+  name: string;
+  members: {
+    name: string;
+    address: string;
+  }[];
+  threshold: number;
+}
