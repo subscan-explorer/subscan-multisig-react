@@ -1,21 +1,18 @@
 /* eslint-disable no-console */
-import { CaretRightOutlined, GlobalOutlined, ExportOutlined } from '@ant-design/icons';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
-import { Badge, Button, Collapse, Space, Table, Tooltip, Typography } from 'antd';
+import { Button, Collapse, Space, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
-import { saveAs } from 'file-saver';
 import { NETWORK_CONFIG } from '../config';
 import { Path } from '../config/routes';
 import { useApi, useIsInjected } from '../hooks';
 import { Chain } from '../providers';
 import { accuracyFormat, convertToSS58, isInCurrentScope } from '../utils';
-import { getMultiAccountScope } from '../utils/helper/multisig';
-import { genExpandIcon } from './expandIcon';
+import { genExpandMembersIcon } from './expandIcon';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
 
@@ -60,24 +57,12 @@ export function Wallets() {
 
   const renderAction = useCallback(
     (row: KeyringAddress) => {
-      const { address } = row;
-
-      const exportAccountConfig = () => {
-        const config = {
-          name: row.meta.name,
-          members: row.meta.addressPair as KeyringJson[],
-          threshold: row.meta.threshold,
-          scope: getMultiAccountScope(row.publicKey),
-        };
-
-        const blob = new Blob([JSON.stringify(config)], { type: 'text/plain;charset=utf-8' });
-        saveAs(blob, `${row.address}.json`);
-      };
+      // const { address } = row;
 
       return (
         <Space size="middle">
           {/*  eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          <Badge dot count={(row as unknown as any).entries.length}>
+          {/* <Badge dot count={(row as unknown as any).entries.length}>
             <Tooltip overlay={t('actions')}>
               <Button
                 onClick={() => {
@@ -87,8 +72,8 @@ export function Wallets() {
                 icon={<CaretRightOutlined />}
               ></Button>
             </Tooltip>
-          </Badge>
-
+          </Badge> */}
+          {/*
           <Tooltip overlay={t('View in Subscan explorer')}>
             <Button
               className="flex items-center justify-center"
@@ -103,11 +88,24 @@ export function Wallets() {
               onClick={exportAccountConfig}
               icon={<ExportOutlined />}
             ></Button>
-          </Tooltip>
+          </Tooltip> */}
+
+          <Button
+            type="primary"
+            className="flex items-center justify-center"
+            onClick={() => {
+              history.push(Path.extrinsic + '/' + row.address);
+            }}
+            style={{
+              borderRadius: '4px',
+            }}
+          >
+            Actions
+          </Button>
         </Space>
       );
     },
-    [history, network, t]
+    [history]
   );
 
   const columns: ColumnsType<KeyringAddress> = [
@@ -141,7 +139,8 @@ export function Wallets() {
       },
     },
     {
-      title: t('actions'),
+      // title: t('actions'),
+      title: '',
       key: 'action',
       render: (_1: unknown, row) => renderAction(row),
     },
@@ -218,7 +217,7 @@ export function Wallets() {
         columns={columns}
         dataSource={multisigAccounts}
         rowKey="address"
-        expandable={{ expandedRowRender, expandIcon: genExpandIcon(network) }}
+        expandable={{ expandedRowRender, expandIcon: genExpandMembersIcon(), expandIconColumnIndex: 4 }}
         pagination={false}
         loading={isCalculating}
         className="lg:block hidden overflow-x-scroll"

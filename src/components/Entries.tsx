@@ -23,7 +23,7 @@ export interface EntriesProps {
   loading?: boolean;
 }
 
-const { Title, Paragraph } = Typography;
+const { Paragraph } = Typography;
 const { Panel } = Collapse;
 const CALL_DATA_LENGTH = 25;
 
@@ -195,8 +195,9 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
     });
 
     return (
-      <>
-        <Title level={5}>{t('progress')}</Title>
+      <div className="record-table bg-bg-100 py-3 px-5">
+        <div className=" text-black-800 text-base leading-none mb-3">{t('progress')}</div>
+
         <Table
           columns={progressColumnsNested}
           dataSource={account.meta.addressPair as { key: string; name: string; address: string }[]}
@@ -207,9 +208,10 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
           className="mb-4 mx-4"
         />
 
-        <Title level={5}>{t('parameters')}</Title>
+        <div className=" text-black-800 text-base leading-none my-3">{t('parameters')}</div>
+
         <Args args={args} className="mb-4 mx-4" />
-      </>
+      </div>
     );
   };
 
@@ -223,7 +225,8 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
         pagination={false}
         expandable={{
           expandedRowRender,
-          expandIcon: genExpandIcon(network),
+          expandIcon: genExpandIcon(),
+          expandIconColumnIndex: 4,
         }}
         className="lg:block hidden"
       ></Table>

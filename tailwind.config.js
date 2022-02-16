@@ -31,6 +31,12 @@ module.exports = {
         kusama: {
           main: '#000',
         },
+        black: {
+          800: '#302B3C',
+        },
+        bg: {
+          100: '#F3F5F9',
+        },
       }),
       height: {
         'screen-sub-head': 'calc(100vh - 68px)',
