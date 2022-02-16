@@ -1,5 +1,8 @@
 import { Typography } from 'antd';
-import { CSSProperties, PropsWithChildren } from 'react';
+import { CSSProperties, PropsWithChildren, useMemo } from 'react';
+import { CopyOutlined } from '@ant-design/icons';
+import { getMainColor } from '../utils';
+import { NETWORK_LIGHT_THEME } from '../config';
 import { useApi } from '../hooks';
 
 const { Link } = Typography;
@@ -16,13 +19,39 @@ export interface SubscanLinkProps extends PropsWithChildren<unknown> {
 export function SubscanLink({ address, extrinsic, children, copyable, block, ...other }: SubscanLinkProps) {
   const { network } = useApi();
 
+  const mainColor = useMemo(() => {
+    return getMainColor(network);
+  }, [network]);
+
+  const linkColor = useMemo(() => {
+    return NETWORK_LIGHT_THEME[network]['@link-color'];
+  }, [network]);
+
   if (address) {
     return (
       <Link
         href={`https://${network}.subscan.io/account/${address}`}
         target="_blank"
-        copyable={copyable}
+        copyable={
+          copyable && {
+            tooltips: false,
+            icon: (
+              <CopyOutlined
+                className="rounded-full opacity-60 cursor-pointer p-1"
+                style={{
+                  color: mainColor,
+                  backgroundColor: mainColor + '40',
+                }}
+                onClick={(e) => e.preventDefault()}
+              />
+            ),
+          }
+        }
         className="w-full"
+        style={{
+          color: linkColor,
+          height: '20px',
+        }}
       >
         {address}
       </Link>

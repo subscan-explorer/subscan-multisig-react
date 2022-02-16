@@ -11,5 +11,6 @@
   "@tabs-active-color": "@project-main-bg",
   "@tabs-highlight-color": "@project-main-bg",
   "@tabs-hover-color": "@project-main-bg",
-  "@tabs-ink-bar-color": "@project-main-bg"
+  "@tabs-ink-bar-color": "@project-main-bg",
+  "@link-color": "#4572DE"
 }

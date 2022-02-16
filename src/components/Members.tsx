@@ -10,11 +10,14 @@ export const Members = ({ record }: { record: KeyringAddress }) => {
   const { t } = useTranslation();
   const isExtensionAccount = useIsInjected();
   const columnsNested: ColumnsType<KeyringJson> = [
-    { dataIndex: 'name' },
+    {
+      dataIndex: 'name',
+      render: (name) => <div>{name}</div>,
+    },
     {
       dataIndex: 'address',
       render: (address) => (
-        <Space size="middle">
+        <Space size="small" className="flex items-center">
           <BaseIdentityIcon theme="polkadot" size={32} value={address} />
           <SubscanLink address={address} />
         </Space>
@@ -27,7 +30,12 @@ export const Members = ({ record }: { record: KeyringAddress }) => {
   ];
 
   return (
-    <>
+    <div
+      className="bg-bg-100 small-table"
+      style={{
+        padding: '20px',
+      }}
+    >
       <Table
         columns={columnsNested}
         dataSource={record.meta.addressPair as KeyringJson[]}
@@ -38,7 +46,7 @@ export const Members = ({ record }: { record: KeyringAddress }) => {
       />
 
       <MemberList data={record} />
-    </>
+    </div>
   );
 };
 
