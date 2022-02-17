@@ -15,6 +15,7 @@ import { accuracyFormat, convertToSS58, isInCurrentScope } from '../utils';
 import { genExpandMembersIcon } from './expandIcon';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
+import { AddIcon } from './icons';
 
 interface AddressPair {
   name: string;
@@ -61,38 +62,9 @@ export function Wallets() {
 
       return (
         <Space size="middle">
-          {/*  eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          {/* <Badge dot count={(row as unknown as any).entries.length}>
-            <Tooltip overlay={t('actions')}>
-              <Button
-                onClick={() => {
-                  history.push(Path.extrinsic + '/' + row.address);
-                }}
-                className="flex items-center justify-center"
-                icon={<CaretRightOutlined />}
-              ></Button>
-            </Tooltip>
-          </Badge> */}
-          {/*
-          <Tooltip overlay={t('View in Subscan explorer')}>
-            <Button
-              className="flex items-center justify-center"
-              onClick={() => window?.open(`https://${network}.subscan.io/account/${address}`, '__blank')}
-              icon={<GlobalOutlined />}
-            ></Button>
-          </Tooltip>
-
-          <Tooltip overlay={t('Export account config')}>
-            <Button
-              className="flex items-center justify-center"
-              onClick={exportAccountConfig}
-              icon={<ExportOutlined />}
-            ></Button>
-          </Tooltip> */}
-
           <Button
             type="primary"
-            className="flex items-center justify-center"
+            className="flex items-center justify-center h-7"
             onClick={() => {
               history.push(Path.extrinsic + '/' + row.address);
             }}
@@ -165,14 +137,16 @@ export function Wallets() {
     ];
 
     return (
-      <Table
-        columns={columnsNested}
-        dataSource={record.meta.addressPair as KeyringJson[]}
-        pagination={false}
-        bordered
-        rowKey="address"
-        className="table-without-head"
-      />
+      <div className="multisig-list-expand bg-gray-100 p-5">
+        <Table
+          columns={columnsNested}
+          dataSource={record.meta.addressPair as KeyringJson[]}
+          pagination={false}
+          bordered
+          rowKey="address"
+          className=" table-without-head"
+        />
+      </div>
     );
   };
 
@@ -207,10 +181,36 @@ export function Wallets() {
     })();
   }, [api, network]);
 
+  if (!isCalculating && multisigAccounts.length === 0) {
+    return (
+      <Space
+        direction="vertical"
+        className="w-full h-full flex flex-col items-center justify-center absolute"
+        id="wallets"
+      >
+        <div className="flex flex-col items-center">
+          <AddIcon />
+
+          <div className="text-black-800 font-semibold text-xl lg:mt-16 lg:mb-10 mt-6 mb-4">
+            Please create Multisig wallet first
+          </div>
+
+          <Link to={Path.wallet}>
+            <Button type="primary" className="w-44">
+              {t('wallet.add')}
+            </Button>
+          </Link>
+        </div>
+      </Space>
+    );
+  }
+
   return (
-    <Space direction="vertical" className="w-full" id="wallets">
+    <Space direction="vertical" className="absolute top-4 bottom-4 left-4 right-4 overflow-auto" id="wallets">
       <Link to={Path.wallet}>
-        <Button type="primary">{t('wallet.add')}</Button>
+        <Button type="primary" className="w-44">
+          {t('wallet.add')}
+        </Button>
       </Link>
 
       <Table
@@ -220,7 +220,7 @@ export function Wallets() {
         expandable={{ expandedRowRender, expandIcon: genExpandMembersIcon(), expandIconColumnIndex: 4 }}
         pagination={false}
         loading={isCalculating}
-        className="lg:block hidden overflow-x-scroll"
+        className="lg:block hidden multisig-list-table"
       />
 
       <Space direction="vertical" className="lg:hidden block">

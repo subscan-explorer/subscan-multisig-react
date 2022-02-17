@@ -31,7 +31,7 @@ export const Members = ({ record }: { record: KeyringAddress }) => {
 
   return (
     <div
-      className="bg-bg-100 small-table"
+      className="bg-gray-100 small-table"
       style={{
         padding: '20px',
       }}
