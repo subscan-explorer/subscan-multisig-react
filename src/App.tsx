@@ -51,7 +51,7 @@ function App() {
           <span className="flex items-center justify-between">
             <Link to={Path.root} className="flex items-center mr-4">
               <img src="/image/logo@2x.png" style={{ width: '9rem' }} className="mr-4" />
-              <span className={`bg-white px-3 rounded-lg leading-6 whitespace-nowrap text-${network}-main`}>
+              <span className={`bg-white px-3 rounded-full leading-6 whitespace-nowrap text-${network}-main`}>
                 {t('multisig.index')}
               </span>
             </Link>
