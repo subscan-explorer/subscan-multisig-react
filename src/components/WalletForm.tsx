@@ -1,10 +1,11 @@
-import { DownOutlined, MinusCircleOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { DeleteOutlined } from '@ant-design/icons';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { encodeAddress } from '@polkadot/util-crypto';
 import {
   AutoComplete,
   Button,
+  Checkbox,
   Col,
   Descriptions,
   Form,
@@ -17,7 +18,6 @@ import {
   Select,
   Tag,
   Tooltip,
-  Checkbox,
   Upload,
 } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
@@ -25,10 +25,12 @@ import { format } from 'date-fns';
 import { useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
+import iconDownFilled from 'src/assets/images/icon_down_filled.svg';
+import iconQuestion from 'src/assets/images/icon_question.svg';
 import { NETWORKS, validateMessages } from '../config';
 import i18n from '../config/i18n';
 import { useApi, useContacts } from '../hooks';
-import { Network, ShareScope, WalletFormValue, MultisigAccountConfig } from '../model';
+import { MultisigAccountConfig, Network, ShareScope, WalletFormValue } from '../model';
 import { InjectedAccountWithMeta } from '../model/account';
 import { convertToSS58, findMultiAccount, getMainColor, updateMultiAccountScope } from '../utils';
 
@@ -43,10 +45,10 @@ const THRESHOLD = 2;
 function LabelWithTip({ name, tipMessage }: LabelWithTipProps) {
   const { t } = useTranslation();
   return (
-    <div className="flex items-center gap-4">
-      <span>{t(name)}</span>
+    <div className="flex items-center gap-2">
+      <span className="text-black-800 font-bold">{t(name)}</span>
       <Tooltip placement="right" title={t(tipMessage)}>
-        <QuestionCircleOutlined color="primary" />
+        <img src={iconQuestion} alt="tooltip" className="opacity-50" />
       </Tooltip>
     </div>
   );
@@ -95,6 +97,9 @@ export function WalletForm() {
   const history = useHistory();
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
   const [shareScope, setShareScope] = useState<ShareScope>(ShareScope.all);
+  const mainColor = useMemo(() => {
+    return getMainColor(network);
+  }, [network]);
   const options = useMemo<{ label: string; value: string }[]>(() => {
     const accountOptions = accounts?.map(({ address, meta }) => ({
       label: meta?.name ? `${meta?.name} - ${address}` : address,
@@ -249,7 +254,7 @@ export function WalletForm() {
           exec();
         }
       }}
-      className="max-w-3xl mx-auto"
+      className="max-w-screen-xl mx-auto"
     >
       <Form.Item>
         <div className="w-full grid grid-cols-4 items-center gap-8">
@@ -292,7 +297,14 @@ export function WalletForm() {
               <Select mode="multiple" disabled={shareScope !== ShareScope.custom}>
                 {NETWORKS.map((net) => (
                   <Select.Option value={net} key={net}>
-                    <Tag color={getMainColor(net as Network)}>{net}</Tag>
+                    <Tag
+                      color={getMainColor(net as Network)}
+                      style={{
+                        borderRadius: '2px',
+                      }}
+                    >
+                      {net}
+                    </Tag>
                   </Select.Option>
                 ))}
               </Select>
@@ -303,7 +315,7 @@ export function WalletForm() {
 
       <LabelWithTip name="members" tipMessage="wallet.tip.members" />
 
-      <Row gutter={10} className="bg-gray-100 dark:bg-gray-500 mt-2 mb-6 p-4 rounded-lg">
+      <Row gutter={20} className="bg-bg-100 mt-2 mb-6 p-4">
         <Col span={2}>{t('id')}</Col>
         <Col span={5}>{t('name')}</Col>
         <Col span={17}>{t('address')}</Col>
@@ -313,7 +325,7 @@ export function WalletForm() {
         {(fields, { add, remove }) => (
           <>
             {fields.map((field, index) => (
-              <Row key={field.key} gutter={10} className="px-4">
+              <Row key={field.key} gutter={20} className="px-4">
                 <Col span={2} className="pl-2 pt-2">
                   {index + 1}
                 </Col>
@@ -321,18 +333,17 @@ export function WalletForm() {
                   <Form.Item
                     {...field}
                     name={[field.name, 'name']}
-                    fieldKey={[field.fieldKey, 'name']}
+                    fieldKey={[field.key, 'name']}
                     rules={[{ required: true, message: t('Member name is required') }]}
                   >
                     <Input size="large" placeholder={t('wallet.tip.member_name')} className="wallet-member" />
                   </Form.Item>
                 </Col>
-
-                <Col span={15}>
+                <Col span={16}>
                   <Form.Item
                     {...field}
                     name={[field.name, 'address']}
-                    fieldKey={[field.fieldKey, 'address']}
+                    fieldKey={[field.key, 'address']}
                     validateFirst
                     rules={[
                       { required: true, message: t('Account address is required') },
@@ -369,7 +380,7 @@ export function WalletForm() {
                       }}
                     >
                       <Input
-                        suffix={<DownOutlined className="opacity-30" />}
+                        suffix={<img src={iconDownFilled} alt="down" />}
                         size="large"
                         placeholder={t('wallet.tip.member_address')}
                         className="wallet-member"
@@ -378,9 +389,13 @@ export function WalletForm() {
                   </Form.Item>
                 </Col>
 
-                <Col span={2}>
+                <Col span={1}>
                   <Form.Item>
-                    <MinusCircleOutlined
+                    <DeleteOutlined
+                      className="text-xl mt-2"
+                      style={{
+                        color: mainColor,
+                      }}
                       onClick={() => {
                         updateSelectedAccounts(['members', field.name, 'address']);
 
@@ -404,12 +419,11 @@ export function WalletForm() {
               <Col span={24}>
                 <Form.Item>
                   <Button
-                    type="dashed"
                     size="large"
                     onClick={() => add()}
                     block
-                    icon={<PlusOutlined />}
                     className="flex justify-center items-center w-full"
+                    style={{ color: mainColor }}
                   >
                     {t('add_members')}
                   </Button>
@@ -425,12 +439,17 @@ export function WalletForm() {
       </Form.Item>
 
       <Form.Item>
-        <div className="w-full grid grid-cols-2 items-center gap-8">
+        <div className="w-2/5 grid grid-cols-2 items-center gap-8">
           <Button type="primary" size="large" block htmlType="submit" className="flex justify-center items-center">
             {t('create')}
           </Button>
           <Link to="/" className="block">
-            <Button type="default" size="large" className="flex justify-center items-center w-full">
+            <Button
+              type="default"
+              size="large"
+              className="flex justify-center items-center w-full"
+              style={{ color: mainColor }}
+            >
               {t('cancel')}
             </Button>
           </Link>

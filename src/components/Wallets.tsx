@@ -61,38 +61,9 @@ export function Wallets() {
 
       return (
         <Space size="middle">
-          {/*  eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          {/* <Badge dot count={(row as unknown as any).entries.length}>
-            <Tooltip overlay={t('actions')}>
-              <Button
-                onClick={() => {
-                  history.push(Path.extrinsic + '/' + row.address);
-                }}
-                className="flex items-center justify-center"
-                icon={<CaretRightOutlined />}
-              ></Button>
-            </Tooltip>
-          </Badge> */}
-          {/*
-          <Tooltip overlay={t('View in Subscan explorer')}>
-            <Button
-              className="flex items-center justify-center"
-              onClick={() => window?.open(`https://${network}.subscan.io/account/${address}`, '__blank')}
-              icon={<GlobalOutlined />}
-            ></Button>
-          </Tooltip>
-
-          <Tooltip overlay={t('Export account config')}>
-            <Button
-              className="flex items-center justify-center"
-              onClick={exportAccountConfig}
-              icon={<ExportOutlined />}
-            ></Button>
-          </Tooltip> */}
-
           <Button
             type="primary"
-            className="flex items-center justify-center"
+            className="flex items-center justify-center h-7"
             onClick={() => {
               history.push(Path.extrinsic + '/' + row.address);
             }}
@@ -165,14 +136,16 @@ export function Wallets() {
     ];
 
     return (
-      <Table
-        columns={columnsNested}
-        dataSource={record.meta.addressPair as KeyringJson[]}
-        pagination={false}
-        bordered
-        rowKey="address"
-        className="table-without-head"
-      />
+      <div className="multisig-list-expand bg-bg-100 p-5">
+        <Table
+          columns={columnsNested}
+          dataSource={record.meta.addressPair as KeyringJson[]}
+          pagination={false}
+          bordered
+          rowKey="address"
+          className=" table-without-head"
+        />
+      </div>
     );
   };
 
@@ -220,7 +193,7 @@ export function Wallets() {
         expandable={{ expandedRowRender, expandIcon: genExpandMembersIcon(), expandIconColumnIndex: 4 }}
         pagination={false}
         loading={isCalculating}
-        className="lg:block hidden overflow-x-scroll"
+        className="lg:block hidden overflow-auto multisig-list-table"
       />
 
       <Space direction="vertical" className="lg:hidden block">

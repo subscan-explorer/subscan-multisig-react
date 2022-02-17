@@ -121,7 +121,7 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
       title: t(isConfirmed || isCancelled ? 'extrinsic_index' : 'call_data'),
       dataIndex: isConfirmed || isCancelled ? 'extrinsicIdx' : 'hexCallData',
       width: 300,
-      align: 'center',
+      align: 'left',
       // eslint-disable-next-line complexity
       render(data: string) {
         let extrinsicHeight = '';
@@ -148,13 +148,13 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
     {
       title: t('actions'),
       dataIndex: 'callDataJson',
-      align: 'center',
+      align: 'left',
       render: renderMethod,
     },
     {
       title: t('progress'),
       dataIndex: 'approvals',
-      align: 'center',
+      align: 'left',
       render(approvals: string[]) {
         const cur = (approvals && approvals.length) || 0;
 
@@ -164,7 +164,7 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
     {
       title: t('status.index'),
       key: 'status',
-      align: 'center',
+      align: 'left',
       render: (_, row) => renderAction(row),
     },
   ];
@@ -195,7 +195,7 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
     });
 
     return (
-      <div className="record-table bg-bg-100 py-3 px-5">
+      <div className="record-expand bg-bg-100 py-3 px-5">
         <div className=" text-black-800 text-base leading-none mb-3">{t('progress')}</div>
 
         <Table
@@ -216,7 +216,7 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
   };
 
   return (
-    <>
+    <div className="record-table">
       <Table
         loading={loading}
         dataSource={source}
@@ -270,6 +270,6 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
 
         {!source.length && <Empty />}
       </Space>
-    </>
+    </div>
   );
 }
