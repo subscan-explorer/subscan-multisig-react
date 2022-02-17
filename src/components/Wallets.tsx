@@ -15,6 +15,7 @@ import { accuracyFormat, convertToSS58, isInCurrentScope } from '../utils';
 import { genExpandMembersIcon } from './expandIcon';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
+import { AddIcon } from './icons';
 
 interface AddressPair {
   name: string;
@@ -180,10 +181,36 @@ export function Wallets() {
     })();
   }, [api, network]);
 
+  if (!isCalculating && multisigAccounts.length === 0) {
+    return (
+      <Space
+        direction="vertical"
+        className="w-full h-full flex flex-col items-center justify-center absolute"
+        id="wallets"
+      >
+        <div className="flex flex-col items-center">
+          <AddIcon />
+
+          <div className="text-black-800 font-semibold text-xl lg:mt-16 lg:mb-10 mt-6 mb-4">
+            Please create Multisig wallet first
+          </div>
+
+          <Link to={Path.wallet}>
+            <Button type="primary" className="w-44">
+              {t('wallet.add')}
+            </Button>
+          </Link>
+        </div>
+      </Space>
+    );
+  }
+
   return (
-    <Space direction="vertical" className="w-full" id="wallets">
+    <Space direction="vertical" className="absolute top-4 bottom-4 left-4 right-4 overflow-auto" id="wallets">
       <Link to={Path.wallet}>
-        <Button type="primary">{t('wallet.add')}</Button>
+        <Button type="primary" className="w-44">
+          {t('wallet.add')}
+        </Button>
       </Link>
 
       <Table
@@ -193,7 +220,7 @@ export function Wallets() {
         expandable={{ expandedRowRender, expandIcon: genExpandMembersIcon(), expandIconColumnIndex: 4 }}
         pagination={false}
         loading={isCalculating}
-        className="lg:block hidden overflow-auto multisig-list-table"
+        className="lg:block hidden multisig-list-table"
       />
 
       <Space direction="vertical" className="lg:hidden block">
