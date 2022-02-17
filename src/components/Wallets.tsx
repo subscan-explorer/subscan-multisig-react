@@ -136,7 +136,7 @@ export function Wallets() {
     ];
 
     return (
-      <div className="multisig-list-expand bg-bg-100 p-5">
+      <div className="multisig-list-expand bg-gray-100 p-5">
         <Table
           columns={columnsNested}
           dataSource={record.meta.addressPair as KeyringJson[]}

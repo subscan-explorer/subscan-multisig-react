@@ -315,7 +315,7 @@ export function WalletForm() {
 
       <LabelWithTip name="members" tipMessage="wallet.tip.members" />
 
-      <Row gutter={20} className="bg-bg-100 mt-2 mb-6 p-4">
+      <Row gutter={20} className="bg-gray-100 mt-2 mb-6 p-4">
         <Col span={2}>{t('id')}</Col>
         <Col span={5}>{t('name')}</Col>
         <Col span={17}>{t('address')}</Col>

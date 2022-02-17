@@ -195,7 +195,7 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
     });
 
     return (
-      <div className="record-expand bg-bg-100 py-3 px-5">
+      <div className="record-expand bg-gray-100 py-3 px-5">
         <div className=" text-black-800 text-base leading-none mb-3">{t('progress')}</div>
 
         <Table
