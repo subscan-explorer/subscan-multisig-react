@@ -4,18 +4,18 @@ import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
 import { Button, Collapse, Space, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
-import { NETWORK_CONFIG } from '../config';
+import { NETWORK_CONFIG, NETWORK_LIGHT_THEME } from '../config';
 import { Path } from '../config/routes';
 import { useApi, useIsInjected } from '../hooks';
 import { Chain } from '../providers';
 import { accuracyFormat, convertToSS58, isInCurrentScope } from '../utils';
 import { genExpandMembersIcon } from './expandIcon';
+import { AddIcon } from './icons';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
-import { AddIcon } from './icons';
 
 interface AddressPair {
   name: string;
@@ -24,8 +24,6 @@ interface AddressPair {
 }
 
 const { Panel } = Collapse;
-
-const renderAddress = (address: string) => <Link to={Path.extrinsic + '/' + address}>{address}</Link>;
 
 const renderBalances = (account: KeyringAddress, chain: Chain) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -55,6 +53,16 @@ export function Wallets() {
   const [multisigAccounts, setMultisigAccounts] = useState<KeyringAddress[]>([]);
   const isExtensionAccount = useIsInjected();
   const [isCalculating, setIsCalculating] = useState<boolean>(true);
+
+  const linkColor = useMemo(() => {
+    return NETWORK_LIGHT_THEME[network]['@link-color'];
+  }, [network]);
+
+  const renderAddress = (address: string) => (
+    <Link to={Path.extrinsic + '/' + address} style={{ color: linkColor }}>
+      {address}
+    </Link>
+  );
 
   const renderAction = useCallback(
     (row: KeyringAddress) => {
