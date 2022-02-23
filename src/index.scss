@@ -12,7 +12,8 @@ $bg-darwinia: linear-gradient(-45deg, #fe3876 0%, #7c30dd 71%, #3a30dd 100%);
 $radius-base: 10px;
 
 body {
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB', 'Heiti SC', 'Microsoft YaHei',
+    'WenQuanYi Micro Hei', sans-serif !important;
 }
 
 @mixin main-border {
