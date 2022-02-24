@@ -10,7 +10,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { Path } from '../config/routes';
 import { useApi, useIsInjected } from '../hooks';
 import { Chain } from '../providers';
-import { accuracyFormat, convertToSS58, isInCurrentScope, getThemeVar } from '../utils';
+import { accuracyFormat, convertToSS58, getThemeVar, isInCurrentScope } from '../utils';
 import { genExpandMembersIcon } from './expandIcon';
 import { AddIcon } from './icons';
 import { MemberList } from './Members';
@@ -89,18 +89,24 @@ export function Wallets() {
 
       return (
         <Space size="middle">
-          <Button
-            type="primary"
-            className="flex items-center justify-center h-7"
-            onClick={() => {
-              history.push(Path.extrinsic + '/' + row.address);
-            }}
-            style={{
-              borderRadius: '4px',
-            }}
-          >
-            Actions
-          </Button>
+          <div className="flex items-center">
+            <Button
+              type="primary"
+              className="flex items-center justify-center h-7"
+              onClick={() => {
+                history.push(Path.extrinsic + '/' + row.address);
+              }}
+              style={{
+                borderRadius: '4px',
+              }}
+            >
+              Actions
+            </Button>
+
+            {(row as unknown as any).entries && (row as unknown as any).entries.length > 0 && (
+              <div className="ml-2 bg-red-500 rounded-full w-3 h-3"></div>
+            )}
+          </div>
         </Space>
       );
     },
@@ -206,7 +212,7 @@ export function Wallets() {
       );
       setIsCalculating(false);
     })();
-  }, [api, network]);
+  }, [api, network, chain]);
 
   if (!isCalculating && multisigAccounts.length === 0) {
     return (
