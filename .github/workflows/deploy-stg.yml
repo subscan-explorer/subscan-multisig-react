@@ -28,6 +28,7 @@ jobs:
           preview_output: true
           script_install: npm i
           script_build: npm run build
+          alias_domain: multisig-staging
 
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2

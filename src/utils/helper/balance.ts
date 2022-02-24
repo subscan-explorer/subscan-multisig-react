@@ -27,9 +27,9 @@ const toString = (value: string | BN | number): string => {
   if (BN.isBN(value)) {
     return value.toString();
   } else if (isString(value)) {
-    return value;
+    return Number(value).toString(10);
   } else if (isNumber(value)) {
-    return String(value);
+    return value.toString(10);
   } else if (isUndefined(value) || isNaN(value) || isNull(value)) {
     return '0';
   } else {

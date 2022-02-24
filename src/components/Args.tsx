@@ -103,8 +103,8 @@ export function Args({ args, className }: ArgsProps) {
         const isAddr = type ? isAddressType(type) : isSS58Address(value);
 
         if (isObject(value)) {
-          // return <Args args={Object.entries(value).map(([prop, propValue]) => ({ name: prop, value: propValue }))} />;
-          return JSON.stringify(value);
+          return <Args args={Object.entries(value).map(([prop, propValue]) => ({ name: prop, value: propValue }))} />;
+          // return JSON.stringify(value);
         }
 
         if (isAddr) {

@@ -23,7 +23,6 @@ export interface EntriesProps {
   loading?: boolean;
 }
 
-const { Paragraph } = Typography;
 const { Panel } = Collapse;
 const CALL_DATA_LENGTH = 25;
 
@@ -133,12 +132,12 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
 
         return !(isConfirmed || isCancelled) ? (
           <>
-            <Paragraph copyable={!isEmpty(data) && { text: data }}>
+            <Typography.Text copyable={!isEmpty(data) && { text: data }}>
               {!isEmpty(data)
                 ? // ? `${data.substring(0, CALL_DATA_LENGTH)}${data.length > CALL_DATA_LENGTH ? '...' : ''}`
                   toShortString(data, CALL_DATA_LENGTH)
                 : '-'}
-            </Paragraph>
+            </Typography.Text>
           </>
         ) : (
           <SubscanLink extrinsic={{ height: extrinsicHeight, index: extrinsicIndex }}>{data}</SubscanLink>
