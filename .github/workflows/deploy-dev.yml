@@ -27,6 +27,7 @@ jobs:
           preview_output: true
           script_install: npm i
           script_build: npm run build
+          alias_domain: multisig-dev
 
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
