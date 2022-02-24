@@ -1,5 +1,5 @@
 import { partialRight } from 'lodash';
-import { NETWORK_LIGHT_THEME } from '../../config';
+import { NETWORK_LIGHT_THEME, ThemeVariable, NETWORK_CONFIG } from '../../config';
 import { Network } from '../../model';
 
 export function swap<T, U>(value: T | U, value1: U, value2: T): T | U {
@@ -35,8 +35,12 @@ export function makeSure<T = () => void>(fn: T | null | undefined): T | typeof e
   return fn ?? empty;
 }
 
-export function getMainColor(network: Network) {
-  const color = NETWORK_LIGHT_THEME[network]['@project-main-bg'];
+export function getThemeVar(network: Network, varName: ThemeVariable) {
+  let theme = NETWORK_LIGHT_THEME[network];
+  if (!theme) {
+    theme = NETWORK_LIGHT_THEME['polkadot'];
+  }
+  const color = theme[varName];
 
   if (color.startsWith('#')) {
     return color;
@@ -53,4 +57,8 @@ export function toShortString(str: string, maxLength: number): string {
   }
   // eslint-disable-next-line no-magic-numbers
   return `${str.substring(0, maxLength / 2)}...${str.substring(str.length - maxLength / 2)}`;
+}
+
+export function isCustomRpc(network: string): boolean {
+  return Object.keys(NETWORK_CONFIG).indexOf(network) < 0;
 }

@@ -1,19 +1,19 @@
 import { useApi } from 'src/hooks';
-import { getMainColor } from 'src/utils';
+import { getThemeVar } from 'src/utils';
 import { svgIconFactory } from './icon-factory';
 
-function Add() {
+function Add(props: any) {
   const { network } = useApi();
 
   return (
     <div style={{ color: 'red' }}>
-      <svg width="94px" height="94px" viewBox="0 0 94 94" version="1.1">
+      <svg className={props.className} viewBox="0 0 94 94" version="1.1">
         <title>形状结合</title>
         <g id="多签" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
           <g
             id="插件内无账号"
             transform="translate(-753.000000, -330.000000)"
-            fill={getMainColor(network)}
+            fill={getThemeVar(network, '@project-main-bg')}
             fillRule="nonzero"
           >
             <path

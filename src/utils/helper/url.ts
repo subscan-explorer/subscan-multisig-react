@@ -78,3 +78,12 @@ export function getInitialSetting<T = SettingValue | string>(key: SettingKey, de
 
   return (fromHash[key as keyof HashInfo] ?? fromStorage[key as keyof StorageInfo] ?? defaultValue) as unknown as T;
 }
+
+export function changeUrlHash(networkName: string) {
+  if (location.pathname === '/') {
+    location.hash = `${encodeURIComponent(`n=${networkName}`)}`;
+    location.reload();
+  } else {
+    location.replace(`/#${encodeURIComponent(`n=${networkName}`)}`);
+  }
+}

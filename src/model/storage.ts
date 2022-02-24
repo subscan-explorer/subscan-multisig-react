@@ -1,7 +1,8 @@
 import { THEME } from '../config';
-import { Network } from './network';
+import { Network, NetConfig } from './network';
 
 export interface StorageInfo {
   network?: Network;
   theme?: THEME;
+  customNetwork?: NetConfig;
 }

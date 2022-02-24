@@ -5,6 +5,10 @@ import { Network } from '../model';
 import { readStorage, updateStorage } from '../utils/helper/storage';
 
 export const toggleTheme = (theme: THEME, network: Network) => {
+  let networkName = network;
+  if (Object.keys(NETWORK_LIGHT_THEME).indexOf(networkName) < 0) {
+    networkName = 'polkadot';
+  }
   const networkTheme = theme === THEME.DARK ? NETWORK_DARK_THEME : NETWORK_LIGHT_THEME;
 
   if (document && document.documentElement) {
@@ -15,7 +19,7 @@ export const toggleTheme = (theme: THEME, network: Network) => {
     .modifyVars({
       ...SKIN_THEME[theme],
       ...SKIN_THEME.vars,
-      ...networkTheme[network],
+      ...networkTheme[networkName],
     })
     .then(() => {
       updateStorage({ theme });

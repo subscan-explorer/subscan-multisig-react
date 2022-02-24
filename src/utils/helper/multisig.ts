@@ -5,7 +5,6 @@ import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { u8aToHex } from '@polkadot/util';
 import { createKeyMulti } from '@polkadot/util-crypto';
 import store from 'store';
-import { NETWORKS } from '../../config';
 import { Network, ShareScope, WalletFormValue } from '../../model';
 
 interface MultiInfo {
@@ -117,13 +116,14 @@ export function updateMultiAccountScope(
   { share, scope = [], members, threshold }: WalletFormValue,
   network: Network
 ): void {
-  const networks = ShareScope.custom === share ? (scope as Network[]) : share === ShareScope.all ? NETWORKS : [network];
+  const saveScope =
+    ShareScope.custom === share ? (scope as Network[]) : share === ShareScope.all ? ShareScope.all : [network];
   const key = createKeyMulti(
     members.map((item) => item.address),
     threshold
   );
 
-  store.set(scopeKey(key), networks);
+  store.set(scopeKey(key), saveScope);
 }
 
 export function getMultiAccountScope(publicKey: Uint8Array): Network[] {
@@ -133,7 +133,11 @@ export function getMultiAccountScope(publicKey: Uint8Array): Network[] {
 }
 
 export function isInCurrentScope(publicKey: Uint8Array, network: Network): boolean {
-  const scope: Network[] = store.get(scopeKey(publicKey)) ?? null;
+  const savedScope = store.get(scopeKey(publicKey));
+  if (savedScope === ShareScope.all) {
+    return true;
+  }
 
+  const scope: Network[] = savedScope ?? null;
   return scope && scope.includes(network);
 }

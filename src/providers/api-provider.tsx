@@ -6,7 +6,8 @@ import React, { createContext, Dispatch, useCallback, useEffect, useReducer, use
 import { NETWORK_CONFIG } from '../config';
 import { Action, ConnectStatus, InjectedAccountWithMeta, NetConfig, Network } from '../model';
 import { convertToSS58, getInitialSetting, patchUrl } from '../utils';
-import { updateStorage } from '../utils/helper/storage';
+import { changeUrlHash } from '../utils/helper';
+import { readStorage, updateStorage } from '../utils/helper/storage';
 
 interface StoreState {
   accounts: InjectedAccountWithMeta[] | null;
@@ -68,7 +69,7 @@ export type ApiCtx = {
   switchNetwork: (type: Network) => void;
   setApi: (api: ApiPromise) => void;
   setRandom: (num: number) => void;
-  networkConfig: NetConfig;
+  networkConfig: NetConfig | undefined;
   chain: Chain;
   extensions: InjectedExtension[] | undefined;
 };
@@ -90,7 +91,9 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
   const [chain, setChain] = useState<Chain>({ ss58Format: '', tokens: [] });
   const [random, setRandom] = useState<number>(0);
   const [extensions, setExtensions] = useState<InjectedExtension[] | undefined>(undefined);
+  const [networkConfig, setNetworkConfig] = useState(NETWORK_CONFIG[state.network]);
 
+  // eslint-disable-next-line complexity
   useEffect(() => {
     /**
      * just for refresh purpose;
@@ -103,7 +106,21 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
       );
     }
 
-    const url = NETWORK_CONFIG[state.network].rpc;
+    const storage = readStorage();
+    let selectedNetwork: NetConfig = NETWORK_CONFIG[state.network];
+    if (!selectedNetwork) {
+      if (storage.customNetwork && storage.customNetwork.fullName === state.network) {
+        selectedNetwork = storage.customNetwork;
+      }
+    }
+    if (!selectedNetwork) {
+      changeUrlHash('polkadot');
+      return;
+    }
+
+    setNetworkConfig(selectedNetwork);
+
+    const url = selectedNetwork.rpc;
     const provider = new WsProvider(url);
     const nApi = new ApiPromise({
       provider,
@@ -177,7 +194,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
         setApi,
         setRandom,
         api,
-        networkConfig: NETWORK_CONFIG[state.network],
+        networkConfig,
         chain,
         extensions,
       }}

@@ -32,7 +32,7 @@ import i18n from '../config/i18n';
 import { useApi, useContacts } from '../hooks';
 import { MultisigAccountConfig, Network, ShareScope, WalletFormValue } from '../model';
 import { InjectedAccountWithMeta } from '../model/account';
-import { convertToSS58, findMultiAccount, getMainColor, updateMultiAccountScope } from '../utils';
+import { convertToSS58, findMultiAccount, getThemeVar, updateMultiAccountScope } from '../utils';
 
 interface LabelWithTipProps {
   name: string;
@@ -91,14 +91,14 @@ function confirmToAdd(accountExist: KeyringAddress, confirm: () => void) {
 
 export function WalletForm() {
   const { t } = useTranslation();
-  const { accounts, networkConfig, api, network } = useApi();
+  const { accounts, api, network, chain } = useApi();
   const { contacts } = useContacts();
   const [form] = useForm();
   const history = useHistory();
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
   const [shareScope, setShareScope] = useState<ShareScope>(ShareScope.all);
   const mainColor = useMemo(() => {
-    return getMainColor(network);
+    return getThemeVar(network, '@project-main-bg');
   }, [network]);
   const options = useMemo<{ label: string; value: string }[]>(() => {
     const accountOptions = accounts?.map(({ address, meta }) => ({
@@ -163,7 +163,7 @@ export function WalletForm() {
           const encodeMembers = config.members.map((member) => {
             return {
               name: member.name,
-              address: encodeAddress(member.address, networkConfig.ss58Prefix),
+              address: encodeAddress(member.address, Number(chain.ss58Format)),
             };
           });
           form.setFieldsValue({ threshold: config.threshold, name: config.name, members: encodeMembers });
@@ -199,7 +199,7 @@ export function WalletForm() {
         const signatories = members.map(({ address }) => address);
         const addressPair = members.map(({ address, ...other }) => ({
           ...other,
-          address: encodeAddress(address, networkConfig.ss58Prefix),
+          address: encodeAddress(address, Number(chain.ss58Format)),
         }));
         // Add external address to contact list.
         const addExternalToContact = () => {
@@ -298,7 +298,7 @@ export function WalletForm() {
                 {NETWORKS.map((net) => (
                   <Select.Option value={net} key={net}>
                     <Tag
-                      color={getMainColor(net as Network)}
+                      color={getThemeVar(net as Network, '@project-main-bg')}
                       style={{
                         borderRadius: '2px',
                       }}
@@ -349,7 +349,7 @@ export function WalletForm() {
                       { required: true, message: t('Account address is required') },
                       {
                         validator: (_, value) =>
-                          convertToSS58(value, networkConfig.ss58Prefix) ? Promise.resolve() : Promise.reject(),
+                          convertToSS58(value, Number(chain.ss58Format)) ? Promise.resolve() : Promise.reject(),
                         message: t('You must input a ss58 format address'),
                       },
                     ]}

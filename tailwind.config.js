@@ -31,6 +31,9 @@ module.exports = {
         kusama: {
           main: '#000',
         },
+        custom: {
+          main: '#e6007a',
+        },
         black: {
           800: '#302B3C',
         },

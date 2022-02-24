@@ -5,7 +5,7 @@ import { NetConfig } from '../model';
 import { useTranslation } from '../packages/react-signer/src/translate';
 import { Language } from './Language';
 
-export function Footer({ networkConfig, className = '' }: { networkConfig: NetConfig; className?: string }) {
+export function Footer({ networkConfig, className = '' }: { networkConfig?: NetConfig; className?: string }) {
   const { t } = useTranslation();
   const contactIcons = useMemo(
     () => [
@@ -43,8 +43,8 @@ export function Footer({ networkConfig, className = '' }: { networkConfig: NetCo
             <Menu>
               <Menu.Item>
                 <div className="flex flex-col items-center text-blue-400 hover:text-blue-600">
-                  <span>{t('donate_unit', { unit: networkConfig.token.native })}</span>
-                  <span>{networkConfig.donate.address}</span>
+                  <span>{t('donate_unit', { unit: networkConfig?.token?.native })}</span>
+                  <span>{networkConfig?.donate?.address}</span>
                 </div>
               </Menu.Item>
 

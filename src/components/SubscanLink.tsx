@@ -1,8 +1,7 @@
 import { Typography } from 'antd';
 import { CSSProperties, PropsWithChildren, useMemo } from 'react';
 import { CopyOutlined } from '@ant-design/icons';
-import { getMainColor } from '../utils';
-import { NETWORK_LIGHT_THEME } from '../config';
+import { getThemeVar } from '../utils';
 import { useApi } from '../hooks';
 
 const { Link } = Typography;
@@ -20,11 +19,11 @@ export function SubscanLink({ address, extrinsic, children, copyable, block, ...
   const { network } = useApi();
 
   const mainColor = useMemo(() => {
-    return getMainColor(network);
+    return getThemeVar(network, '@project-main-bg');
   }, [network]);
 
   const linkColor = useMemo(() => {
-    return NETWORK_LIGHT_THEME[network]['@link-color'];
+    return getThemeVar(network, '@link-color');
   }, [network]);
 
   if (address) {

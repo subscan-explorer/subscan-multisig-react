@@ -5,12 +5,14 @@ import { BlockAuthors, Events } from '@polkadot/react-query';
 import Signer from '@polkadot/react-signer';
 import { Alert, Button, Dropdown, Layout, Menu } from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Route, Switch } from 'react-router-dom';
-import { HeadAccounts } from './components/HeadAccounts';
+import subscanLogo from 'src/assets/images/subscan_logo.png';
 import { Footer } from './components/Footer';
-import { DownIcon } from './components/icons';
+import { HeadAccounts } from './components/HeadAccounts';
+import { AddIcon, DownIcon } from './components/icons';
+import { AddCustomRpcModal } from './components/modals/AddCustomRpcModal';
 import Status from './components/Status';
 import { ThemeSwitch } from './components/ThemeSwitch';
 import { NETWORK_CONFIG } from './config';
@@ -18,6 +20,7 @@ import { Path, routes } from './config/routes';
 import { useApi } from './hooks';
 import { Network } from './model';
 import { Connecting } from './pages/Connecting';
+import { changeUrlHash } from './utils';
 
 const genHeaderLinkStyle = (classes: TemplateStringsArray, network: Network) => {
   return `text-white opacity-80 hover:opacity-100 leading-normal whitespace-nowrap cursor-pointer transition-all duration-200 mr-4 dark:text-${network}-main ${classes.join(
@@ -40,6 +43,12 @@ function App() {
   );
   const headerLinkStyle = useMemo(() => genHeaderLinkStyle`${network}`, [network]);
 
+  const [customRpcModalVisible, setCustomRpcModalVisible] = useState(false);
+
+  const networkAlias = useMemo(() => {
+    return Object.keys(NETWORK_CONFIG).indexOf(network) >= 0 ? network : 'custom';
+  }, [network]);
+
   return (
     <>
       <GlobalStyle uiHighlight={uiHighlight} />
@@ -51,7 +60,7 @@ function App() {
           <span className="flex items-center justify-between">
             <Link to={Path.root} className="flex items-center mr-4">
               <img src="/image/logo@2x.png" style={{ width: '9rem' }} className="mr-4" />
-              <span className={`bg-white px-3 rounded-full leading-6 whitespace-nowrap text-${network}-main`}>
+              <span className={`bg-white px-3 rounded-full leading-6 whitespace-nowrap text-${networkAlias}-main`}>
                 {t('multisig.index')}
               </span>
             </Link>
@@ -74,29 +83,35 @@ function App() {
                       key={item.name}
                       onClick={() => {
                         if (item.name !== network) {
-                          if (location.pathname === '/') {
-                            location.hash = `${encodeURIComponent(`n=${item.name}`)}`;
-                            location.reload();
-                          } else {
-                            location.replace(`/#${encodeURIComponent(`n=${item.name}`)}`);
-                          }
+                          changeUrlHash(item.name);
                         }
                       }}
                     >
                       <div className="flex items-center gap-4">
-                        <img src={item.facade.logo} className="w-8 h-8" />
+                        <img src={item.facade?.logo || subscanLogo} className="w-8 h-8" />
                         <span>{item.fullName}</span>
                       </div>
                     </Menu.Item>
                   ))}
+                  <Menu.Item
+                    key="custom"
+                    onClick={() => {
+                      setCustomRpcModalVisible(true);
+                    }}
+                  >
+                    <div className="flex items-center gap-4">
+                      <AddIcon className="w-8 h-8" />
+                      <span>Use Custom</span>
+                    </div>
+                  </Menu.Item>
                 </Menu>
               }
               placement="bottomCenter"
               arrow
             >
               <Button className="flex justify-between items-center px-2 ">
-                <img src={networkConfig.facade.logo} className="w-6 h-6 mr-0 md:mr-2 " />
-                {networkConfig.fullName}
+                <img src={networkConfig?.facade?.logo || subscanLogo} className="w-6 h-6 mr-0 md:mr-2 " />
+                {networkConfig?.fullName}
                 <DownIcon />
               </Button>
             </Dropdown>
@@ -127,6 +142,8 @@ function App() {
       </Layout>
 
       {apiError && <Alert message={apiError} type="error" showIcon closable className="fixed top-24 right-20" />}
+
+      <AddCustomRpcModal visible={customRpcModalVisible} onCancel={() => setCustomRpcModalVisible(false)} />
     </>
   );
 }

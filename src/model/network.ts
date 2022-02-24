@@ -21,14 +21,14 @@ interface Donate {
 }
 
 export interface NetConfig {
-  facade: Facade;
   fullName: string;
   rpc: string;
-  ss58Prefix: SS58Prefix;
-  token: TokenRecord;
-  erc20: TokenRecord;
-  api: Api;
-  donate: Donate;
+  api?: Api;
+  facade?: Facade;
+  ss58Prefix?: SS58Prefix;
+  token?: TokenRecord;
+  erc20?: TokenRecord;
+  donate?: Donate;
 }
 
 export type NetworkConfig<T = NetConfig> = Config<Network, T>;
@@ -59,3 +59,8 @@ export type TxStatus =
  * pending: initial state, indicate that the connection never launched.
  */
 export type ConnectStatus = 'pending' | 'connecting' | 'success' | 'fail' | 'disconnected';
+
+export interface CustomNetConfig {
+  fullName: string;
+  rpc: string;
+}
