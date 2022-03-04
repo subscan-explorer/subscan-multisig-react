@@ -59,6 +59,12 @@ export function toShortString(str: string, maxLength: number): string {
   return `${str.substring(0, maxLength / 2)}...${str.substring(str.length - maxLength / 2)}`;
 }
 
-export function isCustomRpc(network: string): boolean {
-  return Object.keys(NETWORK_CONFIG).indexOf(network) < 0;
+export function isCustomRpc(rpc: string): boolean {
+  // eslint-disable-next-line no-console
+  console.log('rpc', rpc);
+  return (
+    Object.keys(NETWORK_CONFIG).filter((key) => {
+      return NETWORK_CONFIG[key as Network].rpc === rpc;
+    }).length === 0
+  );
 }

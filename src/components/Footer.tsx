@@ -1,12 +1,16 @@
 import { Dropdown, Layout, Menu, Typography } from 'antd';
 import { getYear } from 'date-fns';
 import { useMemo } from 'react';
+import { useApi } from 'src/hooks';
 import { NetConfig } from '../model';
 import { useTranslation } from '../packages/react-signer/src/translate';
 import { Language } from './Language';
+import { ThemeSwitch } from './ThemeSwitch';
 
 export function Footer({ networkConfig, className = '' }: { networkConfig?: NetConfig; className?: string }) {
   const { t } = useTranslation();
+  const { network } = useApi();
+
   const contactIcons = useMemo(
     () => [
       { href: 'https://twitter.com/subscan_io/', icon: 'twitter-black' },
@@ -59,7 +63,7 @@ export function Footer({ networkConfig, className = '' }: { networkConfig?: NetC
           <Typography.Link
             target="__blank"
             rel="noopener"
-            className="bg-white flex items-center justify-center rounded"
+            className="bg-white flex items-center justify-center rounded opacity-40"
             style={{ width: 30, height: 30 }}
           >
             <img src={`/icons/donate.svg`} className="w-6 h-6" />
@@ -72,7 +76,7 @@ export function Footer({ networkConfig, className = '' }: { networkConfig?: NetC
             rel="noopener"
             href={href}
             key={icon}
-            className="bg-white flex items-center justify-center rounded"
+            className="bg-white flex items-center justify-center rounded opacity-40"
             style={{ width: 30, height: 30 }}
           >
             <img src={`/icons/${icon}.svg`} className="w-4 h-4" />
@@ -80,6 +84,8 @@ export function Footer({ networkConfig, className = '' }: { networkConfig?: NetC
         ))}
 
         <Language />
+
+        <ThemeSwitch network={network} />
       </div>
     </Layout.Footer>
   );

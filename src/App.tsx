@@ -3,7 +3,7 @@ import GlobalStyle from '@polkadot/react-components/styles';
 import { useApi as usePolkaApi } from '@polkadot/react-hooks';
 import { BlockAuthors, Events } from '@polkadot/react-query';
 import Signer from '@polkadot/react-signer';
-import { Alert, Button, Dropdown, Layout, Menu } from 'antd';
+import { Alert, Button, Layout } from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,16 +11,15 @@ import { Link, Route, Switch } from 'react-router-dom';
 import subscanLogo from 'src/assets/images/subscan_logo.png';
 import { Footer } from './components/Footer';
 import { HeadAccounts } from './components/HeadAccounts';
-import { AddIcon, DownIcon } from './components/icons';
+import { DownIcon } from './components/icons';
 import { AddCustomRpcModal } from './components/modals/AddCustomRpcModal';
+import { SelectNetworkModal } from './components/modals/SelectNetworkModal';
 import Status from './components/Status';
-import { ThemeSwitch } from './components/ThemeSwitch';
 import { NETWORK_CONFIG } from './config';
 import { Path, routes } from './config/routes';
 import { useApi } from './hooks';
 import { Network } from './model';
 import { Connecting } from './pages/Connecting';
-import { changeUrlHash } from './utils';
 
 const genHeaderLinkStyle = (classes: TemplateStringsArray, network: Network) => {
   return `text-white opacity-80 hover:opacity-100 leading-normal whitespace-nowrap cursor-pointer transition-all duration-200 mr-4 dark:text-${network}-main ${classes.join(
@@ -36,7 +35,7 @@ function App() {
     () => (networkStatus === 'success' ? '/image/polka-check.png' : '/image/polka-cross.png'),
     [networkStatus]
   );
-  const networks = useMemo(() => Object.entries(NETWORK_CONFIG).map(([key, value]) => ({ name: key, ...value })), []);
+  // const networks = useMemo(() => Object.entries(NETWORK_CONFIG).map(([key, value]) => ({ name: key, ...value })), []);
   const uiHighlight = useMemo(
     () => (isDevelopment ? undefined : getSystemColor(systemChain, systemName, specName)),
     [isDevelopment, specName, systemChain, systemName]
@@ -48,6 +47,8 @@ function App() {
   const networkAlias = useMemo(() => {
     return Object.keys(NETWORK_CONFIG).indexOf(network) >= 0 ? network : 'custom';
   }, [network]);
+
+  const [selectNetworkModalVisible, setSelectNetworkModalVisible] = useState(false);
 
   return (
     <>
@@ -75,7 +76,18 @@ function App() {
 
             <HeadAccounts />
 
-            <Dropdown
+            <Button
+              className="flex justify-between items-center px-2 "
+              onClick={() => {
+                setSelectNetworkModalVisible(true);
+              }}
+            >
+              <img src={networkConfig?.facade?.logo || subscanLogo} className="w-6 h-6 mr-0 md:mr-2 " />
+              {networkConfig?.fullName}
+              <DownIcon />
+            </Button>
+
+            {/* <Dropdown
               overlay={
                 <Menu>
                   {networks.map((item) => (
@@ -114,9 +126,9 @@ function App() {
                 {networkConfig?.fullName}
                 <DownIcon />
               </Button>
-            </Dropdown>
+            </Dropdown> */}
 
-            <ThemeSwitch network={network} />
+            {/* <ThemeSwitch network={network} /> */}
           </div>
         </Header>
 
@@ -144,6 +156,8 @@ function App() {
       {apiError && <Alert message={apiError} type="error" showIcon closable className="fixed top-24 right-20" />}
 
       <AddCustomRpcModal visible={customRpcModalVisible} onCancel={() => setCustomRpcModalVisible(false)} />
+
+      <SelectNetworkModal visible={selectNetworkModalVisible} onCancel={() => setSelectNetworkModalVisible(false)} />
     </>
   );
 }

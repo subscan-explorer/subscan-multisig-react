@@ -6,11 +6,13 @@ import { readStorage } from './storage';
 interface HashInfo {
   network?: Network;
   toAccount?: string;
+  rpc?: string;
 }
 
 interface HashShort {
   n?: Network;
   t?: string;
+  r?: string;
 }
 
 type SettingKey = keyof StorageInfo | keyof HashInfo;
@@ -25,6 +27,7 @@ export type AdapterMap<T extends object, D extends object> = {
 const toShort: AdapterMap<HashInfo, HashShort> = {
   network: 'n',
   toAccount: 't',
+  rpc: 'r',
 };
 
 const toLong: AdapterMap<HashShort, HashInfo> = Object.entries(toShort).reduce(
@@ -79,11 +82,11 @@ export function getInitialSetting<T = SettingValue | string>(key: SettingKey, de
   return (fromHash[key as keyof HashInfo] ?? fromStorage[key as keyof StorageInfo] ?? defaultValue) as unknown as T;
 }
 
-export function changeUrlHash(networkName: string) {
+export function changeUrlHash(rpcUrl: string) {
   if (location.pathname === '/') {
-    location.hash = `${encodeURIComponent(`n=${networkName}`)}`;
+    location.hash = `${encodeURIComponent(`r=${rpcUrl}`)}`;
     location.reload();
   } else {
-    location.replace(`/#${encodeURIComponent(`n=${networkName}`)}`);
+    location.replace(`/#${encodeURIComponent(`r=${rpcUrl}`)}`);
   }
 }

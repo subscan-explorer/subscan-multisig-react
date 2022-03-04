@@ -12,6 +12,7 @@ import { readStorage, updateStorage } from '../utils/helper/storage';
 interface StoreState {
   accounts: InjectedAccountWithMeta[] | null;
   network: Network;
+  rpc: string;
   networkStatus: ConnectStatus;
 }
 
@@ -27,13 +28,14 @@ export interface Chain {
 
 type ActionType = 'switchNetwork' | 'updateNetworkStatus' | 'setAccounts';
 
-const cacheNetwork = (network: Network): void => {
-  patchUrl({ network });
+const cacheNetwork = (network: Network, rpc: string): void => {
+  patchUrl({ rpc });
   updateStorage({ network });
 };
 
 const initialState: StoreState = {
-  network: getInitialSetting<Network>('network', 'pangolin'),
+  network: getInitialSetting<Network>('network', 'polkadot'),
+  rpc: getInitialSetting<string>('rpc', 'wss://rpc.polkadot.io'),
   accounts: null,
   networkStatus: 'pending',
 };
@@ -63,6 +65,7 @@ export type ApiCtx = {
   api: ApiPromise | null;
   dispatch: Dispatch<Action<ActionType>>;
   network: Network;
+  rpc: string;
   networkStatus: ConnectStatus;
   setAccounts: (accounts: InjectedAccountWithMeta[]) => void;
   setNetworkStatus: (status: ConnectStatus) => void;
@@ -107,17 +110,27 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
     }
 
     const storage = readStorage();
-    let selectedNetwork: NetConfig = NETWORK_CONFIG[state.network];
+    let selectedNetwork: NetConfig | null = null;
+    let networkName: Network = 'polkadot';
+    Object.keys(NETWORK_CONFIG).forEach((key) => {
+      if (NETWORK_CONFIG[key as Network].rpc === state.rpc) {
+        selectedNetwork = NETWORK_CONFIG[key as Network];
+        networkName = key as Network;
+      }
+    });
+
     if (!selectedNetwork) {
-      if (storage.customNetwork && storage.customNetwork.fullName === state.network) {
+      if (storage.customNetwork && storage.customNetwork.rpc === state.rpc) {
         selectedNetwork = storage.customNetwork;
+        networkName = 'polkadot';
       }
     }
     if (!selectedNetwork) {
-      changeUrlHash('polkadot');
+      changeUrlHash(NETWORK_CONFIG['polkadot'].rpc);
       return;
     }
 
+    switchNetwork(networkName);
     setNetworkConfig(selectedNetwork);
 
     const url = selectedNetwork.rpc;
@@ -133,7 +146,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
 
       setExtensions(exts);
       setApi(nApi);
-      cacheNetwork(state.network);
+      cacheNetwork(state.network, state.rpc);
     };
 
     setNetworkStatus('connecting');
@@ -143,7 +156,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
     return () => {
       nApi.off('ready', onReady);
     };
-  }, [state.network, setNetworkStatus, random]);
+  }, [state.network, setNetworkStatus, random, state.rpc, switchNetwork]);
 
   /**
    * connect to substrate or metamask when account type changed.

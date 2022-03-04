@@ -171,5 +171,11 @@
     "Invalid Address": "Please input valid address",
     "Add External Address": "Add external address to contact"
   },
-  "zh": "中文"
+  "zh": "中文",
+  "custom": {
+    "custom rpc endpoint": "Custom RPC Endpoint",
+    "add custom endpoint": "Add Custom Endpoint",
+    "websocket": "Websocket",
+    "duplicate websocket": "Duplicate Websocket"
+  }
 }

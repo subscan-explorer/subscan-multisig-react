@@ -169,5 +169,11 @@
     "Add Contact": "添加联系人",
     "Invalid Address": "请输入正确的地址",
     "Add External Address": "将外部账号加入联系人列表"
+  },
+  "custom": {
+    "custom rpc endpoint": "自定义网络节点",
+    "add custom endpoint": "添加自定义节点",
+    "websocket": "Websocket",
+    "duplicate websocket": "重复的Websocket节点"
   }
 }

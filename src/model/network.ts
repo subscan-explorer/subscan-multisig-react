@@ -29,6 +29,7 @@ export interface NetConfig {
   token?: TokenRecord;
   erc20?: TokenRecord;
   donate?: Donate;
+  isTest?: boolean;
 }
 
 export type NetworkConfig<T = NetConfig> = Config<Network, T>;

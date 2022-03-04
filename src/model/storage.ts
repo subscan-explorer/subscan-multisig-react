@@ -5,4 +5,5 @@ export interface StorageInfo {
   network?: Network;
   theme?: THEME;
   customNetwork?: NetConfig;
+  addedCustomNetworks?: NetConfig[];
 }

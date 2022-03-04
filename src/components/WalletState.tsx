@@ -23,7 +23,7 @@ const { Text } = Typography;
 export function WalletState() {
   const { t } = useTranslation();
   const history = useHistory();
-  const { network } = useApi();
+  const { network, rpc } = useApi();
   const {
     multisigAccount,
     setMultisigAccount,
@@ -41,10 +41,10 @@ export function WalletState() {
 
   const { isCustomNetwork, mainColor } = useMemo(() => {
     return {
-      isCustomNetwork: isCustomRpc(network),
+      isCustomNetwork: isCustomRpc(rpc),
       mainColor: getThemeVar(network, '@project-main-bg'),
     };
-  }, [network]);
+  }, [rpc, network]);
 
   const states = useMemo<{ label: string; count: number | undefined }[]>(() => {
     const res = [];

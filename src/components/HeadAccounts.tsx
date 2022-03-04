@@ -1,9 +1,10 @@
-import { DownOutlined, PlusCircleFilled, DeleteOutlined } from '@ant-design/icons';
+import { DownOutlined, DeleteOutlined } from '@ant-design/icons';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import keyring from '@polkadot/ui-keyring';
 import { Popover, Tabs, Typography, Button, message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getThemeVar } from 'src/utils';
 import { useApi, useContacts } from '../hooks';
 import { Network } from '../model';
 import { AddContactModal } from './AddContactModal';
@@ -24,6 +25,10 @@ export const HeadAccounts = () => {
   const [addContactModalVisible, setAddContactModalVisible] = useState(false);
 
   const headerLinkStyle = useMemo(() => genHeaderLinkStyle`${network}`, [network]);
+
+  const mainColor = useMemo(() => {
+    return getThemeVar(network, '@project-main-bg');
+  }, [network]);
 
   useEffect(() => {
     if (popoverVisible) {
@@ -63,18 +68,18 @@ export const HeadAccounts = () => {
                 </div>
 
                 <div className="flex justify-end md:mt-2">
-                  <div
+                  <Button
+                    type="default"
+                    size="large"
+                    className="flex justify-center items-center w-full"
+                    style={{ color: mainColor }}
                     onClick={() => {
                       setAddContactModalVisible(true);
                       setPopoverVisible(false);
                     }}
-                    style={{ cursor: 'pointer' }}
-                    className="flex items-center"
                   >
-                    <PlusCircleFilled className="highlight--color md:mr-1" />
-
-                    <Typography.Text>{t('contact.Add Contact')}</Typography.Text>
-                  </div>
+                    {t('contact.Add Contact')}
+                  </Button>
                 </div>
               </div>
             </TabPane>

@@ -143,7 +143,7 @@ function ConfirmedOrCancelled({ nodes, account, loading, isConfirmed }: Confirme
 /* -----------------------------------extrinsic tabs------------------------------------ */
 
 export function ExtrinsicRecords() {
-  const { network } = useApi();
+  const { rpc } = useApi();
   const { t } = useTranslation();
   const { account: multiAddress } = useParams<{ account: string }>();
   const { multisigAccount, inProgress, confirmedAccount, cancelledAccount, queryInProgress, loadingInProgress } =
@@ -152,9 +152,9 @@ export function ExtrinsicRecords() {
 
   const { isCustomNetwork } = useMemo(() => {
     return {
-      isCustomNetwork: isCustomRpc(network),
+      isCustomNetwork: isCustomRpc(rpc),
     };
-  }, [network]);
+  }, [rpc]);
 
   const [fetchConfimed, { data: confirmedData, loading: loadingConfirmed }] = useManualQuery<MultisigRecordsQueryRes>(
     MULTISIG_RECORD_QUERY,

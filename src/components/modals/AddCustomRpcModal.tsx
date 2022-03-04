@@ -1,5 +1,6 @@
 import { Button, Col, Input, message, Modal, Row } from 'antd';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NETWORK_CONFIG } from 'src/config';
 import { useApi } from 'src/hooks';
 import { changeUrlHash, getThemeVar } from 'src/utils';
@@ -11,6 +12,7 @@ interface AddCustomRpcModalProps {
 }
 
 export const AddCustomRpcModal = (props: AddCustomRpcModalProps) => {
+  const { t } = useTranslation();
   const { network } = useApi();
   const mainColor = useMemo(() => {
     return getThemeVar(network, '@project-main-bg');
@@ -27,14 +29,16 @@ export const AddCustomRpcModal = (props: AddCustomRpcModalProps) => {
       destroyOnClose
       onCancel={props.onCancel}
       bodyStyle={{
-        paddingLeft: '80px',
-        paddingRight: '80px',
-        paddingBottom: '60px',
+        paddingLeft: '20px',
+        paddingRight: '20px',
+        paddingBottom: '30px',
       }}
     >
-      <div className="text-center text-black-800 text-xl font-semibold leading-none">Custom RPC Endpoint</div>
+      <div className="text-center text-black-800 text-xl font-semibold leading-none">
+        {t('custom.custom rpc endpoint')}
+      </div>
 
-      <div className="text-sm text-black-800 font-semibold mt-6 mb-1">Name</div>
+      <div className="text-sm text-black-800 font-semibold mt-6 mb-1">{t('name')}</div>
 
       <Input
         value={rpcName}
@@ -43,7 +47,7 @@ export const AddCustomRpcModal = (props: AddCustomRpcModalProps) => {
         }}
       />
 
-      <div className="text-sm text-black-800 font-semibold mt-6 mb-1">Rpc</div>
+      <div className="text-sm text-black-800 font-semibold mt-6 mb-1">{t('websocket')}</div>
 
       <Input
         value={rpcUrl}
@@ -73,10 +77,10 @@ export const AddCustomRpcModal = (props: AddCustomRpcModalProps) => {
                 },
               });
               props.onCancel();
-              changeUrlHash(rpcName);
+              changeUrlHash(rpcUrl);
             }}
           >
-            OK
+            {t('save')}
           </Button>
         </Col>
 
@@ -88,7 +92,7 @@ export const AddCustomRpcModal = (props: AddCustomRpcModalProps) => {
             }}
             onClick={props.onCancel}
           >
-            Cancel
+            {t('cancel')}
           </Button>
         </Col>
       </Row>

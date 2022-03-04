@@ -34,7 +34,7 @@ export const MultisigContext = createContext<{
 
 export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) => {
   const [isPageLocked, setIsPageLock] = useState<boolean>(false);
-  const { network } = useApi();
+  const { rpc } = useApi();
   const value = useMultisig();
   const { account } = useParams<{ account: string }>();
   const [fetchData, { data }] = useManualQuery<{ multisigRecords: { totalCount: number } }>(
@@ -45,10 +45,10 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
     }
   );
   const refreshConfirmedAccount = useCallback(() => {
-    if (!isCustomRpc(network)) {
+    if (!isCustomRpc(rpc)) {
       fetchData({ variables: { account, status: 'confirmed' }, skipCache: true });
     }
-  }, [account, fetchData, network]);
+  }, [account, fetchData, rpc]);
 
   const [fetchCancelledData, { data: cancelledData }] = useManualQuery<{ multisigRecords: { totalCount: number } }>(
     MULTISIG_RECORD_COUNT_QUERY,
@@ -59,10 +59,10 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
   );
 
   const refreshCancelledAccount = useCallback(() => {
-    if (!isCustomRpc(network)) {
+    if (!isCustomRpc(rpc)) {
       fetchCancelledData({ variables: { account, status: 'cancelled' }, skipCache: true });
     }
-  }, [account, fetchCancelledData, network]);
+  }, [account, fetchCancelledData, rpc]);
 
   useEffect(() => {
     refreshConfirmedAccount();
