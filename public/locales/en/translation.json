@@ -176,7 +176,10 @@
     "custom rpc endpoint": "Custom RPC Endpoint",
     "add custom endpoint": "Add Custom Endpoint",
     "websocket": "Websocket",
-    "duplicate websocket": "Duplicate Websocket"
+    "duplicate websocket": "Duplicate Websocket",
+    "add custom network success": "Add custom network success"
   },
-  "network not supported": "This network is not currently supported"
+  "network not supported": "This network is not currently supported",
+  "remark": "Remark",
+  "endpoint": "Endpoint"
 }

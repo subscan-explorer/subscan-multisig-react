@@ -43,6 +43,9 @@ export const HeadAccounts = () => {
         trigger="click"
         visible={popoverVisible}
         onVisibleChange={setPopoverVisible}
+        overlayInnerStyle={{
+          borderRadius: '0.15rem',
+        }}
         content={
           <Tabs defaultActiveKey="1">
             <TabPane tab={t('My Account')} key="1">

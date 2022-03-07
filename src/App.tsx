@@ -12,7 +12,6 @@ import subscanLogo from 'src/assets/images/subscan_logo.png';
 import { Footer } from './components/Footer';
 import { HeadAccounts } from './components/HeadAccounts';
 import { DownIcon } from './components/icons';
-import { AddCustomRpcModal } from './components/modals/AddCustomRpcModal';
 import { SelectNetworkModal } from './components/modals/SelectNetworkModal';
 import Status from './components/Status';
 import { NETWORK_CONFIG } from './config';
@@ -42,8 +41,6 @@ function App() {
     [isDevelopment, specName, systemChain, systemName]
   );
   const headerLinkStyle = useMemo(() => genHeaderLinkStyle`${network}`, [network]);
-
-  const [customRpcModalVisible, setCustomRpcModalVisible] = useState(false);
 
   const networkAlias = useMemo(() => {
     return Object.keys(NETWORK_CONFIG).indexOf(network) >= 0 ? network : 'custom';
@@ -112,8 +109,6 @@ function App() {
       </Layout>
 
       {apiError && <Alert message={apiError} type="error" showIcon closable className="fixed top-24 right-20" />}
-
-      <AddCustomRpcModal visible={customRpcModalVisible} onCancel={() => setCustomRpcModalVisible(false)} />
 
       <SelectNetworkModal visible={selectNetworkModalVisible} onCancel={() => setSelectNetworkModalVisible(false)} />
     </>

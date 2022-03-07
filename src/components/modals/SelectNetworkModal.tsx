@@ -105,6 +105,12 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
         updateCustomNetworks();
         setRpcName('');
         setRpcUrl('');
+
+        selectCustomNetwork({
+          fullName: rpcName.trim(),
+          rpc: rpcUrl.trim(),
+        });
+        props.onCancel();
       };
 
       api.on('ready', onReady);
@@ -372,7 +378,7 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
                   }
                   trigger={['click']}
                   placement="bottomCenter"
-                  className="mr-3"
+                  className="mr-3 rounded-none"
                 >
                   <SettingOutlined
                     className="rounded-full opacity-40 cursor-pointer p-1"
@@ -393,6 +399,7 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
             <div className="w-36">
               <Input
                 value={rpcName}
+                placeholder={t('remark')}
                 onChange={(e) => {
                   setRpcName(e.target.value);
                 }}
@@ -402,6 +409,7 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
             <Input
               className="mx-3"
               value={rpcUrl}
+              placeholder={t('endpoint')}
               onChange={(e) => {
                 setRpcUrl(e.target.value);
               }}
