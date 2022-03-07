@@ -78,7 +78,7 @@ export function Wallets() {
   }, [network]);
 
   const renderAddress = (address: string) => (
-    <Link to={Path.extrinsic + '/' + address} style={{ color: linkColor }}>
+    <Link to={Path.extrinsic + '/' + address + history.location.hash} style={{ color: linkColor }}>
       {address}
     </Link>
   );
@@ -94,7 +94,7 @@ export function Wallets() {
               type="primary"
               className="flex items-center justify-center h-7"
               onClick={() => {
-                history.push(Path.extrinsic + '/' + row.address);
+                history.push(Path.extrinsic + '/' + row.address + history.location.hash);
               }}
               style={{
                 borderRadius: '4px',
@@ -228,7 +228,7 @@ export function Wallets() {
             Please create Multisig wallet first
           </div>
 
-          <Link to={Path.wallet}>
+          <Link to={Path.wallet + history.location.hash}>
             <Button type="primary" className="w-44">
               {t('wallet.add')}
             </Button>
@@ -240,7 +240,7 @@ export function Wallets() {
 
   return (
     <Space direction="vertical" className="absolute top-4 bottom-4 left-4 right-4 overflow-auto" id="wallets">
-      <Link to={Path.wallet}>
+      <Link to={Path.wallet + history.location.hash}>
         <Button type="primary" className="w-44">
           {t('wallet.add')}
         </Button>

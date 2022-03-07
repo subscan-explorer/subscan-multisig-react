@@ -7,7 +7,7 @@ import { Alert, Button, Layout } from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Route, Switch } from 'react-router-dom';
+import { Link, Route, Switch, useHistory } from 'react-router-dom';
 import subscanLogo from 'src/assets/images/subscan_logo.png';
 import { Footer } from './components/Footer';
 import { HeadAccounts } from './components/HeadAccounts';
@@ -29,6 +29,7 @@ const genHeaderLinkStyle = (classes: TemplateStringsArray, network: Network) => 
 
 function App() {
   const { t } = useTranslation();
+  const history = useHistory();
   const { networkStatus, network, networkConfig } = useApi();
   const { systemChain, systemName, specName, isDevelopment, apiError } = usePolkaApi();
   const polkaLogo = useMemo(
@@ -59,7 +60,7 @@ function App() {
           style={{ marginTop: -1 }}
         >
           <span className="flex items-center justify-between">
-            <Link to={Path.root} className="flex items-center mr-4">
+            <Link to={Path.root + history.location.hash} className="flex items-center mr-4">
               <img src="/image/logo@2x.png" style={{ width: '9rem' }} className="mr-4" />
               <span className={`bg-white px-3 rounded-full leading-6 whitespace-nowrap text-${networkAlias}-main`}>
                 {t('multisig.index')}
@@ -86,49 +87,6 @@ function App() {
               {networkConfig?.fullName}
               <DownIcon />
             </Button>
-
-            {/* <Dropdown
-              overlay={
-                <Menu>
-                  {networks.map((item) => (
-                    <Menu.Item
-                      key={item.name}
-                      onClick={() => {
-                        if (item.name !== network) {
-                          changeUrlHash(item.name);
-                        }
-                      }}
-                    >
-                      <div className="flex items-center gap-4">
-                        <img src={item.facade?.logo || subscanLogo} className="w-8 h-8" />
-                        <span>{item.fullName}</span>
-                      </div>
-                    </Menu.Item>
-                  ))}
-                  <Menu.Item
-                    key="custom"
-                    onClick={() => {
-                      setCustomRpcModalVisible(true);
-                    }}
-                  >
-                    <div className="flex items-center gap-4">
-                      <AddIcon className="w-8 h-8" />
-                      <span>Use Custom</span>
-                    </div>
-                  </Menu.Item>
-                </Menu>
-              }
-              placement="bottomCenter"
-              arrow
-            >
-              <Button className="flex justify-between items-center px-2 ">
-                <img src={networkConfig?.facade?.logo || subscanLogo} className="w-6 h-6 mr-0 md:mr-2 " />
-                {networkConfig?.fullName}
-                <DownIcon />
-              </Button>
-            </Dropdown> */}
-
-            {/* <ThemeSwitch network={network} /> */}
           </div>
         </Header>
 

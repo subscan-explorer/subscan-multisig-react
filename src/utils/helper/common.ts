@@ -60,8 +60,6 @@ export function toShortString(str: string, maxLength: number): string {
 }
 
 export function isCustomRpc(rpc: string): boolean {
-  // eslint-disable-next-line no-console
-  console.log('rpc', rpc);
   return (
     Object.keys(NETWORK_CONFIG).filter((key) => {
       return NETWORK_CONFIG[key as Network].rpc === rpc;
