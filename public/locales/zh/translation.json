@@ -175,5 +175,6 @@
     "add custom endpoint": "添加自定义节点",
     "websocket": "Websocket",
     "duplicate websocket": "重复的Websocket节点"
-  }
+  },
+  "network not supported": "暂不支持该网络"
 }

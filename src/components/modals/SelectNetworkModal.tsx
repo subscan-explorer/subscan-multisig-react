@@ -1,5 +1,8 @@
-import { CloseOutlined, SearchOutlined, SettingOutlined } from '@ant-design/icons';
-import { Button, Col, Dropdown, Input, message, Modal, Row, Menu } from 'antd';
+import { CloseOutlined, SettingOutlined } from '@ant-design/icons';
+import { ApiPromise } from '@polkadot/api';
+import { WsProvider } from '@polkadot/rpc-provider';
+import { Button, Col, Dropdown, Input, Menu, message, Modal, Row } from 'antd';
+import classNames from 'classnames';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import subscanLogo from 'src/assets/images/subscan_logo.png';
@@ -8,7 +11,7 @@ import { useApi } from 'src/hooks';
 import { NetConfig } from 'src/model';
 import { changeUrlHash, getThemeVar } from 'src/utils';
 import { readStorage, updateStorage } from 'src/utils/helper/storage';
-import classNames from 'classnames';
+import { ConfirmDialog } from './ConfirmDialog';
 
 interface SelectNetworkModalProps {
   visible: boolean;
@@ -22,7 +25,6 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
     return getThemeVar(network, '@project-main-bg');
   }, [network]);
 
-  const [searchWord, setSearchWord] = useState('');
   const [rpcName, setRpcName] = useState('');
   const [rpcUrl, setRpcUrl] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
@@ -30,6 +32,21 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
   const networks = useMemo(() => Object.entries(NETWORK_CONFIG).map(([key, value]) => ({ name: key, ...value })), []);
 
   const [customNetworks, setCustomNetworks] = useState<NetConfig[]>([]);
+
+  const [addNetworkLoading, setAddNetworkLoading] = useState(false);
+  const [addNetworkErrorDialogVisible, setAddNetworkErrorDialogVisible] = useState(false);
+  const [editingNetworkKey, setEditingNetworkKey] = useState('');
+  const [editingNetworkRpcName, setEditingNetworkRpcName] = useState('');
+  const [editingNetworkRpcUrl, setEditingNetworkRpcUrl] = useState('');
+
+  useEffect(() => {
+    setEditingNetworkKey('');
+    setEditingNetworkRpcName('');
+    setEditingNetworkRpcUrl('');
+    setRpcName('');
+    setRpcUrl('');
+    setShowCustomInput(false);
+  }, [props.visible]);
 
   const updateCustomNetworks = () => {
     const storage = readStorage();
@@ -41,36 +58,124 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
       return;
     }
 
-    const storage = readStorage();
-    const oldCustomNetworks = storage.addedCustomNetworks || [];
+    setAddNetworkLoading(true);
+    try {
+      const provider = new WsProvider(rpcUrl);
+      const api = new ApiPromise({
+        provider,
+      });
 
-    let duplicate = false;
-    networks.forEach((networkItem) => {
-      if (networkItem.rpc === rpcUrl.trim()) {
-        duplicate = true;
-        return;
-      }
-    });
-    oldCustomNetworks.forEach((networkItem) => {
-      if (networkItem.rpc === rpcUrl.trim()) {
-        duplicate = true;
-        return;
-      }
-    });
+      const onReady = async () => {
+        setAddNetworkLoading(false);
 
-    if (duplicate) {
-      message.warn(t('custom.duplicate websocket url'));
+        if (!api.query.multisig) {
+          setAddNetworkErrorDialogVisible(true);
+          return;
+        }
+
+        api.off('ready', onReady);
+
+        const storage = readStorage();
+        const oldCustomNetworks = storage.addedCustomNetworks || [];
+
+        let duplicate = false;
+        networks.forEach((networkItem) => {
+          if (networkItem.rpc === rpcUrl.trim()) {
+            duplicate = true;
+            return;
+          }
+        });
+        oldCustomNetworks.forEach((networkItem) => {
+          if (networkItem.rpc === rpcUrl.trim()) {
+            duplicate = true;
+            return;
+          }
+        });
+
+        if (duplicate) {
+          message.warn(t('custom.duplicate websocket url'));
+          return;
+        }
+
+        oldCustomNetworks.push({
+          fullName: rpcName.trim(),
+          rpc: rpcUrl.trim(),
+        });
+        updateStorage({ addedCustomNetworks: oldCustomNetworks });
+        updateCustomNetworks();
+        setRpcName('');
+        setRpcUrl('');
+      };
+
+      api.on('ready', onReady);
+    } catch {
+      setAddNetworkLoading(false);
+      setAddNetworkErrorDialogVisible(true);
+    }
+  };
+
+  const updateCustomNetwork = () => {
+    if (!editingNetworkRpcName.trim() || !editingNetworkRpcUrl.trim() || !editingNetworkKey) {
       return;
     }
 
-    oldCustomNetworks.push({
-      fullName: rpcName.trim(),
-      rpc: rpcUrl.trim(),
-    });
-    updateStorage({ addedCustomNetworks: oldCustomNetworks });
-    updateCustomNetworks();
-    setRpcName('');
-    setRpcUrl('');
+    setAddNetworkLoading(true);
+    try {
+      const provider = new WsProvider(editingNetworkRpcUrl);
+      const api = new ApiPromise({
+        provider,
+      });
+
+      const onReady = async () => {
+        setAddNetworkLoading(false);
+
+        if (!api.query.multisig) {
+          setAddNetworkErrorDialogVisible(true);
+          return;
+        }
+
+        api.off('ready', onReady);
+
+        const storage = readStorage();
+        const oldCustomNetworks = storage.addedCustomNetworks || [];
+
+        let duplicate = false;
+        networks.forEach((networkItem) => {
+          if (networkItem.rpc === editingNetworkRpcUrl.trim()) {
+            duplicate = true;
+            return;
+          }
+        });
+        oldCustomNetworks.forEach((networkItem) => {
+          if (networkItem.rpc === editingNetworkRpcUrl.trim() && editingNetworkKey !== editingNetworkRpcUrl.trim()) {
+            duplicate = true;
+            return;
+          }
+        });
+
+        if (duplicate) {
+          message.warn(t('custom.duplicate websocket url'));
+          return;
+        }
+
+        const networkIndex = oldCustomNetworks.findIndex((networkItem) => networkItem.rpc === editingNetworkKey);
+        oldCustomNetworks.splice(networkIndex, 1, {
+          fullName: editingNetworkRpcName,
+          rpc: editingNetworkRpcUrl,
+        });
+
+        updateStorage({ addedCustomNetworks: oldCustomNetworks });
+        updateCustomNetworks();
+        setEditingNetworkRpcName('');
+        setEditingNetworkRpcUrl('');
+        setEditingNetworkKey('');
+      };
+
+      api.on('ready', onReady);
+    } catch {
+      setAddNetworkLoading(false);
+      setAddNetworkErrorDialogVisible(true);
+    }
   };
 
   const deleteCustomNetwork = (networkItem: NetConfig) => {
@@ -105,6 +210,7 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
     if (!netConfig.fullName || !netConfig.rpc) {
       return;
     }
+
     updateStorage({
       customNetwork: {
         fullName: netConfig.fullName,
@@ -130,15 +236,7 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
         paddingBottom: '30px',
       }}
     >
-      <div className="flex items-center">
-        <Input
-          value={searchWord}
-          prefix={<SearchOutlined style={{ color: mainColor }} />}
-          onChange={(e) => {
-            setSearchWord(e.target.value);
-          }}
-        />
-
+      <div className="flex items-center justify-end">
         <CloseOutlined className="cursor-pointer ml-2" style={{ color: '#666666' }} onClick={props.onCancel} />
       </div>
 
@@ -198,50 +296,90 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
         <div className="mt-2 bg-divider" style={{ height: '1px' }} />
 
         <div className="pt-3">
-          {customNetworks.map((networkItem) => (
-            <div
-              key={networkItem.rpc}
-              className="mb-3 bg-gray-200 h-10 cursor-pointer flex items-center justify-between"
-            >
-              <div className="flex items-center flex-1" onClick={() => selectCustomNetwork(networkItem)}>
-                <div className="font-bold text-black-800 leading-none ml-3" style={{ fontSize: '14px' }}>
-                  {networkItem.fullName}
+          {customNetworks.map((networkItem) =>
+            editingNetworkKey === networkItem.rpc ? (
+              <div className={classNames('flex items-center mb-3')} key={`${networkItem.rpc}-edit`}>
+                <div className="w-36">
+                  <Input
+                    value={editingNetworkRpcName}
+                    onChange={(e) => {
+                      setEditingNetworkRpcName(e.target.value);
+                    }}
+                  />
                 </div>
 
-                <div className="leading-none opacity-40 ml-5" style={{ fontSize: '14px', color: mainColor }}>
-                  {networkItem.rpc}
-                </div>
-              </div>
+                <Input
+                  className="mx-3"
+                  value={editingNetworkRpcUrl}
+                  onChange={(e) => {
+                    setEditingNetworkRpcUrl(e.target.value);
+                  }}
+                />
 
-              <Dropdown
-                overlay={
-                  <Menu>
-                    {/* <Menu.Item key="1">Edit</Menu.Item> */}
-                    <Menu.Item
-                      key="2"
-                      onClick={() => {
-                        deleteCustomNetwork(networkItem);
-                      }}
-                    >
-                      Delete
-                    </Menu.Item>
-                  </Menu>
-                }
-                trigger={['click']}
-                placement="bottomCenter"
-                className="mr-3"
-              >
-                <SettingOutlined
-                  className="rounded-full opacity-40 cursor-pointer p-1"
+                <Button
+                  loading={addNetworkLoading}
                   style={{
                     color: mainColor,
-                    backgroundColor: mainColor + '40',
                   }}
-                  onClick={(e) => e.preventDefault()}
-                />
-              </Dropdown>
-            </div>
-          ))}
+                  onClick={updateCustomNetwork}
+                >
+                  {t('save')}
+                </Button>
+              </div>
+            ) : (
+              <div
+                key={networkItem.rpc}
+                className="mb-3 bg-gray-200 h-10 cursor-pointer flex items-center justify-between"
+              >
+                <div className="flex items-center flex-1" onClick={() => selectCustomNetwork(networkItem)}>
+                  <div className="font-bold text-black-800 leading-none ml-3" style={{ fontSize: '14px' }}>
+                    {networkItem.fullName}
+                  </div>
+
+                  <div className="leading-none opacity-40 ml-5" style={{ fontSize: '14px', color: mainColor }}>
+                    {networkItem.rpc}
+                  </div>
+                </div>
+
+                <Dropdown
+                  overlay={
+                    <Menu>
+                      <Menu.Item
+                        key="1"
+                        onClick={() => {
+                          setEditingNetworkKey(networkItem.rpc);
+                          setEditingNetworkRpcName(networkItem.fullName);
+                          setEditingNetworkRpcUrl(networkItem.rpc);
+                        }}
+                      >
+                        Edit
+                      </Menu.Item>
+                      <Menu.Item
+                        key="2"
+                        onClick={() => {
+                          deleteCustomNetwork(networkItem);
+                        }}
+                      >
+                        Delete
+                      </Menu.Item>
+                    </Menu>
+                  }
+                  trigger={['click']}
+                  placement="bottomCenter"
+                  className="mr-3"
+                >
+                  <SettingOutlined
+                    className="rounded-full opacity-40 cursor-pointer p-1"
+                    style={{
+                      color: mainColor,
+                      backgroundColor: mainColor + '40',
+                    }}
+                    onClick={(e) => e.preventDefault()}
+                  />
+                </Dropdown>
+              </div>
+            )
+          )}
         </div>
 
         {showCustomInput && (
@@ -264,6 +402,7 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
             />
 
             <Button
+              loading={addNetworkLoading}
               style={{
                 color: mainColor,
               }}
@@ -288,6 +427,14 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
           </Col>
         </Row>
       </div>
+
+      <ConfirmDialog
+        title="Error"
+        content={t('network not supported')}
+        visible={addNetworkErrorDialogVisible}
+        onCancel={() => setAddNetworkErrorDialogVisible(false)}
+        onConfirm={() => setAddNetworkErrorDialogVisible(false)}
+      />
     </Modal>
   );
 };

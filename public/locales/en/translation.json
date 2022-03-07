@@ -177,5 +177,6 @@
     "add custom endpoint": "Add Custom Endpoint",
     "websocket": "Websocket",
     "duplicate websocket": "Duplicate Websocket"
-  }
+  },
+  "network not supported": "This network is not currently supported"
 }
