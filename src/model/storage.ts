@@ -6,4 +6,5 @@ export interface StorageInfo {
   theme?: THEME;
   customNetwork?: NetConfig;
   addedCustomNetworks?: NetConfig[];
+  selectedRpc?: string;
 }

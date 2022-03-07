@@ -204,6 +204,9 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
     }
     props.onCancel();
     changeUrlHash(netConfig.rpc);
+    updateStorage({
+      selectedRpc: netConfig.rpc,
+    });
   };
 
   const selectCustomNetwork = (netConfig: NetConfig) => {
@@ -219,6 +222,9 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
     });
     props.onCancel();
     changeUrlHash(netConfig.rpc);
+    updateStorage({
+      selectedRpc: netConfig.rpc,
+    });
   };
 
   return (

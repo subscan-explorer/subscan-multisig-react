@@ -35,7 +35,7 @@ const cacheNetwork = (network: Network, rpc: string): void => {
 
 const initialState: StoreState = {
   network: getInitialSetting<Network>('network', 'polkadot'),
-  rpc: getInitialSetting<string>('rpc', 'wss://rpc.polkadot.io'),
+  rpc: getInitialSetting<string>('rpc', ''),
   accounts: null,
   networkStatus: 'pending',
 };
@@ -110,6 +110,26 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
     }
 
     const storage = readStorage();
+    if (!state.rpc) {
+      if (storage.selectedRpc) {
+        let hasMatch = false;
+        Object.keys(NETWORK_CONFIG).forEach((key) => {
+          if (NETWORK_CONFIG[key as Network].rpc === storage.selectedRpc) {
+            hasMatch = true;
+          }
+        });
+        storage.addedCustomNetworks?.forEach((networkItem) => {
+          if (networkItem.rpc === storage.selectedRpc) {
+            hasMatch = true;
+          }
+        });
+        if (hasMatch) {
+          changeUrlHash(storage.selectedRpc);
+          return;
+        }
+      }
+    }
+
     let selectedNetwork: NetConfig | null = null;
     let networkName: Network = 'polkadot';
     Object.keys(NETWORK_CONFIG).forEach((key) => {
