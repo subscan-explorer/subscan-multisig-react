@@ -124,7 +124,8 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
           }
         });
         if (hasMatch) {
-          changeUrlHash(storage.selectedRpc);
+          location.hash = `${encodeURIComponent(`r=${storage.selectedRpc}`)}`;
+          location.reload();
           return;
         }
       }
