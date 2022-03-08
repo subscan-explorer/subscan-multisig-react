@@ -67,13 +67,14 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
 
       const onReady = async () => {
         setAddNetworkLoading(false);
+        api.off('ready', onReady);
+        api.off('error', onError);
+        api.off('disconnected', onError);
 
         if (!api.query.multisig) {
           setAddNetworkErrorDialogVisible(true);
           return;
         }
-
-        api.off('ready', onReady);
 
         const storage = readStorage();
         const oldCustomNetworks = storage.addedCustomNetworks || [];
@@ -113,7 +114,17 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
         props.onCancel();
       };
 
+      const onError = async () => {
+        setAddNetworkLoading(false);
+
+        api.off('ready', onReady);
+        api.off('error', onError);
+        api.off('disconnected', onError);
+      };
+
       api.on('ready', onReady);
+      api.on('error', onError);
+      api.on('disconnected', onError);
     } catch {
       setAddNetworkLoading(false);
       setAddNetworkErrorDialogVisible(true);
