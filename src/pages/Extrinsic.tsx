@@ -22,7 +22,7 @@ export function Extrinsic() {
   const [fetchMultisigDetail, { data: multisigDetail }] = useManualQuery<{
     multisigAccount: { id: string; threshold: number; members: string[] };
   }>(MULTISIG_ACCOUNT_DETAIL_QUERY, {
-    variables: { ss58Account },
+    variables: { account: ss58Account },
     skipCache: true,
   });
 
@@ -30,7 +30,7 @@ export function Extrinsic() {
     const localMultisig = keyring.getAccount(ss58Account);
 
     if (!localMultisig) {
-      fetchMultisigDetail({ variables: { ss58Account }, skipCache: true });
+      fetchMultisigDetail({ variables: { account: ss58Account }, skipCache: true });
     } else {
       setMultisig(keyring.getAccount(ss58Account));
     }
