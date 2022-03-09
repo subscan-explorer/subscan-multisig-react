@@ -70,6 +70,7 @@ export const NETWORK_CONFIG: NetworkConfig = {
     },
   },
   pangolin: {
+    isTest: true,
     facade: {
       logo: '/image/pangolin-button-mobile.png',
       logoWithText: '/image/pangolin-logo.svg',

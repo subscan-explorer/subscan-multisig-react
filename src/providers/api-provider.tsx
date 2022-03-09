@@ -6,11 +6,13 @@ import React, { createContext, Dispatch, useCallback, useEffect, useReducer, use
 import { NETWORK_CONFIG } from '../config';
 import { Action, ConnectStatus, InjectedAccountWithMeta, NetConfig, Network } from '../model';
 import { convertToSS58, getInitialSetting, patchUrl } from '../utils';
-import { updateStorage } from '../utils/helper/storage';
+import { changeUrlHash } from '../utils/helper';
+import { readStorage, updateStorage } from '../utils/helper/storage';
 
 interface StoreState {
   accounts: InjectedAccountWithMeta[] | null;
   network: Network;
+  rpc: string;
   networkStatus: ConnectStatus;
 }
 
@@ -26,13 +28,14 @@ export interface Chain {
 
 type ActionType = 'switchNetwork' | 'updateNetworkStatus' | 'setAccounts';
 
-const cacheNetwork = (network: Network): void => {
-  patchUrl({ network });
+const cacheNetwork = (network: Network, rpc: string): void => {
+  patchUrl({ rpc });
   updateStorage({ network });
 };
 
 const initialState: StoreState = {
-  network: getInitialSetting<Network>('network', 'pangolin'),
+  network: getInitialSetting<Network>('network', 'polkadot'),
+  rpc: getInitialSetting<string>('rpc', ''),
   accounts: null,
   networkStatus: 'pending',
 };
@@ -62,13 +65,14 @@ export type ApiCtx = {
   api: ApiPromise | null;
   dispatch: Dispatch<Action<ActionType>>;
   network: Network;
+  rpc: string;
   networkStatus: ConnectStatus;
   setAccounts: (accounts: InjectedAccountWithMeta[]) => void;
   setNetworkStatus: (status: ConnectStatus) => void;
   switchNetwork: (type: Network) => void;
   setApi: (api: ApiPromise) => void;
   setRandom: (num: number) => void;
-  networkConfig: NetConfig;
+  networkConfig: NetConfig | undefined;
   chain: Chain;
   extensions: InjectedExtension[] | undefined;
 };
@@ -90,7 +94,9 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
   const [chain, setChain] = useState<Chain>({ ss58Format: '', tokens: [] });
   const [random, setRandom] = useState<number>(0);
   const [extensions, setExtensions] = useState<InjectedExtension[] | undefined>(undefined);
+  const [networkConfig, setNetworkConfig] = useState(NETWORK_CONFIG[state.network]);
 
+  // eslint-disable-next-line complexity
   useEffect(() => {
     /**
      * just for refresh purpose;
@@ -103,7 +109,52 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
       );
     }
 
-    const url = NETWORK_CONFIG[state.network].rpc;
+    const storage = readStorage();
+    if (!state.rpc) {
+      if (storage.selectedRpc) {
+        let hasMatch = false;
+        Object.keys(NETWORK_CONFIG).forEach((key) => {
+          if (NETWORK_CONFIG[key as Network].rpc === storage.selectedRpc) {
+            hasMatch = true;
+          }
+        });
+        storage.addedCustomNetworks?.forEach((networkItem) => {
+          if (networkItem.rpc === storage.selectedRpc) {
+            hasMatch = true;
+          }
+        });
+        if (hasMatch) {
+          location.hash = `${encodeURIComponent(`r=${storage.selectedRpc}`)}`;
+          location.reload();
+          return;
+        }
+      }
+    }
+
+    let selectedNetwork: NetConfig | null = null;
+    let networkName: Network = 'polkadot';
+    Object.keys(NETWORK_CONFIG).forEach((key) => {
+      if (NETWORK_CONFIG[key as Network].rpc === state.rpc) {
+        selectedNetwork = NETWORK_CONFIG[key as Network];
+        networkName = key as Network;
+      }
+    });
+
+    if (!selectedNetwork) {
+      if (storage.customNetwork && storage.customNetwork.rpc === state.rpc) {
+        selectedNetwork = storage.customNetwork;
+        networkName = 'polkadot';
+      }
+    }
+    if (!selectedNetwork) {
+      changeUrlHash(NETWORK_CONFIG['polkadot'].rpc);
+      return;
+    }
+
+    switchNetwork(networkName);
+    setNetworkConfig(selectedNetwork);
+
+    const url = selectedNetwork.rpc;
     const provider = new WsProvider(url);
     const nApi = new ApiPromise({
       provider,
@@ -116,7 +167,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
 
       setExtensions(exts);
       setApi(nApi);
-      cacheNetwork(state.network);
+      cacheNetwork(state.network, state.rpc);
     };
 
     setNetworkStatus('connecting');
@@ -126,7 +177,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
     return () => {
       nApi.off('ready', onReady);
     };
-  }, [state.network, setNetworkStatus, random]);
+  }, [state.network, setNetworkStatus, random, state.rpc, switchNetwork]);
 
   /**
    * connect to substrate or metamask when account type changed.
@@ -177,7 +228,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
         setApi,
         setRandom,
         api,
-        networkConfig: NETWORK_CONFIG[state.network],
+        networkConfig,
         chain,
         extensions,
       }}

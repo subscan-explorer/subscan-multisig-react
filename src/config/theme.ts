@@ -13,6 +13,21 @@ import kusama from '../theme/network/kusama.json';
 import pangolin from '../theme/network/pangolin.json';
 import polkadot from '../theme/network/polkadot.json';
 
+export type ThemeVariable =
+  | '@btn-border-radius-base'
+  | '@btn-default-bg'
+  | '@btn-default-border'
+  | '@btn-primary-bg'
+  | '@card-radius'
+  | '@layout-header-background'
+  | '@project-main-bg'
+  | '@project-radius-base'
+  | '@tabs-active-color'
+  | '@tabs-highlight-color'
+  | '@tabs-hover-color'
+  | '@tabs-ink-bar-color'
+  | '@link-color';
+
 export const NETWORK_LIGHT_THEME: NetworkConfig<{ [key in keyof typeof darwinia]: string }> = {
   crab,
   darwinia,

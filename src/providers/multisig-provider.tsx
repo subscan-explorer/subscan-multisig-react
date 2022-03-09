@@ -4,9 +4,9 @@ import { useManualQuery } from 'graphql-hooks';
 import { createContext, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { MULTISIG_RECORD_COUNT_QUERY } from '../config';
-import { useMultisig } from '../hooks';
+import { useMultisig, useApi } from '../hooks';
 import { Entry } from '../model';
-import { empty } from '../utils';
+import { empty, isCustomRpc } from '../utils';
 
 export const MultisigContext = createContext<{
   inProgress: Entry[];
@@ -34,6 +34,7 @@ export const MultisigContext = createContext<{
 
 export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) => {
   const [isPageLocked, setIsPageLock] = useState<boolean>(false);
+  const { rpc } = useApi();
   const value = useMultisig();
   const { account } = useParams<{ account: string }>();
   const [fetchData, { data }] = useManualQuery<{ multisigRecords: { totalCount: number } }>(
@@ -43,10 +44,12 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
       skipCache: true,
     }
   );
-  const refreshConfirmedAccount = useCallback(
-    () => fetchData({ variables: { account, status: 'confirmed' }, skipCache: true }),
-    [account, fetchData]
-  );
+  const refreshConfirmedAccount = useCallback(() => {
+    if (!isCustomRpc(rpc)) {
+      fetchData({ variables: { account, status: 'confirmed' }, skipCache: true });
+    }
+  }, [account, fetchData, rpc]);
+
   const [fetchCancelledData, { data: cancelledData }] = useManualQuery<{ multisigRecords: { totalCount: number } }>(
     MULTISIG_RECORD_COUNT_QUERY,
     {
@@ -54,16 +57,17 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
       skipCache: true,
     }
   );
-  const refreshCancelledAccount = useCallback(
-    () => fetchCancelledData({ variables: { account, status: 'cancelled' }, skipCache: true }),
-    [account, fetchCancelledData]
-  );
+
+  const refreshCancelledAccount = useCallback(() => {
+    if (!isCustomRpc(rpc)) {
+      fetchCancelledData({ variables: { account, status: 'cancelled' }, skipCache: true });
+    }
+  }, [account, fetchCancelledData, rpc]);
 
   useEffect(() => {
     refreshConfirmedAccount();
     refreshCancelledAccount();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [refreshConfirmedAccount, refreshCancelledAccount]);
 
   return (
     <MultisigContext.Provider

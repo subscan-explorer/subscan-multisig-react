@@ -197,15 +197,17 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
       <div className="record-expand bg-gray-100 py-3 px-5">
         <div className=" text-black-800 text-base leading-none mb-3">{t('progress')}</div>
 
-        <Table
-          columns={progressColumnsNested}
-          dataSource={account.meta.addressPair as { key: string; name: string; address: string }[]}
-          pagination={false}
-          bordered
-          rowKey="address"
-          showHeader={false}
-          className="mb-4 mx-4"
-        />
+        <div className="members">
+          <Table
+            columns={progressColumnsNested}
+            dataSource={account.meta.addressPair as { key: string; name: string; address: string }[]}
+            pagination={false}
+            bordered
+            rowKey="address"
+            showHeader={false}
+            className="mb-4 mx-4"
+          />
+        </div>
 
         <div className=" text-black-800 text-base leading-none my-3">{t('parameters')}</div>
 

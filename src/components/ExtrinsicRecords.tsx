@@ -1,15 +1,15 @@
 import { ReloadOutlined } from '@ant-design/icons';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { Space, Spin, Tabs } from 'antd';
-import { useQuery } from 'graphql-hooks';
+import { useManualQuery } from 'graphql-hooks';
 import { isNumber } from 'lodash';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { MULTISIG_RECORD_QUERY } from '../config';
 import { useApi } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
-import { IExtrinsic, parseArgs } from '../utils';
+import { IExtrinsic, isCustomRpc, parseArgs } from '../utils';
 import { Entries } from './Entries';
 
 interface MultisigRecordsQueryRes {
@@ -143,53 +143,72 @@ function ConfirmedOrCancelled({ nodes, account, loading, isConfirmed }: Confirme
 /* -----------------------------------extrinsic tabs------------------------------------ */
 
 export function ExtrinsicRecords() {
+  const { rpc } = useApi();
   const { t } = useTranslation();
   const { account: multiAddress } = useParams<{ account: string }>();
   const { multisigAccount, inProgress, confirmedAccount, cancelledAccount, queryInProgress, loadingInProgress } =
     useMultisigContext();
   const [tabKey, setTabKey] = useState('inProgress');
 
-  const {
-    data: confirmedData,
-    refetch: refetchConfimed,
-    loading: loadingConfirmed,
-  } = useQuery<MultisigRecordsQueryRes>(MULTISIG_RECORD_QUERY, {
-    variables: {
-      account: multiAddress,
-      status: 'confirmed',
-      offset: 0,
-      limit: 10,
-    },
-  });
+  const { isCustomNetwork } = useMemo(() => {
+    return {
+      isCustomNetwork: isCustomRpc(rpc),
+    };
+  }, [rpc]);
 
-  const {
-    data: cancelledData,
-    refetch: refetchCancelled,
-    loading: loadingCancelled,
-  } = useQuery<MultisigRecordsQueryRes>(MULTISIG_RECORD_QUERY, {
-    variables: {
-      account: multiAddress,
-      status: 'cancelled',
-      offset: 0,
-      limit: 10,
-    },
-  });
+  const [fetchConfimed, { data: confirmedData, loading: loadingConfirmed }] = useManualQuery<MultisigRecordsQueryRes>(
+    MULTISIG_RECORD_QUERY,
+    {
+      variables: {
+        account: multiAddress,
+        status: 'confirmed',
+        offset: 0,
+        limit: 10,
+      },
+    }
+  );
 
+  const [fetchCancelled, { data: cancelledData, loading: loadingCancelled }] = useManualQuery<MultisigRecordsQueryRes>(
+    MULTISIG_RECORD_QUERY,
+    {
+      variables: {
+        account: multiAddress,
+        status: 'cancelled',
+        offset: 0,
+        limit: 10,
+      },
+    }
+  );
+
+  useEffect(() => {
+    if (!isCustomNetwork) {
+      fetchConfimed();
+      fetchCancelled();
+    }
+  }, [isCustomNetwork, fetchCancelled, fetchConfimed]);
+
+  // eslint-disable-next-line complexity
   const handleChangeTab = (key: string) => {
     setTabKey(key);
     if (key === 'inProgress') {
       queryInProgress();
     } else if (key === 'confirmed') {
-      refetchConfimed();
+      if (!isCustomNetwork) {
+        fetchConfimed();
+      }
     } else if (key === 'cancelled') {
-      refetchCancelled();
+      if (!isCustomNetwork) {
+        fetchCancelled();
+      }
     }
   };
 
   const refreshData = () => {
     queryInProgress();
-    refetchConfimed();
-    refetchCancelled();
+    if (!isCustomNetwork) {
+      fetchConfimed();
+      fetchCancelled();
+    }
   };
 
   return (
@@ -213,40 +232,44 @@ export function ExtrinsicRecords() {
             <Spin className="w-full mt-4" />
           )}
         </TabPane>
-        <TabPane
-          tab={
-            <Space>
-              <span>{t('multisig.Confirmed Extrinsic')}</span>
-              <span>{confirmedAccount}</span>
-            </Space>
-          }
-          key="confirmed"
-        >
-          <ConfirmedOrCancelled
-            nodes={confirmedData?.multisigRecords?.nodes || []}
-            loading={loadingConfirmed}
-            account={multisigAccount}
-            multiAddress={multiAddress}
-            isConfirmed
-          />
-        </TabPane>
-        <TabPane
-          tab={
-            <Space>
-              <span>{t('multisig.Cancelled Extrinsic')}</span>
-              <span>{cancelledAccount}</span>
-            </Space>
-          }
-          key="cancelled"
-        >
-          <ConfirmedOrCancelled
-            nodes={cancelledData?.multisigRecords?.nodes || []}
-            loading={loadingCancelled}
-            account={multisigAccount}
-            multiAddress={multiAddress}
-            isConfirmed={false}
-          />
-        </TabPane>
+        {!isCustomNetwork && (
+          <>
+            <TabPane
+              tab={
+                <Space>
+                  <span>{t('multisig.Confirmed Extrinsic')}</span>
+                  <span>{confirmedAccount}</span>
+                </Space>
+              }
+              key="confirmed"
+            >
+              <ConfirmedOrCancelled
+                nodes={confirmedData?.multisigRecords?.nodes || []}
+                loading={loadingConfirmed}
+                account={multisigAccount}
+                multiAddress={multiAddress}
+                isConfirmed
+              />
+            </TabPane>
+            <TabPane
+              tab={
+                <Space>
+                  <span>{t('multisig.Cancelled Extrinsic')}</span>
+                  <span>{cancelledAccount}</span>
+                </Space>
+              }
+              key="cancelled"
+            >
+              <ConfirmedOrCancelled
+                nodes={cancelledData?.multisigRecords?.nodes || []}
+                loading={loadingCancelled}
+                account={multisigAccount}
+                multiAddress={multiAddress}
+                isConfirmed={false}
+              />
+            </TabPane>
+          </>
+        )}
       </Tabs>
     </div>
   );

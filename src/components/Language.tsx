@@ -42,7 +42,7 @@ export function Language({ network, className = '' }: LanguageProps) {
       className={className}
     >
       <Button
-        className={`${textColor} flex items-center justify-around uppercase`}
+        className={`${textColor} flex items-center justify-around uppercase opacity-40`}
         icon={
           <EarthIcon style={{ color: (network && NETWORK_LIGHT_THEME[network]['@project-main-bg']) || 'inherit' }} />
         }

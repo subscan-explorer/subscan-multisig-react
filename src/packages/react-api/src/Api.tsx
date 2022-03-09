@@ -202,13 +202,9 @@ function Api({ children, store }: Props): React.ReactElement<Props> | null {
     isApiReady: false,
   } as unknown as ApiState);
   const [apiError, setApiError] = useState<null | string>(null);
-  const {
-    api: iApi,
-    networkConfig: { rpc: url },
-    extensions,
-    networkStatus,
-    setNetworkStatus,
-  } = useApi();
+  const { api: iApi, networkConfig, extensions, networkStatus, setNetworkStatus } = useApi();
+
+  const url = networkConfig ? networkConfig.rpc : '';
 
   const value = useMemo<ApiProps>(
     () => ({

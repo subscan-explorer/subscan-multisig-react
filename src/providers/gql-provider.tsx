@@ -12,11 +12,11 @@ export const GqlProvider = ({ children }: React.PropsWithChildren<unknown>) => {
 
   const value = useMemo(() => {
     const client = new GraphQLClient({
-      url: isDev && network === 'pangolin' ? subqlDev : networkConfig.api.subql || subqlDev,
+      url: isDev && network === 'pangolin' ? subqlDev : networkConfig?.api?.subql || subqlDev,
     });
 
     return client;
-  }, [network, networkConfig.api.subql]);
+  }, [network, networkConfig]);
 
   return <ClientContext.Provider value={value}>{children}</ClientContext.Provider>;
 };

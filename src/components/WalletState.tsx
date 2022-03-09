@@ -7,8 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import iconDown from 'src/assets/images/icon_down.svg';
 import { saveAs } from 'file-saver';
-import { getMainColor } from '../utils';
-import { getMultiAccountScope } from '../utils/helper';
+import { getThemeVar } from '../utils';
+import { getMultiAccountScope, isCustomRpc } from '../utils/helper';
 import { LONG_DURATION } from '../config';
 import { useApi, useIsInjected } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
@@ -23,7 +23,7 @@ const { Text } = Typography;
 export function WalletState() {
   const { t } = useTranslation();
   const history = useHistory();
-  const { network } = useApi();
+  const { network, rpc } = useApi();
   const {
     multisigAccount,
     setMultisigAccount,
@@ -39,17 +39,23 @@ export function WalletState() {
   const [renameInput, setRenameInput] = useState('');
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
-  const mainColor = useMemo(() => {
-    return getMainColor(network);
-  }, [network]);
+  const { isCustomNetwork, mainColor } = useMemo(() => {
+    return {
+      isCustomNetwork: isCustomRpc(rpc),
+      mainColor: getThemeVar(network, '@project-main-bg'),
+    };
+  }, [rpc, network]);
 
-  const states = useMemo<{ label: string; count: number | undefined }[]>(
-    () => [
-      {
-        label: 'multisig.In Progress',
-        count: inProgress.length,
-      },
-      { label: 'multisig.Confirmed Extrinsic', count: confirmedAccount },
+  const states = useMemo<{ label: string; count: number | undefined }[]>(() => {
+    const res = [];
+    res.push({
+      label: 'multisig.In Progress',
+      count: inProgress.length,
+    });
+    if (!isCustomNetwork) {
+      res.push({ label: 'multisig.Confirmed Extrinsic', count: confirmedAccount });
+    }
+    res.push(
       {
         label: 'multisig.Threshold',
         count: multisigAccount?.meta.threshold as number,
@@ -58,10 +64,16 @@ export function WalletState() {
         label: 'multisig.Members',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         count: (multisigAccount?.meta.who as any)?.length as number,
-      },
-    ],
-    [inProgress.length, confirmedAccount, multisigAccount?.meta.threshold, multisigAccount?.meta.who]
-  );
+      }
+    );
+    return res;
+  }, [
+    inProgress.length,
+    confirmedAccount,
+    multisigAccount?.meta.threshold,
+    multisigAccount?.meta.who,
+    isCustomNetwork,
+  ]);
   const renameWallet = useCallback(
     ({ name }: { name: string }) => {
       try {

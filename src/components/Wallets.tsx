@@ -7,11 +7,10 @@ import { ColumnsType } from 'antd/lib/table';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
-import { NETWORK_CONFIG, NETWORK_LIGHT_THEME } from '../config';
 import { Path } from '../config/routes';
 import { useApi, useIsInjected } from '../hooks';
 import { Chain } from '../providers';
-import { accuracyFormat, convertToSS58, isInCurrentScope } from '../utils';
+import { accuracyFormat, convertToSS58, getThemeVar, isInCurrentScope } from '../utils';
 import { genExpandMembersIcon } from './expandIcon';
 import { AddIcon } from './icons';
 import { MemberList } from './Members';
@@ -29,7 +28,9 @@ const renderBalances = (account: KeyringAddress, chain: Chain) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { value, kton } = account as any;
   const { tokens } = chain;
-  return tokens.map(({ decimal, symbol }) => {
+
+  if (tokens.length > 0) {
+    const { decimal, symbol } = tokens[0];
     let amount = '';
 
     if (symbol.toLocaleLowerCase().includes('kton')) {
@@ -43,7 +44,25 @@ const renderBalances = (account: KeyringAddress, chain: Chain) => {
         {accuracyFormat(amount, decimal)} {symbol}
       </p>
     );
-  });
+  }
+
+  return null;
+
+  // return tokens.map(({ decimal, symbol }) => {
+  //   let amount = '';
+
+  //   if (symbol.toLocaleLowerCase().includes('kton')) {
+  //     amount = kton;
+  //   } else {
+  //     amount = value;
+  //   }
+
+  //   return (
+  //     <p key={symbol} className="whitespace-nowrap">
+  //       {accuracyFormat(amount, decimal)} {symbol}
+  //     </p>
+  //   );
+  // });
 };
 
 export function Wallets() {
@@ -55,11 +74,11 @@ export function Wallets() {
   const [isCalculating, setIsCalculating] = useState<boolean>(true);
 
   const linkColor = useMemo(() => {
-    return NETWORK_LIGHT_THEME[network]['@link-color'];
+    return getThemeVar(network, '@link-color');
   }, [network]);
 
   const renderAddress = (address: string) => (
-    <Link to={Path.extrinsic + '/' + address} style={{ color: linkColor }}>
+    <Link to={Path.extrinsic + '/' + address + history.location.hash} style={{ color: linkColor }}>
       {address}
     </Link>
   );
@@ -70,18 +89,24 @@ export function Wallets() {
 
       return (
         <Space size="middle">
-          <Button
-            type="primary"
-            className="flex items-center justify-center h-7"
-            onClick={() => {
-              history.push(Path.extrinsic + '/' + row.address);
-            }}
-            style={{
-              borderRadius: '4px',
-            }}
-          >
-            Actions
-          </Button>
+          <div className="flex items-center">
+            <Button
+              type="primary"
+              className="flex items-center justify-center h-7"
+              onClick={() => {
+                history.push(Path.extrinsic + '/' + row.address + history.location.hash);
+              }}
+              style={{
+                borderRadius: '4px',
+              }}
+            >
+              Actions
+            </Button>
+
+            {(row as unknown as any).entries && (row as unknown as any).entries.length > 0 && (
+              <div className="ml-2 bg-red-500 rounded-full w-3 h-3"></div>
+            )}
+          </div>
         </Space>
       );
     },
@@ -145,7 +170,7 @@ export function Wallets() {
     ];
 
     return (
-      <div className="multisig-list-expand bg-gray-100 p-5">
+      <div className="multisig-list-expand bg-gray-100 p-5 members">
         <Table
           columns={columnsNested}
           dataSource={record.meta.addressPair as KeyringJson[]}
@@ -173,7 +198,7 @@ export function Wallets() {
       setMultisigAccounts(
         accounts.map((item, index) => {
           (item.meta.addressPair as KeyringJson[]).forEach((key) => {
-            key.address = convertToSS58(key.address, NETWORK_CONFIG[network].ss58Prefix);
+            key.address = convertToSS58(key.address, Number(chain.ss58Format));
           });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const source = (balances as any)[index] as unknown as any;
@@ -187,7 +212,7 @@ export function Wallets() {
       );
       setIsCalculating(false);
     })();
-  }, [api, network]);
+  }, [api, network, chain]);
 
   if (!isCalculating && multisigAccounts.length === 0) {
     return (
@@ -197,13 +222,13 @@ export function Wallets() {
         id="wallets"
       >
         <div className="flex flex-col items-center">
-          <AddIcon />
+          <AddIcon className="w-24 h-24" />
 
           <div className="text-black-800 font-semibold text-xl lg:mt-16 lg:mb-10 mt-6 mb-4">
             Please create Multisig wallet first
           </div>
 
-          <Link to={Path.wallet}>
+          <Link to={Path.wallet + history.location.hash}>
             <Button type="primary" className="w-44">
               {t('wallet.add')}
             </Button>
@@ -215,7 +240,7 @@ export function Wallets() {
 
   return (
     <Space direction="vertical" className="absolute top-4 bottom-4 left-4 right-4 overflow-auto" id="wallets">
-      <Link to={Path.wallet}>
+      <Link to={Path.wallet + history.location.hash}>
         <Button type="primary" className="w-44">
           {t('wallet.add')}
         </Button>

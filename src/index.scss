@@ -144,6 +144,13 @@ body {
   overflow: hidden;
 }
 
+.members {
+  .ant-table-cell {
+    padding: 2px 10px;
+    height: 45px;
+  }
+}
+
 .record-table,
 .multisig-list-table {
   tr.ant-table-expanded-row > td {
@@ -162,11 +169,6 @@ body {
       .ant-table-container {
         border-radius: 0;
       }
-    }
-
-    .ant-table-cell {
-      padding: 2px 10px;
-      height: 45px;
     }
   }
 }
@@ -208,39 +210,53 @@ body {
     -webkit-box-shadow: 0 0 0 2px #d9d9d990 !important;
     box-shadow: 0 0 0 3px #00000008 !important;
   }
+}
 
-  .ant-input-affix-wrapper {
+.ant-input-affix-wrapper {
+  border-radius: 0.15rem !important;
+  border-color: #d9d9d9 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+
+  &:hover {
     border-radius: 0.15rem !important;
     border-color: #d9d9d9 !important;
-    outline: 0 !important;
+    box-shadow: none !important;
+  }
+
+  &:focus {
+    border-radius: 0.15rem !important;
+    border-color: #d9d9d9 !important;
+    box-shadow: none !important;
+  }
+
+  .ant-input {
     box-shadow: none !important;
 
     &:hover {
-      border-radius: 0.15rem !important;
-      border-color: #d9d9d9 !important;
       box-shadow: none !important;
     }
 
     &:focus {
-      border-radius: 0.15rem !important;
-      border-color: #d9d9d9 !important;
       box-shadow: none !important;
-    }
-
-    .ant-input {
-      box-shadow: none !important;
-
-      &:hover {
-        box-shadow: none !important;
-      }
-
-      &:focus {
-        box-shadow: none !important;
-      }
     }
   }
 }
 
 .ant-alert {
   border-radius: 0.15rem !important;
+}
+
+.ant-dropdown-menu {
+  border-radius: 0.15rem !important;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
