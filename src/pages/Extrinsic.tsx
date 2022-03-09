@@ -40,7 +40,7 @@ export function Extrinsic() {
 
     if (!localMultisig) {
       if (isCustomNetwork) {
-        message.warn(t('multisig account not exist'));
+        message.warn(t('multisig account not exist', { account: ss58Account }));
         history.push('/' + history.location.hash);
       } else {
         fetchMultisigDetail({ variables: { account: ss58Account }, skipCache: true });
@@ -84,7 +84,7 @@ export function Extrinsic() {
 
       setMultisig(keyring.getAccount(ss58Account));
     } else if (!localMultisig && multisigDetail && multisigDetail.multisigAccount === null) {
-      message.warn(t('multisig account not exist'));
+      message.warn(t('multisig account not exist', { account: ss58Account }));
       history.push('/' + history.location.hash);
     }
   }, [ss58Account, multisigDetail, api, network, history, t]);

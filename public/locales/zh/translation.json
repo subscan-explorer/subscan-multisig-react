@@ -180,5 +180,5 @@
   "network not supported": "暂不支持该网络",
   "remark": "备注",
   "endpoint": "节点",
-  "multisig account not exist": "未找到本地的多签账号配置"
+  "multisig account not exist": "未在当前网络找到多签账号：“{{account}}”"
 }

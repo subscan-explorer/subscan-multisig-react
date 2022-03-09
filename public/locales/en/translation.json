@@ -182,5 +182,5 @@
   "network not supported": "This network is not currently supported",
   "remark": "Remark",
   "endpoint": "Endpoint",
-  "multisig account not exist": "Multisig account not found, please create it first"
+  "multisig account not exist": "Multi-signature account “{{account}}” Not found in current network"
 }
