@@ -37,6 +37,7 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
   const { rpc } = useApi();
   const value = useMultisig();
   const { account } = useParams<{ account: string }>();
+
   const [fetchData, { data }] = useManualQuery<{ multisigRecords: { totalCount: number } }>(
     MULTISIG_RECORD_COUNT_QUERY,
     {

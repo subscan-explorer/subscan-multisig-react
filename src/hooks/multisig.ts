@@ -1,17 +1,20 @@
 import { AnyJson } from '@polkadot/types/types';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
+import { encodeAddress } from '@polkadot/util-crypto';
 import { difference, intersection } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { convertToSS58 } from '../utils';
 import { Entry } from '../model';
+import { convertToSS58 } from '../utils';
 import { useApi } from './api';
 
 export function useMultisig(acc?: string) {
   const [multisigAccount, setMultisigAccount] = useState<KeyringAddress | null>(null);
-  const { api, networkStatus, network, chain } = useApi();
+  const { api, networkStatus, chain } = useApi();
   const { account } = useParams<{ account: string }>();
+  const ss58Account = encodeAddress(account, Number(chain.ss58Format));
+
   const [inProgress, setInProgress] = useState<Entry[]>([]);
   const [loadingInProgress, setLoadingInProgress] = useState(false);
   const queryInProgress = useCallback(async () => {
@@ -21,7 +24,7 @@ export function useMultisig(acc?: string) {
 
     setLoadingInProgress(true);
 
-    const multisig = keyring.getAccount(acc ?? account);
+    const multisig = keyring.getAccount(acc ?? ss58Account);
     // Use different ss58 addresses
     (multisig?.meta.addressPair as KeyringJson[])?.forEach((key) => {
       key.address = convertToSS58(key.address, Number(chain.ss58Format));
@@ -64,7 +67,7 @@ export function useMultisig(acc?: string) {
     setMultisigAccount(multisig || null);
     setInProgress(calls || []);
     setLoadingInProgress(false);
-  }, [api, acc, account, network]);
+  }, [api, acc, ss58Account, chain]);
 
   useEffect(() => {
     if (networkStatus !== 'success') {
