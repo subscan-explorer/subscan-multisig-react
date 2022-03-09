@@ -1,23 +1,32 @@
 import { encodeAddress } from '@polkadot/util-crypto';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
-import { Card, Spin } from 'antd';
+import { Card, message, Spin } from 'antd';
 import { useManualQuery } from 'graphql-hooks';
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useParams, useHistory } from 'react-router-dom';
 import { MULTISIG_ACCOUNT_DETAIL_QUERY } from 'src/config';
 import { ShareScope } from 'src/model';
-import { updateMultiAccountScope } from 'src/utils';
+import { isCustomRpc, updateMultiAccountScope } from 'src/utils';
+import { useTranslation } from 'react-i18next';
 import { ExtrinsicRecords } from '../components/ExtrinsicRecords';
 import { WalletState } from '../components/WalletState';
 import { useApi } from '../hooks';
 import { EntriesProvider } from '../providers/multisig-provider';
 
 export function Extrinsic() {
-  const { api, network, chain } = useApi();
+  const history = useHistory();
+  const { t } = useTranslation();
+  const { api, network, chain, rpc } = useApi();
   const { account } = useParams<{ account: string }>();
   const ss58Account = encodeAddress(account, Number(chain.ss58Format));
   const [multisig, setMultisig] = useState<KeyringAddress | undefined>();
+
+  const { isCustomNetwork } = useMemo(() => {
+    return {
+      isCustomNetwork: isCustomRpc(rpc),
+    };
+  }, [rpc]);
 
   const [fetchMultisigDetail, { data: multisigDetail }] = useManualQuery<{
     multisigAccount: { id: string; threshold: number; members: string[] };
@@ -30,12 +39,18 @@ export function Extrinsic() {
     const localMultisig = keyring.getAccount(ss58Account);
 
     if (!localMultisig) {
-      fetchMultisigDetail({ variables: { account: ss58Account }, skipCache: true });
+      if (isCustomNetwork) {
+        message.warn(t('multisig account not exist'));
+        history.push('/' + history.location.hash);
+      } else {
+        fetchMultisigDetail({ variables: { account: ss58Account }, skipCache: true });
+      }
     } else {
       setMultisig(keyring.getAccount(ss58Account));
     }
-  }, [ss58Account, fetchMultisigDetail]);
+  }, [isCustomNetwork, ss58Account, fetchMultisigDetail, history, t]);
 
+  // eslint-disable-next-line complexity
   useEffect(() => {
     const localMultisig = keyring.getAccount(ss58Account);
 
@@ -68,8 +83,11 @@ export function Extrinsic() {
       );
 
       setMultisig(keyring.getAccount(ss58Account));
+    } else if (!localMultisig && multisigDetail && multisigDetail.multisigAccount === null) {
+      message.warn(t('multisig account not exist'));
+      history.push('/' + history.location.hash);
     }
-  }, [ss58Account, multisigDetail, api, network]);
+  }, [ss58Account, multisigDetail, api, network, history, t]);
 
   if (!multisig) {
     return (

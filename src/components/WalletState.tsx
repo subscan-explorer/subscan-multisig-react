@@ -108,7 +108,7 @@ export function WalletState() {
     try {
       keyring.forgetAccount(multisigAccount?.address as string);
       message.success(t('success'));
-      history.push('/');
+      history.push('/' + history.location.hash);
     } catch (error: unknown) {
       if (error instanceof Error) {
         message.error(error.message);

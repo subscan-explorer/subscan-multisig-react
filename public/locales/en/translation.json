@@ -181,5 +181,6 @@
   },
   "network not supported": "This network is not currently supported",
   "remark": "Remark",
-  "endpoint": "Endpoint"
+  "endpoint": "Endpoint",
+  "multisig account not exist": "Multisig account not found, please create it first"
 }
