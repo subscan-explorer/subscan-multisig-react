@@ -50,7 +50,7 @@ export function Extrinsic() {
     } else {
       setMultisig(keyring.getAccount(ss58Account));
     }
-  }, [isCustomNetwork, fetchMultisigDetail, history, t, chain, account, networkStatus]);
+  }, [isCustomNetwork, fetchMultisigDetail, history, t, chain, account, networkStatus, chain.ss58Format]);
 
   // eslint-disable-next-line complexity
   useEffect(() => {
@@ -94,7 +94,7 @@ export function Extrinsic() {
       message.warn(t('multisig account not exist', { account: ss58Account }));
       history.push('/' + history.location.hash);
     }
-  }, [multisigDetail, api, network, history, t, chain, account, networkStatus]);
+  }, [multisigDetail, api, network, history, t, chain, account, networkStatus, chain.ss58Format]);
 
   if (!multisig) {
     return (
