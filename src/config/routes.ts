@@ -13,26 +13,21 @@ export const routes: RouteProps[] = [
   {
     exact: true,
     path: '/',
-    children: Home,
+    component: Home,
   },
   {
     exact: true,
     path: '/wallet',
-    children: Wallet,
+    component: Wallet,
   },
   {
     exact: true,
     path: '/account/:account',
-    children: Extrinsic,
-  },
-  {
-    exact: true,
-    path: '/404',
-    children: null,
+    component: Extrinsic,
   },
   {
     exact: true,
     path: '*',
-    children: Home,
+    component: Home,
   },
 ];

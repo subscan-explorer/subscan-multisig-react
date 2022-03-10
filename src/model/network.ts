@@ -30,6 +30,7 @@ export interface NetConfig {
   erc20?: TokenRecord;
   donate?: Donate;
   isTest?: boolean;
+  explorerHostName?: string;
 }
 
 export type NetworkConfig<T = NetConfig> = Config<Network, T>;

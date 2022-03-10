@@ -238,7 +238,7 @@ export function WalletForm() {
 
             updateMultiAccountScope(values, network);
             message.success(t('success'));
-            history.push('/');
+            history.push('/' + history.location.hash);
           } catch (error: unknown) {
             if (error instanceof Error) {
               message.error(t(error.message));

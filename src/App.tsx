@@ -19,6 +19,7 @@ import { Path, routes } from './config/routes';
 import { useApi } from './hooks';
 import { Network } from './model';
 import { Connecting } from './pages/Connecting';
+import { isCustomRpc } from './utils';
 
 const genHeaderLinkStyle = (classes: TemplateStringsArray, network: Network) => {
   return `text-white opacity-80 hover:opacity-100 leading-normal whitespace-nowrap cursor-pointer transition-all duration-200 mr-4 dark:text-${network}-main ${classes.join(
@@ -26,10 +27,11 @@ const genHeaderLinkStyle = (classes: TemplateStringsArray, network: Network) => 
   )}`;
 };
 
+// eslint-disable-next-line complexity
 function App() {
   const { t } = useTranslation();
   const history = useHistory();
-  const { networkStatus, network, networkConfig } = useApi();
+  const { networkStatus, network, networkConfig, rpc } = useApi();
   const { systemChain, systemName, specName, isDevelopment, apiError } = usePolkaApi();
   const polkaLogo = useMemo(
     () => (networkStatus === 'success' ? '/image/polka-check.png' : '/image/polka-cross.png'),
@@ -46,7 +48,21 @@ function App() {
     return Object.keys(NETWORK_CONFIG).indexOf(network) >= 0 ? network : 'custom';
   }, [network]);
 
+  const { isCustomNetwork } = useMemo(() => {
+    return {
+      isCustomNetwork: isCustomRpc(rpc),
+    };
+  }, [rpc]);
+
   const [selectNetworkModalVisible, setSelectNetworkModalVisible] = useState(false);
+
+  const openExplorer = () => {
+    if (isCustomNetwork) {
+      window.open(`https://${networkConfig?.explorerHostName}.subscan.io`, '_blank');
+    } else {
+      window.open(`https://${network}.subscan.io`, '_blank');
+    }
+  };
 
   return (
     <>
@@ -68,9 +84,11 @@ function App() {
           </span>
 
           <div className="flex items-center justify-between">
-            <span onClick={() => window.open(`https://${network}.subscan.io`, '_blank')} className={headerLinkStyle}>
-              {t('explorer')}
-            </span>
+            {(!isCustomNetwork || networkConfig?.explorerHostName) && (
+              <span onClick={openExplorer} className={headerLinkStyle}>
+                {t('explorer')}
+              </span>
+            )}
 
             <HeadAccounts />
 
