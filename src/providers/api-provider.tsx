@@ -192,20 +192,21 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
       const chainState = await api.rpc.system.properties();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { tokenDecimals, tokenSymbol, ss58Format } = chainState?.toHuman() as any;
+      const finalSs58Format = ss58Format || api.consts.system?.ss58Prefix;
       const chainInfo = tokenDecimals.reduce(
         (acc: Chain, decimal: string, index: number) => {
           const token = { decimal, symbol: tokenSymbol[index] };
 
           return { ...acc, tokens: [...acc.tokens, token] };
         },
-        { ss58Format, tokens: [] } as Chain
+        { ss58Format: finalSs58Format, tokens: [] } as Chain
       );
 
       setChain(chainInfo);
       setAccounts(
         newAccounts?.map(({ address, ...other }) => ({
           ...other,
-          address: convertToSS58(address, ss58Format),
+          address: convertToSS58(address, finalSs58Format),
         }))
       );
     })();

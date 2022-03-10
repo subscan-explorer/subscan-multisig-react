@@ -43,15 +43,6 @@ export function SubscanLink({ address, extrinsic, children, copyable, block, ...
   if (address) {
     return (
       <Text
-        onClick={() =>
-          openLink(
-            !isCustomNetwork
-              ? `https://${network}.subscan.io/account/${address}`
-              : networkConfig?.explorerHostName
-              ? `https://${networkConfig?.explorerHostName}.subscan.io/account/${address}`
-              : ''
-          )
-        }
         copyable={
           copyable && {
             tooltips: false,
@@ -69,12 +60,24 @@ export function SubscanLink({ address, extrinsic, children, copyable, block, ...
         }
         className="w-full"
         style={{
-          color: linkColor,
+          color: !isCustomNetwork || networkConfig?.explorerHostName ? linkColor : '#302B3C',
           height: '20px',
           cursor: !isCustomNetwork || networkConfig?.explorerHostName ? 'pointer' : 'default',
         }}
       >
-        {address}
+        <span
+          onClick={() =>
+            openLink(
+              !isCustomNetwork
+                ? `https://${network}.subscan.io/account/${address}`
+                : networkConfig?.explorerHostName
+                ? `https://${networkConfig?.explorerHostName}.subscan.io/account/${address}`
+                : ''
+            )
+          }
+        >
+          {address}
+        </span>
       </Text>
     );
   }
@@ -95,7 +98,7 @@ export function SubscanLink({ address, extrinsic, children, copyable, block, ...
           );
         }}
         style={{
-          color: linkColor,
+          color: !isCustomNetwork || networkConfig?.explorerHostName ? linkColor : '#302B3C',
           height: '20px',
           cursor: !isCustomNetwork || networkConfig?.explorerHostName ? 'pointer' : 'default',
         }}
@@ -119,7 +122,7 @@ export function SubscanLink({ address, extrinsic, children, copyable, block, ...
           );
         }}
         style={{
-          color: linkColor,
+          color: !isCustomNetwork || networkConfig?.explorerHostName ? linkColor : '#302B3C',
           height: '20px',
           cursor: !isCustomNetwork || networkConfig?.explorerHostName ? 'pointer' : 'default',
         }}
