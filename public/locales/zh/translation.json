@@ -127,6 +127,7 @@
     "pending": "等待批准"
   },
   "save": "保存",
+  "add": "添加",
   "submit": "提交",
   "submit the following extrinsic": "提交下面的外部信息",
   "submit_extrinsic": "发起交易",
@@ -178,7 +179,11 @@
     "add custom network success": "保存成功"
   },
   "network not supported": "暂不支持该网络",
-  "remark": "备注",
-  "endpoint": "节点",
-  "multisig account not exist": "未在当前网络找到多签账号：“{{account}}”"
+  "remark": "备注*",
+  "endpoint": "节点*",
+  "multisig account not exist": "未在当前网络找到多签账号：“{{account}}”",
+  "explorer optional": "浏览器 (可选)",
+  "mainnet": "主网",
+  "testnet": "测试网",
+  "custom network": "自定义网络"
 }

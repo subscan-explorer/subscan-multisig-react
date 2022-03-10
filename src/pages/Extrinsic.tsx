@@ -17,9 +17,8 @@ import { EntriesProvider } from '../providers/multisig-provider';
 export function Extrinsic() {
   const history = useHistory();
   const { t } = useTranslation();
-  const { api, network, chain, rpc } = useApi();
+  const { api, network, chain, rpc, networkStatus } = useApi();
   const { account } = useParams<{ account: string }>();
-  const ss58Account = encodeAddress(account, Number(chain.ss58Format));
   const [multisig, setMultisig] = useState<KeyringAddress | undefined>();
 
   const { isCustomNetwork } = useMemo(() => {
@@ -30,12 +29,15 @@ export function Extrinsic() {
 
   const [fetchMultisigDetail, { data: multisigDetail }] = useManualQuery<{
     multisigAccount: { id: string; threshold: number; members: string[] };
-  }>(MULTISIG_ACCOUNT_DETAIL_QUERY, {
-    variables: { account: ss58Account },
-    skipCache: true,
-  });
+  }>(MULTISIG_ACCOUNT_DETAIL_QUERY);
 
+  // eslint-disable-next-line complexity
   useEffect(() => {
+    if (!chain || !chain.ss58Format || networkStatus !== 'success') {
+      return;
+    }
+    const ss58Account = encodeAddress(account, Number(chain.ss58Format));
+
     const localMultisig = keyring.getAccount(ss58Account);
 
     if (!localMultisig) {
@@ -48,10 +50,15 @@ export function Extrinsic() {
     } else {
       setMultisig(keyring.getAccount(ss58Account));
     }
-  }, [isCustomNetwork, ss58Account, fetchMultisigDetail, history, t]);
+  }, [isCustomNetwork, fetchMultisigDetail, history, t, chain, account, networkStatus]);
 
   // eslint-disable-next-line complexity
   useEffect(() => {
+    if (!chain || !chain.ss58Format || networkStatus !== 'success') {
+      return;
+    }
+
+    const ss58Account = encodeAddress(account, Number(chain.ss58Format));
     const localMultisig = keyring.getAccount(ss58Account);
 
     if (!localMultisig && multisigDetail && multisigDetail.multisigAccount) {
@@ -87,7 +94,7 @@ export function Extrinsic() {
       message.warn(t('multisig account not exist', { account: ss58Account }));
       history.push('/' + history.location.hash);
     }
-  }, [ss58Account, multisigDetail, api, network, history, t]);
+  }, [multisigDetail, api, network, history, t, chain, account, networkStatus]);
 
   if (!multisig) {
     return (

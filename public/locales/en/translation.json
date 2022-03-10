@@ -128,6 +128,7 @@
     "pending": "Pending"
   },
   "save": "Save",
+  "add": "Add",
   "submit": "Submit",
   "submit the following extrinsic": "submit the following extrinsic",
   "submit_extrinsic": "Initiate Extrinsic",
@@ -180,7 +181,11 @@
     "add custom network success": "Add custom network success"
   },
   "network not supported": "This network is not currently supported",
-  "remark": "Remark",
-  "endpoint": "Endpoint",
-  "multisig account not exist": "Multi-signature account “{{account}}” Not found in current network"
+  "remark": "Remark Name*",
+  "endpoint": "Endpoint*",
+  "multisig account not exist": "Multi-signature account “{{account}}” Not found in current network",
+  "explorer optional": "Explorer (optional)",
+  "mainnet": "Mainnet",
+  "testnet": "Testnet",
+  "custom network": "Custom Network"
 }
