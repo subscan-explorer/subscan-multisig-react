@@ -46,6 +46,7 @@ export function SubscanLink({ address, extrinsic, children, copyable, block, ...
         copyable={
           copyable && {
             tooltips: false,
+            text: address,
             icon: (
               <CopyOutlined
                 className="rounded-full opacity-60 cursor-pointer p-1"
