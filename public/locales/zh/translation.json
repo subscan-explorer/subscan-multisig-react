@@ -185,5 +185,6 @@
   "explorer optional": "浏览器 (可选)",
   "mainnet": "主网",
   "testnet": "测试网",
-  "custom network": "自定义网络"
+  "custom network": "自定义网络",
+  "unavailable endpoint": "无效的节点"
 }

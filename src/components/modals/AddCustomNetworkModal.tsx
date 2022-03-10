@@ -33,6 +33,7 @@ export const AddCustomNetworkModal = (props: AddCustomNetworkModalProps) => {
 
   const [addNetworkLoading, setAddNetworkLoading] = useState(false);
   const [addNetworkErrorDialogVisible, setAddNetworkErrorDialogVisible] = useState(false);
+  const [addNetworkErrorContent, setAddNetworkErrorContent] = useState('');
 
   // eslint-disable-next-line complexity
   useEffect(() => {
@@ -69,6 +70,7 @@ export const AddCustomNetworkModal = (props: AddCustomNetworkModalProps) => {
 
         if (!api.query.multisig) {
           setAddNetworkErrorDialogVisible(true);
+          setAddNetworkErrorContent(t('network not supported'));
           return;
         }
 
@@ -111,6 +113,7 @@ export const AddCustomNetworkModal = (props: AddCustomNetworkModalProps) => {
       const onError = async () => {
         setAddNetworkLoading(false);
         setAddNetworkErrorDialogVisible(true);
+        setAddNetworkErrorContent(t('unavailable endpoint'));
 
         api.disconnect();
         api.off('ready', onReady);
@@ -124,6 +127,7 @@ export const AddCustomNetworkModal = (props: AddCustomNetworkModalProps) => {
     } catch {
       setAddNetworkLoading(false);
       setAddNetworkErrorDialogVisible(true);
+      setAddNetworkErrorContent(t('unavailable endpoint'));
     }
   };
 
@@ -144,6 +148,7 @@ export const AddCustomNetworkModal = (props: AddCustomNetworkModalProps) => {
 
         if (!api.query.multisig) {
           setAddNetworkErrorDialogVisible(true);
+          setAddNetworkErrorContent(t('network not supported'));
           return;
         }
 
@@ -186,6 +191,7 @@ export const AddCustomNetworkModal = (props: AddCustomNetworkModalProps) => {
     } catch {
       setAddNetworkLoading(false);
       setAddNetworkErrorDialogVisible(true);
+      setAddNetworkErrorContent('unavailable endpoint');
     }
   };
 
@@ -295,7 +301,7 @@ export const AddCustomNetworkModal = (props: AddCustomNetworkModalProps) => {
 
       <ConfirmDialog
         title="Error"
-        content={t('network not supported')}
+        content={addNetworkErrorContent}
         visible={addNetworkErrorDialogVisible}
         onCancel={() => setAddNetworkErrorDialogVisible(false)}
         onConfirm={() => setAddNetworkErrorDialogVisible(false)}

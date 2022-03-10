@@ -187,5 +187,6 @@
   "explorer optional": "Explorer (optional)",
   "mainnet": "Mainnet",
   "testnet": "Testnet",
-  "custom network": "Custom Network"
+  "custom network": "Custom Network",
+  "unavailable endpoint": "Unavailable Endpoint"
 }
