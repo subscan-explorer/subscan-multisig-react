@@ -221,7 +221,7 @@ export const AddCustomNetworkModal = (props: AddCustomNetworkModalProps) => {
       destroyOnClose
       onCancel={props.onCancel}
       closable={false}
-      width={560}
+      width={620}
       bodyStyle={{
         paddingLeft: '20px',
         paddingRight: '20px',
