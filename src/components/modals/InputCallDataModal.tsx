@@ -81,6 +81,9 @@ export const InputCallDataModal = (props: InputCallDataModalProps) => {
         <div className="mt-2">
           {props.availableAccounts && props.availableAccounts.length > 0 && (
             <Select
+              style={{
+                width: '100%',
+              }}
               placeholder={t('Select approve account')}
               defaultValue={props.availableAccounts[0].address}
               onChange={setSelectedAddress}
@@ -94,7 +97,7 @@ export const InputCallDataModal = (props: InputCallDataModalProps) => {
           )}
         </div>
 
-        <div className="mt-6 font-bold text-black-800">{t('call_hash')}*</div>
+        <div className="mt-6 font-bold text-black-800">{t('call_hash')}</div>
 
         <div className="mt-2">
           <Typography.Text
