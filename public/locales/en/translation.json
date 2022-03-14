@@ -188,5 +188,8 @@
   "mainnet": "Mainnet",
   "testnet": "Testnet",
   "custom network": "Custom Network",
-  "unavailable endpoint": "Unavailable Endpoint"
+  "unavailable endpoint": "Unavailable Endpoint",
+  "decode call data error": "Decode call data error",
+  "missing call data": "Please input call data first",
+  "missing selected account": "Please choose approve account first"
 }
