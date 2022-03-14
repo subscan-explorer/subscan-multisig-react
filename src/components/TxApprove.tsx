@@ -1,37 +1,31 @@
-import { CopyOutlined } from '@ant-design/icons';
 import { Call } from '@polkadot/types/interfaces';
-import { Button, Form, Input, Modal, Popover, Radio, Select, Space, Typography } from 'antd';
-import { useForm } from 'antd/lib/form/Form';
-import { useCallback, useContext, useMemo } from 'react';
+import { Button, message, Popover, Radio, Space } from 'antd';
+import { useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { validateMessages } from '../config';
-import i18n from '../config/i18n';
+import { InputCallDataModal } from '../components/modals/InputCallDataModal';
 import { useApi, useMultiApprove, useUnapprovedAccounts } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
 import { Entry, TxOperationComponentProps } from '../model';
 import { StatusContext } from '../packages/react-components/src';
 import { PartialQueueTxExtrinsic } from '../packages/react-components/src/Status/types';
-import { makeSure, getThemeVar } from '../utils';
+import { makeSure } from '../utils';
 
-const { info } = Modal;
-
+// eslint-disable-next-line complexity
 export function TxApprove({ entry, txSpy, onOperation }: TxOperationComponentProps) {
   const { t } = useTranslation();
-  const [form] = useForm();
-  const { accounts, api, network } = useApi();
+  const { accounts, api } = useApi();
   const [getApproveTx] = useMultiApprove();
   const { queueExtrinsic } = useContext(StatusContext);
   const [getUnapprovedInjectedList] = useUnapprovedAccounts();
   const { setIsPageLock, queryInProgress, refreshConfirmedAccount } = useMultisigContext();
   const unapprovedAddresses = getUnapprovedInjectedList(entry);
   const availableAccounts = (accounts ?? []).filter((extAddr) => unapprovedAddresses.includes(extAddr.address));
-  const mainColor = useMemo(() => {
-    return getThemeVar(network, '@project-main-bg');
-  }, [network]);
+  const [inputCallDataModalVisible, setInputCallDataModalVisible] = useState(false);
 
   const handleApprove = useCallback(
     (accountId: string, target: Entry) => {
       setIsPageLock(true);
+      setInputCallDataModalVisible(false);
 
       getApproveTx(target, accountId).then((tx) => {
         const queueTx: PartialQueueTxExtrinsic = {
@@ -72,94 +66,24 @@ export function TxApprove({ entry, txSpy, onOperation }: TxOperationComponentPro
 
   if (!entry.callHash || !entry.callData) {
     return (
-      <Button
-        onClick={() => {
-          info({
-            title: t('Transaction information'),
-            content: (
-              <Form
-                form={form}
-                initialValues={{
-                  account: '1ZPVgJpfZ7M2mX6Ta5Vp4byXXq9EQYRrt918VWhSbgkq3Zq',
-                  callData: '',
-                }}
-                layout="vertical"
-                validateMessages={validateMessages[i18n.language as 'en' | 'zh-CN' | 'zh']}
-              >
-                <Form.Item label={t('Approve Account')} name="account" rules={[{ required: true }]}>
-                  {availableAccounts && availableAccounts.length > 0 && (
-                    <Select placeholder={t('Select approve account')}>
-                      {availableAccounts.map((acc) => (
-                        <Select.Option value={acc.address} key={acc.address}>
-                          {acc.meta.name} - {acc.address}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  )}
-                </Form.Item>
+      <>
+        <Button onClick={() => setInputCallDataModalVisible(true)}>{t('approve')}</Button>
 
-                <div className="pb-4">
-                  <div className="pl-3">{t('call_hash')}</div>
-                  <Typography.Text
-                    copyable={{
-                      tooltips: false,
-                      text: entry.callHash || '',
-                      icon: (
-                        <CopyOutlined
-                          className="rounded-full opacity-60 cursor-pointer p-1"
-                          style={{
-                            color: mainColor,
-                            backgroundColor: mainColor + '40',
-                          }}
-                          onClick={(e) => e.preventDefault()}
-                        />
-                      ),
-                    }}
-                  >
-                    {entry.callHash}
-                  </Typography.Text>
-                </div>
-
-                <Form.Item
-                  label={t('call_data')}
-                  name="callData"
-                  validateFirst
-                  rules={[
-                    { required: true },
-                    {
-                      validator: (_, value) => {
-                        try {
-                          api?.registry.createType('Call', value);
-                          return Promise.resolve();
-                        } catch (err) {
-                          return Promise.reject();
-                        }
-                      },
-                      message: t('Invalid call data'),
-                    },
-                  ]}
-                >
-                  <Input.TextArea placeholder={t('call_data')} />
-                </Form.Item>
-              </Form>
-            ),
-            okButtonProps: { htmlType: 'submit' },
-            cancelText: t('cancel'),
-            okText: t('confirm'),
-            closable: true,
-            onOk: () => {
-              const account = form.getFieldValue('account');
-              const callHash = entry.callHash;
-              const data = form.getFieldValue('callData');
-              const callData = api?.registry.createType('Call', data) as Call;
-
-              handleApprove(account, { ...entry, callHash, callData });
-            },
-          });
-        }}
-      >
-        {t('approve')}
-      </Button>
+        <InputCallDataModal
+          visible={inputCallDataModalVisible}
+          onCancel={() => setInputCallDataModalVisible(false)}
+          availableAccounts={availableAccounts}
+          callHash={entry.callHash || ''}
+          onConfirm={(selectedAddress, callData) => {
+            try {
+              const callDataObj = api?.registry.createType('Call', callData) as Call;
+              handleApprove(selectedAddress, { ...entry, callHash: entry.callHash, callData: callDataObj });
+            } catch {
+              message.error(t('decode call data error'));
+            }
+          }}
+        />
+      </>
     );
   } else if (availableAccounts.length === 1) {
     return <Button onClick={() => handleApprove(availableAccounts[0].address, entry)}>{t('approve')}</Button>;
