@@ -27,7 +27,9 @@ ReactDOM.render(
           <Queue>
             <PolkaApiProvider store={store}>
               <GqlProvider>
-                <App />
+                <Suspense fallback={<div />}>
+                  <App />
+                </Suspense>
               </GqlProvider>
             </PolkaApiProvider>
           </Queue>

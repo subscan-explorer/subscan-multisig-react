@@ -1,0 +1,105 @@
+'use strict';
+
+var _interopRequireDefault = require('@babel/runtime/helpers/interopRequireDefault');
+
+Object.defineProperty(exports, '__esModule', {
+  value: true,
+});
+exports.default = void 0;
+
+var _classPrivateFieldLooseBase2 = _interopRequireDefault(require('@babel/runtime/helpers/classPrivateFieldLooseBase'));
+
+var _classPrivateFieldLooseKey2 = _interopRequireDefault(require('@babel/runtime/helpers/classPrivateFieldLooseKey'));
+
+var _rxjs = require('rxjs');
+
+var _chain = require('@polkadot/api-derive/chain');
+
+var _util = require('@polkadot/api-derive/util');
+
+// Copyright 2017-2022 @polkadot/apps-config authors & contributors
+// SPDX-License-Identifier: Apache-2.0
+// structs need to be in order
+
+/* eslint-disable sort-keys */
+function extractAuthor(digest, api) {
+  const preRuntimes = digest.logs.filter((log) => log.isPreRuntime && log.asPreRuntime[0].toString() === 'SUB_');
+  const { solution } = api.registry.createType('SubPreDigest', preRuntimes[0].asPreRuntime[1]);
+  return solution.public_key;
+}
+
+function createHeaderExtended(registry, header, api) {
+  const HeaderBase = registry.createClass('Header');
+
+  var _author = /*#__PURE__*/ (0, _classPrivateFieldLooseKey2.default)('author');
+
+  class SubHeaderExtended extends HeaderBase {
+    constructor(registry, header, api) {
+      super(registry, header);
+      Object.defineProperty(this, _author, {
+        writable: true,
+        value: void 0,
+      });
+      (0, _classPrivateFieldLooseBase2.default)(this, _author)[_author] = extractAuthor(this.digest, api);
+      this.createdAtHash = header === null || header === void 0 ? void 0 : header.createdAtHash;
+    }
+
+    get author() {
+      return (0, _classPrivateFieldLooseBase2.default)(this, _author)[_author];
+    }
+  }
+
+  return new SubHeaderExtended(registry, header, api);
+}
+
+function subscribeNewHeads(instanceId, api) {
+  return (0, _util.memo)(instanceId, () =>
+    (0, _rxjs.combineLatest)([api.rpc.chain.subscribeNewHeads()]).pipe(
+      (0, _rxjs.map)((_ref) => {
+        let [header] = _ref;
+        return createHeaderExtended(header.registry, header, api);
+      })
+    )
+  );
+}
+
+function getHeader(instanceId, api) {
+  return (0, _util.memo)(instanceId, () =>
+    (0, _rxjs.combineLatest)([api.rpc.chain.getHeader()]).pipe(
+      (0, _rxjs.map)((_ref2) => {
+        let [header] = _ref2;
+        return createHeaderExtended(header.registry, header, api);
+      })
+    )
+  );
+}
+
+const definitions = {
+  derives: {
+    chain: {
+      bestNumber: _chain.bestNumber,
+      bestNumberFinalized: _chain.bestNumberFinalized,
+      bestNumberLag: _chain.bestNumberLag,
+      getBlock: _chain.getBlock,
+      getHeader,
+      subscribeNewBlocks: _chain.subscribeNewBlocks,
+      subscribeNewHeads,
+    },
+  },
+  types: [
+    {
+      minmax: [0, undefined],
+      types: {
+        Solution: {
+          public_key: 'AccountId32',
+        },
+        SubPreDigest: {
+          slot: 'u64',
+          solution: 'Solution',
+        },
+      },
+    },
+  ],
+};
+var _default = definitions;
+exports.default = _default;
