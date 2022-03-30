@@ -178,7 +178,8 @@
     "add custom endpoint": "Add Custom Endpoint",
     "websocket": "Websocket",
     "duplicate websocket": "Duplicate Websocket",
-    "add custom network success": "Add custom network success"
+    "add custom network success": "Add custom network success",
+    "edit custom network success": "Edit custom network success"
   },
   "network not supported": "This network is not currently supported",
   "remark": "Remark Name*",
@@ -191,5 +192,6 @@
   "unavailable endpoint": "Unavailable Endpoint",
   "decode call data error": "Decode call data error",
   "missing call data": "Please input call data first",
-  "missing selected account": "Please choose approve account first"
+  "missing selected account": "Please choose approve account first",
+  "endpoint connect timeout": "Endpoint connect timeout"
 }
