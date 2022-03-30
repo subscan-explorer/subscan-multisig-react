@@ -74,7 +74,7 @@ function AddressMini({
     >
       {label && <label className="ui--AddressMini-label">{label}</label>}
       <div className="ui--AddressMini-icon">
-        <BaseIdentityIcon value={value as Uint8Array} />
+        <BaseIdentityIcon value={value as Uint8Array} size={24} />
         {iconInfo && <div className="ui--AddressMini-icon-info">{iconInfo}</div>}
       </div>
       <div className="ui--AddressMini-info">

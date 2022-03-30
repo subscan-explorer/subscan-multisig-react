@@ -33,7 +33,7 @@ function AddressSmall({
 }: Props): React.ReactElement<Props> {
   return (
     <div className={`ui--AddressSmall ${className}`}>
-      <BaseIdentityIcon value={value as Uint8Array} />
+      <BaseIdentityIcon value={value as Uint8Array} size={24} />
       <AccountName
         className={withSidebar ? 'withSidebar' : ''}
         defaultName={defaultName}
