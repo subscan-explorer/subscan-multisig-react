@@ -191,5 +191,6 @@
   "decode call data error": "解析 call data 失败",
   "missing call data": "请输入 call data",
   "missing selected account": "请选择批准的账号",
-  "endpoint connect timeout": "节点连接超时"
+  "endpoint connect timeout": "节点连接超时",
+  "watch only": "阅览模式"
 }

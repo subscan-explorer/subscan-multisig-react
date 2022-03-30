@@ -193,5 +193,6 @@
   "decode call data error": "Decode call data error",
   "missing call data": "Please input call data first",
   "missing selected account": "Please choose approve account first",
-  "endpoint connect timeout": "Endpoint connect timeout"
+  "endpoint connect timeout": "Endpoint connect timeout",
+  "watch only": "Watch Only"
 }

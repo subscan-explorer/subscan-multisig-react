@@ -2,7 +2,7 @@
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
-import { Button, Collapse, Space, Table, Typography } from 'antd';
+import { Button, Collapse, Space, Table, Tooltip, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +10,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { Path } from '../config/routes';
 import { useApi, useIsInjected } from '../hooks';
 import { Chain } from '../providers';
-import { accuracyFormat, convertToSS58, getThemeVar, isInCurrentScope } from '../utils';
+import { formatBalance, convertToSS58, getThemeVar, isInCurrentScope } from '../utils';
 import { genExpandMembersIcon } from './expandIcon';
 import { AddIcon } from './icons';
 import { MemberList } from './Members';
@@ -41,7 +41,12 @@ const renderBalances = (account: KeyringAddress, chain: Chain) => {
 
     return (
       <p key={symbol} className="whitespace-nowrap">
-        {accuracyFormat(amount, decimal)} {symbol}
+        {formatBalance(amount, Number(decimal), {
+          withThousandSplit: true,
+          noDecimal: false,
+          decimal: 3,
+        })}{' '}
+        {symbol}
       </p>
     );
   }
@@ -90,18 +95,20 @@ export function Wallets() {
       return (
         <Space size="middle">
           <div className="flex items-center">
-            <Button
-              type="primary"
-              className="flex items-center justify-center h-7"
-              onClick={() => {
-                history.push(Path.extrinsic + '/' + row.address + history.location.hash);
-              }}
-              style={{
-                borderRadius: '4px',
-              }}
-            >
-              Actions
-            </Button>
+            <Tooltip title={t('actions')}>
+              <Button
+                type="primary"
+                className="flex items-center justify-center h-7"
+                onClick={() => {
+                  history.push(Path.extrinsic + '/' + row.address + history.location.hash);
+                }}
+                style={{
+                  borderRadius: '4px',
+                }}
+              >
+                Actions
+              </Button>
+            </Tooltip>
 
             {(row as unknown as any).entries && (row as unknown as any).entries.length > 0 && (
               <div className="ml-2 bg-red-500 rounded-full w-3 h-3"></div>
@@ -140,7 +147,7 @@ export function Wallets() {
 
         return (addressPair as AddressPair[])?.some((item) => isExtensionAccount(item.address))
           ? t('available')
-          : t('unavailable');
+          : t('watch only');
       },
     },
     {
@@ -250,7 +257,7 @@ export function Wallets() {
         columns={columns}
         dataSource={multisigAccounts}
         rowKey="address"
-        expandable={{ expandedRowRender, expandIcon: genExpandMembersIcon(), expandIconColumnIndex: 4 }}
+        expandable={{ expandedRowRender, expandIcon: genExpandMembersIcon(t('members')), expandIconColumnIndex: 4 }}
         pagination={false}
         loading={isCalculating}
         className="lg:block hidden multisig-list-table"
