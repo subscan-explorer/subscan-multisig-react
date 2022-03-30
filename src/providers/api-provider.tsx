@@ -2,7 +2,9 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { typesChain } from '@polkadot/apps-config';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 import type { InjectedExtension } from '@polkadot/extension-inject/types';
+import { message } from 'antd';
 import React, { createContext, Dispatch, useCallback, useEffect, useReducer, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NETWORK_CONFIG } from '../config';
 import { Action, ConnectStatus, InjectedAccountWithMeta, NetConfig, Network } from '../model';
 import { convertToSS58, getInitialSetting, patchUrl } from '../utils';
@@ -80,6 +82,7 @@ export type ApiCtx = {
 export const ApiContext = createContext<ApiCtx | null>(null);
 
 export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
+  const { t } = useTranslation();
   const [state, dispatch] = useReducer(accountReducer, initialState);
   const switchNetwork = useCallback((payload: Network) => dispatch({ type: 'switchNetwork', payload }), []);
   const setAccounts = useCallback(
@@ -162,7 +165,14 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
       typesChain,
     });
 
+    const CONNECT_TIMEOUT = 15000;
+    const timeFlag = setTimeout(() => {
+      message.error(t('endpoint connect timeout'));
+    }, CONNECT_TIMEOUT);
     const onReady = async () => {
+      if (timeFlag) {
+        clearTimeout(timeFlag);
+      }
       const exts = await web3Enable('polkadot-js/apps');
 
       setExtensions(exts);
@@ -175,9 +185,12 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
     nApi.on('ready', onReady);
 
     return () => {
+      if (timeFlag) {
+        clearTimeout(timeFlag);
+      }
       nApi.off('ready', onReady);
     };
-  }, [state.network, setNetworkStatus, random, state.rpc, switchNetwork]);
+  }, [state.network, setNetworkStatus, random, state.rpc, switchNetwork, t]);
 
   /**
    * connect to substrate or metamask when account type changed.
