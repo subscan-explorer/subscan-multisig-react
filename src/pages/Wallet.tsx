@@ -2,7 +2,7 @@ import { Alert, Card } from 'antd';
 import { Trans } from 'react-i18next';
 import { WalletForm } from '../components/WalletForm';
 
-export function Wallet() {
+export default function Wallet() {
   return (
     <div>
       <div className="lg:mx-60">

@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import { useAccountInfo } from '@polkadot/react-hooks';
 
-import IdentityIcon from './IdentityIcon';
+// import IdentityIcon from './IdentityIcon';
 import Row, { RowProps } from './Row';
 import { toShortAddress } from './util';
 
@@ -51,7 +51,7 @@ function AddressRow({
   );
 
   const isValid = !isNull && (propsIsValid || value || accountIndex);
-  const Icon = value ? IdentityIcon : BaseIdentityIcon;
+  // const Icon = value ? IdentityIcon : BaseIdentityIcon;
   const address = value && isValid ? value : DEFAULT_ADDR;
 
   return (
@@ -60,7 +60,7 @@ function AddressRow({
       buttons={buttons}
       className={className}
       defaultName={defaultName}
-      icon={<Icon size={ICON_SIZE} value={value ? value.toString() : null} />}
+      icon={<BaseIdentityIcon size={ICON_SIZE} value={value ? value.toString() : null} />}
       isDisabled={isDisabled}
       isEditableName={isEditableName}
       isEditableTags

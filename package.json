@@ -127,7 +127,8 @@
     "stylelint-config-standard": "^21.0.0",
     "stylelint-prettier": "^1.2.0",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.4",
-    "tailwindcss-aspect-ratio": "^3.0.0"
+    "tailwindcss-aspect-ratio": "^3.0.0",
+    "webpack-bundle-analyzer": "^4.5.0"
   },
   "resolutions": {
     "@polkadot/types": "7.5.1",

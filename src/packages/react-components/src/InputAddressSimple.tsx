@@ -4,8 +4,9 @@
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
+import BaseIdentityIcon from '@polkadot/react-identicon';
 import addressToAddress from './util/toAddress';
-import IdentityIcon from './IdentityIcon';
+
 import Input from './Input';
 
 interface Props {
@@ -64,7 +65,7 @@ function InputAddressSimple({
       >
         {children}
       </Input>
-      <IdentityIcon className="ui--InputAddressSimpleIcon" size={32} value={address} />
+      <BaseIdentityIcon className="ui--InputAddressSimpleIcon" size={32} value={address} />
     </div>
   );
 }

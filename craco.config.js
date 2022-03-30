@@ -16,6 +16,8 @@ const lightVars = {
 };
 const { alias, configPaths } = require('react-app-rewire-alias');
 
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+
 // just for dev purpose, use to compare vars in different theme.
 // fs.writeFileSync('./ant-theme-vars/dark.json', JSON.stringify(darkVars));
 // fs.writeFileSync('./ant-theme-vars/light.json', JSON.stringify(lightVars));
@@ -81,6 +83,7 @@ module.exports = {
   webpack: {
     plugins: {
       add: [themePlugin],
+      // add: [themePlugin, new BundleAnalyzerPlugin({ analyzerPort: 8919 })],
     },
     // .
     // add mjs compatibility configuration
