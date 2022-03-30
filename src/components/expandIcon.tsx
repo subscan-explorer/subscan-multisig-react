@@ -1,3 +1,4 @@
+import { Tooltip } from 'antd';
 import iconDown from 'src/assets/images/icon_down.svg';
 import iconMembers from 'src/assets/images/icon_members.svg';
 
@@ -24,7 +25,7 @@ export const genExpandIcon =
     );
 
 export const genExpandMembersIcon =
-  () =>
+  (tooltipText: string) =>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ({ onExpand, record }: any) =>
     (
@@ -41,6 +42,8 @@ export const genExpandMembersIcon =
         className="w-14 h-7 flex items-center justify-center rounded-md cursor-pointer"
         onClick={(event) => onExpand(record, event)}
       >
-        <img src={iconMembers} />
+        <Tooltip title={tooltipText}>
+          <img src={iconMembers} />
+        </Tooltip>
       </div>
     );

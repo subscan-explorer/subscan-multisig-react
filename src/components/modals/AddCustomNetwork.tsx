@@ -1,7 +1,7 @@
-import { CloseOutlined } from '@ant-design/icons';
+import { LeftOutlined } from '@ant-design/icons';
 import { ApiPromise } from '@polkadot/api';
 import { WsProvider } from '@polkadot/rpc-provider';
-import { Button, Col, Input, message, Modal, Row } from 'antd';
+import { Button, Col, Input, message, Row } from 'antd';
 import classNames from 'classnames';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,13 +12,12 @@ import { changeUrlHash, getThemeVar } from 'src/utils';
 import { readStorage, updateStorage } from 'src/utils/helper/storage';
 import { ConfirmDialog } from './ConfirmDialog';
 
-interface AddCustomNetworkModalProps {
-  visible: boolean;
+interface AddCustomNetworkProps {
   onCancel: () => void;
   editNetwork: NetConfig | null;
 }
 
-export const AddCustomNetworkModal = (props: AddCustomNetworkModalProps) => {
+export const AddCustomNetwork = (props: AddCustomNetworkProps) => {
   const { t } = useTranslation();
   const { network } = useApi();
   const mainColor = useMemo(() => {
@@ -37,18 +36,16 @@ export const AddCustomNetworkModal = (props: AddCustomNetworkModalProps) => {
 
   // eslint-disable-next-line complexity
   useEffect(() => {
-    if (props.visible) {
-      if (props.editNetwork) {
-        setRpcName(props.editNetwork?.fullName || '');
-        setRpcUrl(props.editNetwork?.rpc || '');
-        setExplorerHostName(props.editNetwork?.explorerHostName || '');
-      } else {
-        setRpcName('');
-        setRpcUrl('');
-        setExplorerHostName('');
-      }
+    if (props.editNetwork) {
+      setRpcName(props.editNetwork?.fullName || '');
+      setRpcUrl(props.editNetwork?.rpc || '');
+      setExplorerHostName(props.editNetwork?.explorerHostName || '');
+    } else {
+      setRpcName('');
+      setRpcUrl('');
+      setExplorerHostName('');
     }
-  }, [props.visible, props.editNetwork]);
+  }, [props.editNetwork]);
 
   const saveNewCustomNetwork = () => {
     if (!rpcName.trim() || !rpcUrl.trim()) {
@@ -214,31 +211,18 @@ export const AddCustomNetworkModal = (props: AddCustomNetworkModalProps) => {
   };
 
   return (
-    <Modal
-      title={null}
-      footer={null}
-      visible={props.visible}
-      destroyOnClose
-      onCancel={props.onCancel}
-      closable={false}
-      width={620}
-      bodyStyle={{
-        paddingLeft: '20px',
-        paddingRight: '20px',
-        paddingBottom: '30px',
-      }}
-    >
+    <div>
       <div className="overflow-auto hide-scrollbar" style={{ maxHeight: '500px' }}>
         <div className="flex items-center justify-center relative">
           <div
             className="font-bold capitalize text-black-800"
             style={{ fontSize: '16px', textTransform: 'capitalize' }}
           >
-            {t('custom.add custom endpoint')}
+            {props.editNetwork ? t('custom.edit custom endpoint') : t('custom.add custom endpoint')}
           </div>
 
-          <CloseOutlined
-            className="absolute cursor-pointer right-0"
+          <LeftOutlined
+            className="absolute cursor-pointer left-0"
             style={{ color: '#666666' }}
             onClick={props.onCancel}
           />
@@ -306,6 +290,6 @@ export const AddCustomNetworkModal = (props: AddCustomNetworkModalProps) => {
         onCancel={() => setAddNetworkErrorDialogVisible(false)}
         onConfirm={() => setAddNetworkErrorDialogVisible(false)}
       />
-    </Modal>
+    </div>
   );
 };

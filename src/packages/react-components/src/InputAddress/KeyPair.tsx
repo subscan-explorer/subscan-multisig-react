@@ -18,7 +18,7 @@ interface Props {
 function KeyPair({ address, className = '' }: Props): React.ReactElement<Props> {
   return (
     <div className={`ui--KeyPair ${className}`}>
-      <BaseIdentityIcon className="icon" value={address} />
+      <BaseIdentityIcon className="icon" value={address} size={24} />
       <div className="name">
         <AccountName value={address} />
       </div>

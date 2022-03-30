@@ -50,7 +50,7 @@ function BlockAuthorsBase({ children }: Props): React.ReactElement<Props> {
 
   useEffect((): void => {
     // No unsub, global context - destroyed on app close
-    api.isReady
+    api?.isReady
       .then((): void => {
         let lastHeaders: HeaderExtendedWithMapping[] = [];
         let lastBlockAuthors: string[] = [];
