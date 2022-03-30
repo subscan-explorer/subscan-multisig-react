@@ -5,7 +5,7 @@ import { BlockAuthors, Events } from '@polkadot/react-query';
 import Signer from '@polkadot/react-signer';
 import { Alert, Button, Layout } from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
-import React, { useMemo, useState } from 'react';
+import React, { Suspense, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Route, Switch, useHistory } from 'react-router-dom';
 import subscanLogo from 'src/assets/images/subscan_logo.png';
@@ -104,25 +104,26 @@ function App() {
             </Button>
           </div>
         </Header>
-
-        <Content className="lg:px-40 sm:py-8 py-1 px-4 my-24 sm:my-20 relative">
-          {networkStatus === 'connecting' ? (
-            <Connecting />
-          ) : (
-            <BlockAuthors>
-              <Events>
-                <Signer>
-                  <Switch>
-                    {routes.map((item, index) => (
-                      <Route key={index} {...item}></Route>
-                    ))}
-                  </Switch>
-                </Signer>
-              </Events>
-            </BlockAuthors>
-          )}
-          <Status />
-        </Content>
+        <Suspense fallback={<div></div>}>
+          <Content className="lg:px-40 sm:py-8 py-1 px-4 my-24 sm:my-20 relative">
+            {networkStatus === 'connecting' ? (
+              <Connecting />
+            ) : (
+              <BlockAuthors>
+                <Events>
+                  <Signer>
+                    <Switch>
+                      {routes.map((item, index) => (
+                        <Route key={index} {...item}></Route>
+                      ))}
+                    </Switch>
+                  </Signer>
+                </Events>
+              </BlockAuthors>
+            )}
+            <Status />
+          </Content>
+        </Suspense>
         <Footer networkConfig={networkConfig} />
       </Layout>
 

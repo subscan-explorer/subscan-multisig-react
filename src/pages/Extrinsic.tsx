@@ -14,7 +14,7 @@ import { WalletState } from '../components/WalletState';
 import { useApi } from '../hooks';
 import { EntriesProvider } from '../providers/multisig-provider';
 
-export function Extrinsic() {
+export default function Extrinsic() {
   const history = useHistory();
   const { t } = useTranslation();
   const { api, network, chain, rpc, networkStatus } = useApi();
