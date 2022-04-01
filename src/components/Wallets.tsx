@@ -2,7 +2,7 @@
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
-import { Button, Collapse, Space, Table, Tooltip, Typography } from 'antd';
+import { Button, Collapse, Space, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +10,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { Path } from '../config/routes';
 import { useApi, useIsInjected } from '../hooks';
 import { Chain } from '../providers';
-import { formatBalance, convertToSS58, getThemeVar, isInCurrentScope } from '../utils';
+import { convertToSS58, formatBalance, getThemeVar, isInCurrentScope } from '../utils';
 import { genExpandMembersIcon } from './expandIcon';
 import { AddIcon } from './icons';
 import { MemberList } from './Members';
@@ -95,20 +95,18 @@ export function Wallets() {
       return (
         <Space size="middle">
           <div className="flex items-center">
-            <Tooltip title={t('actions')}>
-              <Button
-                type="primary"
-                className="flex items-center justify-center h-7"
-                onClick={() => {
-                  history.push(Path.extrinsic + '/' + row.address + history.location.hash);
-                }}
-                style={{
-                  borderRadius: '4px',
-                }}
-              >
-                Actions
-              </Button>
-            </Tooltip>
+            <Button
+              type="primary"
+              className="flex items-center justify-center h-7"
+              onClick={() => {
+                history.push(Path.extrinsic + '/' + row.address + history.location.hash);
+              }}
+              style={{
+                borderRadius: '4px',
+              }}
+            >
+              {t('actions')}
+            </Button>
 
             {(row as unknown as any).entries && (row as unknown as any).entries.length > 0 && (
               <div className="ml-2 bg-red-500 rounded-full w-3 h-3"></div>
@@ -117,7 +115,7 @@ export function Wallets() {
         </Space>
       );
     },
-    [history]
+    [history, t]
   );
 
   const columns: ColumnsType<KeyringAddress> = [
