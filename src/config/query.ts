@@ -26,7 +26,12 @@ export const MULTISIG_RECORD_QUERY = `
         createExtrinsicIdx
         cancelExtrinsicIdx
         confirmExtrinsicIdx
-        approvals
+        approveRecords {
+          nodes {
+            account
+            approveTimepoint
+          }
+        }
 
         block {
           id
