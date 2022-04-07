@@ -10,6 +10,7 @@ import { AddressPair, Entry, TxActionType, Network } from '../model';
 import { toShortString } from '../utils';
 import { ArgObj, Args } from './Args';
 import { genExpandIcon } from './expandIcon';
+import { ApproveRecord } from './ExtrinsicRecords';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
 import { TxApprove } from './TxApprove';
@@ -36,23 +37,35 @@ const renderMethod = (data: any | undefined | null) => {
   }
 };
 
-const renderMemberStatus = (entry: Entry, pair: KeyringJson, _network: Network) => {
+const renderMemberStatus = (entry: Entry, pair: KeyringJson, _network: Network, isInProgress: boolean) => {
   const { address } = pair;
   const { approvals, when } = entry;
   const approved = approvals.includes(address);
+
+  if (!isInProgress && entry.approveRecords) {
+    const approveRecords = entry.approveRecords as ApproveRecord[];
+    const matchedApproveRecord = approveRecords.find((record) => record.account === address);
+    if (!matchedApproveRecord) {
+      return <div>-</div>;
+    }
+    const approveTimepoint = {
+      height: matchedApproveRecord.approveTimepoint.split('-')[0],
+      index: matchedApproveRecord.approveTimepoint.split('-')[1],
+    };
+    return (
+      <div className="flex items-center">
+        <Trans>status.approved</Trans> (
+        <SubscanLink extrinsic={approveTimepoint}>{matchedApproveRecord.approveTimepoint}</SubscanLink>)
+      </div>
+    );
+  }
 
   return approved ? (
     <SubscanLink extrinsic={when}>
       <Trans>status.approved</Trans>
     </SubscanLink>
   ) : (
-    // <CheckCircleFilled
-    //   style={{
-    //     fontSize: '20px',
-    //     color: getMainColor(network),
-    //   }}
-    // />
-    <Trans>status.pending</Trans>
+    <div>-</div>
   );
 };
 
@@ -61,6 +74,7 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
   const { t } = useTranslation();
   const isInjected = useIsInjected();
   const { network } = useApi();
+
   const renderAction = useCallback(
     // eslint-disable-next-line complexity
     (row: Entry) => {
@@ -167,6 +181,7 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
       render: (_, row) => renderAction(row),
     },
   ];
+
   const expandedRowRender = (entry: Entry) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const progressColumnsNested: ColumnsType<any> = [
@@ -182,7 +197,7 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
       },
       {
         key: 'status',
-        render: (_, pair) => renderMemberStatus(entry, pair, network),
+        render: (_, pair) => renderMemberStatus(entry, pair, network, !isCancelled && !isConfirmed),
       },
     ];
     // const callDataJson = entry.callData?.toJSON() ?? {};
@@ -263,7 +278,10 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
                 extra={renderAction(data)}
                 className="overflow-hidden mb-4"
               >
-                <MemberList data={account} statusRender={(pair) => renderMemberStatus(data, pair, network)} />
+                <MemberList
+                  data={account}
+                  statusRender={(pair) => renderMemberStatus(data, pair, network, !isCancelled && !isConfirmed)}
+                />
               </Panel>
             </Collapse>
           );

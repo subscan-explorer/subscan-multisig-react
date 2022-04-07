@@ -22,7 +22,9 @@ interface MultisigRecord {
   createExtrinsicIdx: string;
   confirmExtrinsicIdx: string;
   cancelExtrinsicIdx: string;
-  approvals: string[];
+  approveRecords: {
+    nodes: ApproveRecord[];
+  };
   block: {
     id: string;
     extrinsics: {
@@ -35,6 +37,11 @@ interface MultisigRecord {
       nodes: IExtrinsic[];
     };
   };
+}
+
+export interface ApproveRecord {
+  account: string;
+  approveTimepoint: string;
 }
 
 const { TabPane } = Tabs;
@@ -65,7 +72,7 @@ function ConfirmedOrCancelled({ nodes, account, loading, isConfirmed }: Confirme
         createExtrinsicIdx,
         confirmExtrinsicIdx,
         cancelExtrinsicIdx,
-        approvals,
+        approveRecords,
         block: {
           id: createBlockHash,
           extrinsics: { nodes: createExNodes },
@@ -104,6 +111,8 @@ function ConfirmedOrCancelled({ nodes, account, loading, isConfirmed }: Confirme
       // const { height, index } = maybeTimepointArg || {};
       const [height, index] = createExtrinsicIdx.split('-');
 
+      const approvalAccounts = approveRecords.nodes.map((record) => record.account);
+
       return {
         callDataJson,
         blockHash: createBlockHash,
@@ -112,7 +121,7 @@ function ConfirmedOrCancelled({ nodes, account, loading, isConfirmed }: Confirme
         callHash: null,
         address: multisigAccountId,
         extrinsicIdx: isConfirmed ? confirmExtrinsicIdx : cancelExtrinsicIdx,
-        approvals,
+        approvals: approvalAccounts,
         // approvals: [
         //   ...multisigArgs
         //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -123,6 +132,7 @@ function ConfirmedOrCancelled({ nodes, account, loading, isConfirmed }: Confirme
         created_at: timestamp,
         when: { height: isNumber(height) ? height : +height.replace(/,/g, ''), index: +index },
         depositor: '',
+        approveRecords: approveRecords.nodes,
       };
     });
   }, [api, nodes, isConfirmed]);
