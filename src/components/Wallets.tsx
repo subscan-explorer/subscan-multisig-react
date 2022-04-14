@@ -1,16 +1,28 @@
 /* eslint-disable no-console */
+import { MoreOutlined } from '@ant-design/icons';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
-import { Button, Collapse, Space, Table, Typography } from 'antd';
+import { createKeyMulti, encodeAddress } from '@polkadot/util-crypto';
+import { Button, Collapse, Dropdown, Menu, message, Space, Table, Typography, Upload } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
+import { saveAs } from 'file-saver';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
+import { MultisigAccountConfig, ShareScope } from 'src/model';
 import { Path } from '../config/routes';
 import { useApi, useIsInjected } from '../hooks';
 import { Chain } from '../providers';
-import { convertToSS58, formatBalance, getThemeVar, isInCurrentScope } from '../utils';
+import {
+  convertToSS58,
+  findMultiAccountFromKey,
+  formatBalance,
+  getMultiAccountScope,
+  getThemeVar,
+  isInCurrentScope,
+  updateMultiAccountScopeFromKey,
+} from '../utils';
 import { genExpandMembersIcon } from './expandIcon';
 import { AddIcon } from './icons';
 import { MemberList } from './Members';
@@ -78,9 +90,112 @@ export function Wallets() {
   const isExtensionAccount = useIsInjected();
   const [isCalculating, setIsCalculating] = useState<boolean>(true);
 
-  const linkColor = useMemo(() => {
-    return getThemeVar(network, '@link-color');
+  const { linkColor, mainColor } = useMemo(() => {
+    return { linkColor: getThemeVar(network, '@link-color'), mainColor: getThemeVar(network, '@project-main-bg') };
   }, [network]);
+
+  const exportAllWallets = () => {
+    if (!multisigAccounts || multisigAccounts.length < 1) {
+      return;
+    }
+    const configs: MultisigAccountConfig[] = [];
+    multisigAccounts.forEach((multisigAccount) => {
+      const config = {
+        name: multisigAccount.meta.name || '',
+        members: multisigAccount.meta.addressPair as { name: string; address: string }[],
+        threshold: multisigAccount.meta.threshold as number,
+        scope: getMultiAccountScope(multisigAccount.publicKey),
+      };
+      configs.push(config);
+    });
+
+    const blob = new Blob([JSON.stringify(configs)], { type: 'text/plain;charset=utf-8' });
+    saveAs(blob, `multisig_accounts.json`);
+  };
+
+  const uploadProps = {
+    name: 'file',
+    headers: {
+      authorization: 'authorization-text',
+    },
+    onChange(info: any) {
+      if (info.file.status !== 'uploading') {
+        // console.log(info.file, info.fileList);
+      }
+      // if (info.file.status === 'done') {
+      //   message.success(`${info.file.name} file uploaded successfully`);
+      // } else if (info.file.status === 'error') {
+      //   message.error(`${info.file.name} file upload failed.`);
+      // }
+    },
+    customRequest(info: any) {
+      try {
+        const reader = new FileReader();
+
+        reader.onload = (e: any) => {
+          // eslint-disable-next-line no-console
+          // console.log(e.target.result);
+
+          try {
+            const configs = JSON.parse(e.target.result) as MultisigAccountConfig[];
+            configs
+              .filter((config) => {
+                const encodeMembers = config.members.map((member) => {
+                  return {
+                    name: member.name,
+                    address: encodeAddress(member.address, Number(chain.ss58Format)),
+                  };
+                });
+                const publicKey = createKeyMulti(
+                  encodeMembers.map((item) => item.address),
+                  config.threshold
+                );
+                const acc = findMultiAccountFromKey(publicKey);
+                return !acc;
+              })
+              .forEach((config) => {
+                const encodeMembers = config.members.map((member) => {
+                  return {
+                    name: member.name,
+                    address: encodeAddress(member.address, Number(chain.ss58Format)),
+                  };
+                });
+                const signatories = encodeMembers.map(({ address }) => address);
+
+                const addressPair = config.members.map(({ address, ...other }) => ({
+                  ...other,
+                  address: encodeAddress(address, Number(chain.ss58Format)),
+                }));
+
+                keyring.addMultisig(signatories, config.threshold, {
+                  name: config.name,
+                  addressPair,
+                  genesisHash: api?.genesisHash.toHex(),
+                });
+
+                const publicKey = createKeyMulti(
+                  encodeMembers.map((item) => item.address),
+                  config.threshold
+                );
+
+                updateMultiAccountScopeFromKey(publicKey, ShareScope.all, [], network);
+              });
+
+            message.success(t('success'));
+            refreshMultisigAccounts();
+          } catch {
+            message.error(t('account config error'));
+          }
+        };
+        reader.readAsText(info.file);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          // eslint-disable-next-line no-console
+          console.log('err:', err);
+        }
+      }
+    },
+  };
 
   const renderAddress = (address: string) => (
     <Link to={Path.extrinsic + '/' + address + history.location.hash} style={{ color: linkColor }}>
@@ -188,36 +303,50 @@ export function Wallets() {
     );
   };
 
-  useEffect(() => {
+  const refreshMultisigAccounts = useCallback(async () => {
     setIsCalculating(true);
 
-    (async () => {
-      const accounts = keyring
-        .getAccounts()
-        .filter((account) => account.meta.isMultisig && isInCurrentScope(account.publicKey, network));
-      const balances = await api?.query.system.account.multi(accounts.map(({ address }) => address));
-      const entries = await Promise.all(
-        accounts.map(async ({ address }) => await api?.query.multisig.multisigs.entries(address))
-      );
+    const accounts = keyring
+      .getAccounts()
+      .filter((account) => account.meta.isMultisig && isInCurrentScope(account.publicKey, network));
+    const balances = await api?.query.system.account.multi(accounts.map(({ address }) => address));
+    const entries = await Promise.all(
+      accounts.map(async ({ address }) => await api?.query.multisig.multisigs.entries(address))
+    );
 
-      setMultisigAccounts(
-        accounts.map((item, index) => {
-          (item.meta.addressPair as KeyringJson[]).forEach((key) => {
-            key.address = convertToSS58(key.address, Number(chain.ss58Format));
-          });
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const source = (balances as any)[index] as unknown as any;
-          return {
-            ...item,
-            value: source.data.free.toString(),
-            kton: source.data.freeKton?.toString() ?? '0',
-            entries: entries[index] || [],
-          };
-        })
-      );
-      setIsCalculating(false);
-    })();
+    setMultisigAccounts(
+      accounts.map((item, index) => {
+        (item.meta.addressPair as KeyringJson[]).forEach((key) => {
+          key.address = convertToSS58(key.address, Number(chain.ss58Format));
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const source = (balances as any)[index] as unknown as any;
+        return {
+          ...item,
+          value: source.data.free.toString(),
+          kton: source.data.freeKton?.toString() ?? '0',
+          entries: entries[index] || [],
+        };
+      })
+    );
+    setIsCalculating(false);
   }, [api, network, chain]);
+
+  useEffect(() => {
+    refreshMultisigAccounts();
+  }, [refreshMultisigAccounts]);
+
+  const menu = (
+    <Menu>
+      <Menu.Item key="1" onClick={exportAllWallets}>
+        {t('export all')}
+      </Menu.Item>
+
+      <Upload {...uploadProps} showUploadList={false}>
+        <Menu.Item key="2">{t('import all')}</Menu.Item>
+      </Upload>
+    </Menu>
+  );
 
   if (!isCalculating && multisigAccounts.length === 0) {
     return (
@@ -234,10 +363,18 @@ export function Wallets() {
           </div>
 
           <Link to={Path.wallet + history.location.hash}>
-            <Button type="primary" className="w-44">
+            <Button type="primary" className="w-48">
               {t('wallet.add')}
             </Button>
           </Link>
+
+          <div className="my-1">{t('or')}</div>
+
+          <Upload {...uploadProps} showUploadList={false}>
+            <Button type="primary" className="w-48">
+              {t('import all')}
+            </Button>
+          </Upload>
         </div>
       </Space>
     );
@@ -245,11 +382,36 @@ export function Wallets() {
 
   return (
     <Space direction="vertical" className="absolute top-4 bottom-4 left-4 right-4 overflow-auto" id="wallets">
-      <Link to={Path.wallet + history.location.hash}>
-        <Button type="primary" className="w-44">
-          {t('wallet.add')}
-        </Button>
-      </Link>
+      <div className="flex items-center">
+        <Link to={Path.wallet + history.location.hash}>
+          <Button type="primary" className="w-44">
+            {t('wallet.add')}
+          </Button>
+        </Link>
+
+        <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
+          <MoreOutlined
+            className="ml-4 rounded-full opacity-60 cursor-pointer p-1"
+            style={{
+              color: mainColor,
+              backgroundColor: mainColor + '40',
+            }}
+            onClick={(e) => e.preventDefault()}
+          />
+        </Dropdown>
+
+        {/* {multisigAccounts && multisigAccounts.length >= 1 && (
+          <Tooltip title={t('export all')}>
+            <ExportIcon className="ml-5 mt-1 w-8 h-8 cursor-pointer" onClick={exportAllWallets} />
+          </Tooltip>
+        )}
+
+        <Tooltip title={t('import all')}>
+          <Upload {...uploadProps} showUploadList={false}>
+            <ImportIcon className="ml-5 mt-1 w-8 h-8 cursor-pointer" />
+          </Upload>
+        </Tooltip> */}
+      </div>
 
       <Table
         columns={columns}

@@ -192,5 +192,9 @@
   "missing call data": "请输入 call data",
   "missing selected account": "请选择批准的账号",
   "endpoint connect timeout": "节点连接超时",
-  "watch only": "阅览模式"
+  "watch only": "阅览模式",
+  "export all": "导出所有钱包",
+  "import all": "导入多个钱包",
+  "account config error": "解析配置文件出错",
+  "or": "或"
 }
