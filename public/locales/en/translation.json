@@ -194,5 +194,9 @@
   "missing call data": "Please input call data first",
   "missing selected account": "Please choose approve account first",
   "endpoint connect timeout": "Endpoint connect timeout",
-  "watch only": "Watch Only"
+  "watch only": "Watch Only",
+  "export all": "Export all wallets",
+  "import all": "Import multiple wallets",
+  "account config error": "Config file parse failed",
+  "or": "or"
 }

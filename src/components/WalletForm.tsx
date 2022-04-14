@@ -157,9 +157,13 @@ export function WalletForm() {
 
         reader.onload = (e: any) => {
           // eslint-disable-next-line no-console
-          console.log(e.target.result);
+          // console.log(e.target.result);
 
           const config = JSON.parse(e.target.result) as MultisigAccountConfig;
+          if (!config || !config.members || !config.threshold) {
+            message.error(t('account config error'));
+            return;
+          }
           const encodeMembers = config.members.map((member) => {
             return {
               name: member.name,
@@ -170,6 +174,7 @@ export function WalletForm() {
         };
         reader.readAsText(info.file);
       } catch (err: unknown) {
+        message.error(t('account config error'));
         if (err instanceof Error) {
           // eslint-disable-next-line no-console
           console.log('err:', err);

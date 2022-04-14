@@ -49,4 +49,5 @@ export interface MultisigAccountConfig {
     address: string;
   }[];
   threshold: number;
+  scope: Network[] | ShareScope;
 }

@@ -108,6 +108,12 @@ export function findMultiAccount({
   return existsAccounts.find((acc) => acc.publicKey.toString() === key.toString()) ?? null;
 }
 
+export function findMultiAccountFromKey(publicKey: Uint8Array): KeyringAddress | null {
+  const existsAccounts = keyring.getAccounts().filter((account) => account.meta.isMultisig);
+
+  return existsAccounts.find((acc) => acc.publicKey.toString() === publicKey.toString()) ?? null;
+}
+
 function scopeKey(publicKey: Uint8Array) {
   return `scope:${u8aToHex(publicKey)}`;
 }
@@ -124,6 +130,18 @@ export function updateMultiAccountScope(
   );
 
   store.set(scopeKey(key), saveScope);
+}
+
+export function updateMultiAccountScopeFromKey(
+  publicKey: Uint8Array,
+  share: ShareScope,
+  scope: Network[],
+  network: Network
+): void {
+  const saveScope =
+    ShareScope.custom === share ? (scope as Network[]) : share === ShareScope.all ? ShareScope.all : [network];
+
+  store.set(scopeKey(publicKey), saveScope);
 }
 
 export function getMultiAccountScope(publicKey: Uint8Array): Network[] {
