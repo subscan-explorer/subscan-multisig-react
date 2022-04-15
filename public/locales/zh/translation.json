@@ -196,5 +196,7 @@
   "export all": "导出所有钱包",
   "import all": "导入多个钱包",
   "account config error": "解析配置文件出错",
-  "or": "或"
+  "or": "或",
+  "extension not found": "未检测到 Polkadot-js 扩展",
+  "extension account empty": "Polkadot-js 扩展中账号为空"
 }
