@@ -1,6 +1,7 @@
 import { SettingOutlined } from '@ant-design/icons';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringJson } from '@polkadot/ui-keyring/types';
+import { isFunction } from '@polkadot/util';
 import { Button, Col, Dropdown, Input, Menu, message, Modal, Row, Space, Statistic, Typography } from 'antd';
 import { saveAs } from 'file-saver';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -24,7 +25,7 @@ const { Text } = Typography;
 export function WalletState() {
   const { t } = useTranslation();
   const history = useHistory();
-  const { network, rpc } = useApi();
+  const { network, rpc, api } = useApi();
   const {
     multisigAccount,
     setMultisigAccount,
@@ -47,6 +48,14 @@ export function WalletState() {
       mainColor: getThemeVar(network, '@project-main-bg'),
     };
   }, [rpc, network]);
+
+  const showTransferButton = useMemo(() => {
+    return (
+      isFunction(api?.tx.balances.transfer) &&
+      isFunction(api?.tx.balances.transferKeepAlive) &&
+      isFunction(api?.tx.balances.transferAll)
+    );
+  }, [api]);
 
   const states = useMemo<{ label: string; count: number | undefined }[]>(() => {
     const res = [];
@@ -193,14 +202,16 @@ export function WalletState() {
           isExtensionAccount(pair.address)
         ) && (
           <div className="flex items-center">
-            <Button
-              onClick={() => setIsTransferDisplay(true)}
-              type="primary"
-              size="large"
-              className="w-full md:w-auto mt-4 md:mt-0 mr-2"
-            >
-              {t('transfer')}
-            </Button>
+            {showTransferButton && (
+              <Button
+                onClick={() => setIsTransferDisplay(true)}
+                type="primary"
+                size="large"
+                className="w-full md:w-auto mt-4 md:mt-0 mr-2"
+              >
+                {t('transfer')}
+              </Button>
+            )}
 
             <Button
               onClick={() => setIsExtrinsicDisplay(true)}
