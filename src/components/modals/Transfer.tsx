@@ -25,6 +25,7 @@ import { keyring } from '@polkadot/ui-keyring';
 import { KeyringSectionOption } from '@polkadot/ui-keyring/options/types';
 import type { BN } from '@polkadot/util';
 import { BN_HUNDRED, BN_ZERO, isFunction } from '@polkadot/util';
+import { Typography } from 'antd';
 import { flatten } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -32,6 +33,8 @@ import { useIsInjected, useMultisig } from 'src/hooks';
 import { AddressPair } from 'src/model';
 import { extractExternal } from 'src/utils';
 import styled from 'styled-components';
+
+const { Text } = Typography;
 
 interface Props {
   className?: string;
@@ -87,6 +90,7 @@ function Transfer({
   const [multisigExtrinsic, setMultisigExtrinsic] = useState<SubmittableExtrinsic<'promise'> | null>(null);
   const [accountId, setAccountId] = useState<string | null>(null);
   const isExtensionAccount = useIsInjected();
+  const [reserveAmount, setReserveAmount] = useState(0);
 
   const options = useMemo<KeyringSectionOption[]>(
     () =>
@@ -101,6 +105,14 @@ function Transfer({
     account: [],
     all: [],
   });
+
+  const [depositBase, depositFactor] = useMemo(() => {
+    return [Number(api?.consts.multisig.depositBase.toJSON()), Number(api?.consts.multisig.depositFactor.toJSON())];
+  }, [api]);
+
+  const [chainDecimal, chainToken] = useMemo(() => {
+    return [api?.registry.chainDecimals[0], api?.registry.chainTokens[0]];
+  }, [api]);
 
   const createMultiItem = useCallback(
     (option: Option): Option[] => {
@@ -229,11 +241,36 @@ function Transfer({
       const multiTx = module?.asMulti(...args);
 
       // eslint-disable-next-line no-console
-      console.log('hexCallData', ext.method.toHex());
+      // console.log('hexCallData', ext.method.toHex());
 
       setMultisigExtrinsic(multiTx);
+
+      // Estimate reserve amount
+      try {
+        if (chainDecimal) {
+          setReserveAmount(
+            // eslint-disable-next-line no-magic-numbers
+            (depositBase * 2 + depositFactor * threshold + (depositFactor * (ext.method.toHex().length + 31)) / 32) /
+              Math.pow(10, chainDecimal)
+          );
+        }
+      } catch (err) {
+        setReserveAmount(0);
+      }
     })();
-  }, [canToggleAll, isAll, api, isProtected, amount, recipientId, propSenderId, accountId]);
+  }, [
+    canToggleAll,
+    isAll,
+    api,
+    isProtected,
+    amount,
+    recipientId,
+    propSenderId,
+    accountId,
+    chainDecimal,
+    depositBase,
+    depositFactor,
+  ]);
 
   return (
     <Modal className="app--accounts-Modal" header={t<string>('Send funds')} onClose={onClose} size="large">
@@ -361,32 +398,39 @@ function Transfer({
           </Modal.Columns>
         </div>
       </Modal.Content>
-      <Modal.Actions onCancel={onClose}>
-        <TxButton
-          // accountId={propSenderId || senderId}
-          accountId={accountId}
-          icon="paper-plane"
-          isDisabled={!hasAvailable || !(propRecipientId || recipientId) || !amount || !!recipientPhish}
-          label={t<string>('Make Transfer')}
-          onStart={onClose}
-          extrinsic={multisigExtrinsic}
-          onSuccess={onTxSuccess}
-          // params={
-          //   canToggleAll && isAll
-          //     ? isFunction(api.tx.balances?.transferAll)
-          //       ? [propRecipientId || recipientId, false]
-          //       : [propRecipientId || recipientId, maxTransfer]
-          //     : [propRecipientId || recipientId, amount]
-          // }
-          // tx={
-          //   canToggleAll && isAll && isFunction(api.tx.balances?.transferAll)
-          //     ? api.tx.balances?.transferAll
-          //     : isProtected
-          //     ? api.tx.balances?.transferKeepAlive
-          //     : api.tx.balances?.transfer
-          // }
-        />
-      </Modal.Actions>
+
+      <div className="flex items-center justify-between px-5">
+        <Text style={{ color: 'rgba(78,78,78,0.6)', marginLeft: '20px' }}>
+          {t('multisig.estimate_reserve')} {reserveAmount} {chainToken}
+        </Text>
+
+        <Modal.Actions onCancel={onClose}>
+          <TxButton
+            // accountId={propSenderId || senderId}
+            accountId={accountId}
+            icon="paper-plane"
+            isDisabled={!hasAvailable || !(propRecipientId || recipientId) || !amount || !!recipientPhish}
+            label={t<string>('Make Transfer')}
+            onStart={onClose}
+            extrinsic={multisigExtrinsic}
+            onSuccess={onTxSuccess}
+            // params={
+            //   canToggleAll && isAll
+            //     ? isFunction(api.tx.balances?.transferAll)
+            //       ? [propRecipientId || recipientId, false]
+            //       : [propRecipientId || recipientId, maxTransfer]
+            //     : [propRecipientId || recipientId, amount]
+            // }
+            // tx={
+            //   canToggleAll && isAll && isFunction(api.tx.balances?.transferAll)
+            //     ? api.tx.balances?.transferAll
+            //     : isProtected
+            //     ? api.tx.balances?.transferKeepAlive
+            //     : api.tx.balances?.transfer
+            // }
+          />
+        </Modal.Actions>
+      </div>
     </Modal>
   );
 }
