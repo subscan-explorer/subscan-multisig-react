@@ -1,21 +1,23 @@
 import { SettingOutlined } from '@ant-design/icons';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringJson } from '@polkadot/ui-keyring/types';
-import { Button, message, Modal, Space, Statistic, Typography, Menu, Dropdown, Input, Row, Col } from 'antd';
+import { isFunction } from '@polkadot/util';
+import { Button, Col, Dropdown, Input, Menu, message, Modal, Row, Space, Statistic, Typography } from 'antd';
+import { saveAs } from 'file-saver';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import iconDown from 'src/assets/images/icon_down.svg';
-import { saveAs } from 'file-saver';
-import { getThemeVar } from '../utils';
-import { getMultiAccountScope, isCustomRpc } from '../utils/helper';
+import Transfer from '../components/modals/Transfer';
 import { LONG_DURATION } from '../config';
 import { useApi, useIsInjected } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
+import { getThemeVar } from '../utils';
+import { getMultiAccountScope, isCustomRpc } from '../utils/helper';
 import { ExtrinsicLaunch } from './ExtrinsicLaunch';
 import { Members } from './Members';
-import { SubscanLink } from './SubscanLink';
 import { ConfirmDialog } from './modals/ConfirmDialog';
+import { SubscanLink } from './SubscanLink';
 
 const { Text } = Typography;
 
@@ -23,7 +25,7 @@ const { Text } = Typography;
 export function WalletState() {
   const { t } = useTranslation();
   const history = useHistory();
-  const { network, rpc } = useApi();
+  const { network, rpc, api } = useApi();
   const {
     multisigAccount,
     setMultisigAccount,
@@ -34,6 +36,7 @@ export function WalletState() {
   } = useMultisigContext();
   const [isAccountsDisplay, setIsAccountsDisplay] = useState<boolean>(false);
   const [isExtrinsicDisplay, setIsExtrinsicDisplay] = useState(false);
+  const [isTransferDisplay, setIsTransferDisplay] = useState(false);
   const isExtensionAccount = useIsInjected();
   const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [renameInput, setRenameInput] = useState('');
@@ -45,6 +48,14 @@ export function WalletState() {
       mainColor: getThemeVar(network, '@project-main-bg'),
     };
   }, [rpc, network]);
+
+  const showTransferButton = useMemo(() => {
+    return (
+      isFunction(api?.tx.balances.transfer) &&
+      isFunction(api?.tx.balances.transferKeepAlive) &&
+      isFunction(api?.tx.balances.transferAll)
+    );
+  }, [api]);
 
   const states = useMemo<{ label: string; count: number | undefined }[]>(() => {
     const res = [];
@@ -190,14 +201,27 @@ export function WalletState() {
         {((multisigAccount?.meta.addressPair as KeyringJson[]) || []).some((pair) =>
           isExtensionAccount(pair.address)
         ) && (
-          <Button
-            onClick={() => setIsExtrinsicDisplay(true)}
-            type="primary"
-            size="large"
-            className="w-full md:w-auto mt-4 md:mt-0"
-          >
-            {t('submit_extrinsic')}
-          </Button>
+          <div className="flex items-center">
+            {showTransferButton && (
+              <Button
+                onClick={() => setIsTransferDisplay(true)}
+                type="primary"
+                size="large"
+                className="w-full md:w-auto mt-4 md:mt-0 mr-2"
+              >
+                {t('transfer')}
+              </Button>
+            )}
+
+            <Button
+              onClick={() => setIsExtrinsicDisplay(true)}
+              type="primary"
+              size="large"
+              className="w-full md:w-auto mt-4 md:mt-0"
+            >
+              {t('submit_extrinsic')}
+            </Button>
+          </div>
         )}
       </div>
 
@@ -247,6 +271,18 @@ export function WalletState() {
           }}
         />
       </Modal>
+
+      {isTransferDisplay && (
+        <Transfer
+          key="modal-transfer"
+          onClose={() => setIsTransferDisplay(false)}
+          senderId={multisigAccount?.address}
+          onTxSuccess={() => {
+            setIsTransferDisplay(false);
+            queryInProgress();
+          }}
+        />
+      )}
 
       <Modal
         title={null}

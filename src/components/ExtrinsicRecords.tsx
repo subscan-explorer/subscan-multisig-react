@@ -173,7 +173,7 @@ export function ExtrinsicRecords() {
         account: multiAddress,
         status: 'confirmed',
         offset: 0,
-        limit: 10,
+        limit: 100,
       },
     }
   );
@@ -185,7 +185,7 @@ export function ExtrinsicRecords() {
         account: multiAddress,
         status: 'cancelled',
         offset: 0,
-        limit: 10,
+        limit: 100,
       },
     }
   );
