@@ -99,7 +99,7 @@ export function prettyNumber(
 
   prefix = prefix.replace(/\d{1,3}(?=(\d{3})+(\.\d*)?$)/g, '$&,');
 
-  return !noDecimal ? `${prefix}.${suffix}` : prefix;
+  return !noDecimal && Number(suffix) > 0 ? `${prefix}.${suffix}` : prefix;
 }
 
 const completeDecimal = (value: string, bits: number): string => {
