@@ -41,6 +41,7 @@ export const SUPPORT_TYPES = {
       'vec<balanceof>',
       'compact<balance>',
       'compact<balanceof>',
+      'compact<u128>',
       'option<balance>',
       'option<balanceof>',
     ],

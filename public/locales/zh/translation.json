@@ -196,5 +196,6 @@
   "export all": "导出所有钱包",
   "import all": "导入多个钱包",
   "account config error": "解析配置文件出错",
-  "or": "或"
+  "or": "或",
+  "transfer": "转账"
 }
