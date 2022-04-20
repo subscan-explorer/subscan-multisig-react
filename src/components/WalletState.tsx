@@ -205,9 +205,10 @@ export function WalletState() {
             {showTransferButton && (
               <Button
                 onClick={() => setIsTransferDisplay(true)}
-                type="primary"
+                type="default"
                 size="large"
-                className="w-full md:w-auto mt-4 md:mt-0 mr-2"
+                className="w-full md:w-auto mt-4 md:mt-0 mr-4"
+                style={{ color: mainColor }}
               >
                 {t('transfer')}
               </Button>
