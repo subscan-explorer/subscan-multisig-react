@@ -198,5 +198,6 @@
   "export all": "Export all wallets",
   "import all": "Import multiple wallets",
   "account config error": "Config file parse failed",
-  "or": "or"
+  "or": "or",
+  "transfer": "Transfer"
 }

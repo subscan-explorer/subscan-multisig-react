@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
-import { isNull, isNumber, isString, isUndefined } from 'lodash';
 import BN from 'bn.js';
+import fromExponential from 'from-exponential';
+import { isNull, isNumber, isString, isUndefined } from 'lodash';
 
 export function accuracyFormat(num: BigNumber.Value, accuracy: number | string) {
   if (accuracy) {
@@ -73,7 +74,7 @@ export function formatBalance(
     result = `${prefix}.${suffix}`;
   }
 
-  return withThousandSplit ? prettyNumber(result, { noDecimal, decimal }) : result;
+  return withThousandSplit ? fromExponential(prettyNumber(result, { noDecimal, decimal })) : fromExponential(result);
 }
 
 export interface PrettyNumberOptions {
