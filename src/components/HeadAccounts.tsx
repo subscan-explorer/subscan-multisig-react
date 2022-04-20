@@ -19,7 +19,7 @@ const genHeaderLinkStyle = (classes: TemplateStringsArray, network: Network) => 
 
 export const HeadAccounts = () => {
   const { t } = useTranslation();
-  const { network, accounts } = useApi();
+  const { network, accounts, extensions } = useApi();
   const { contacts, queryContacts } = useContacts();
   const [popoverVisible, setPopoverVisible] = useState(false);
   const [addContactModalVisible, setAddContactModalVisible] = useState(false);
@@ -36,6 +36,18 @@ export const HeadAccounts = () => {
     }
   }, [popoverVisible, queryContacts]);
 
+  const renderAccountContent = () => {
+    if (extensions && extensions.length === 0) {
+      return <div className="mx-5 my-3">{t('extension not found')}</div>;
+    }
+    if (accounts && accounts.length === 0) {
+      return <div className="mx-5 my-3">{t('extension account empty')}</div>;
+    }
+    return accounts?.map((item) => (
+      <AccountItem key={item.address} address={item.address} name={item.meta?.name} type="injected" />
+    ));
+  };
+
   return (
     <>
       <Popover
@@ -47,46 +59,44 @@ export const HeadAccounts = () => {
           borderRadius: '0.15rem',
         }}
         content={
-          <Tabs defaultActiveKey="1">
-            <TabPane tab={t('My Account')} key="1">
-              <div className="truncate account-list">
-                {accounts?.map((item) => (
-                  <AccountItem key={item.address} address={item.address} name={item.meta?.name} type="injected" />
-                ))}
-              </div>
-            </TabPane>
+          <div>
+            <Tabs defaultActiveKey="1">
+              <TabPane tab={t('My Account')} key="1">
+                <div className="truncate account-list">{renderAccountContent()}</div>
+              </TabPane>
 
-            <TabPane tab={t('Contact Account')} key="2">
-              <div className="truncate">
-                <div className="account-list">
-                  {contacts?.map((item) => (
-                    <AccountItem
-                      key={item.address}
-                      address={item.address}
-                      name={item.meta?.name}
-                      type="contact"
-                      refreshContacts={queryContacts}
-                    />
-                  ))}
-                </div>
+              <TabPane tab={t('Contact Account')} key="2">
+                <div className="truncate">
+                  <div className="account-list">
+                    {contacts?.map((item) => (
+                      <AccountItem
+                        key={item.address}
+                        address={item.address}
+                        name={item.meta?.name}
+                        type="contact"
+                        refreshContacts={queryContacts}
+                      />
+                    ))}
+                  </div>
 
-                <div className="flex justify-end md:mt-2">
-                  <Button
-                    type="default"
-                    size="large"
-                    className="flex justify-center items-center w-full"
-                    style={{ color: mainColor }}
-                    onClick={() => {
-                      setAddContactModalVisible(true);
-                      setPopoverVisible(false);
-                    }}
-                  >
-                    {t('contact.Add Contact')}
-                  </Button>
+                  <div className="flex justify-end md:mt-2">
+                    <Button
+                      type="default"
+                      size="large"
+                      className="flex justify-center items-center w-full"
+                      style={{ color: mainColor }}
+                      onClick={() => {
+                        setAddContactModalVisible(true);
+                        setPopoverVisible(false);
+                      }}
+                    >
+                      {t('contact.Add Contact')}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </TabPane>
-          </Tabs>
+              </TabPane>
+            </Tabs>
+          </div>
         }
         placement="bottom"
       >
@@ -126,7 +136,7 @@ const AccountItem = (props: {
   };
 
   return (
-    <div className="header-account-list flex items-center justify-between md:pt-2 w-200">
+    <div className="header-account-list flex items-center justify-between md:pt-2">
       <div className=" flex items-center justify-between ">
         <BaseIdentityIcon
           theme="substrate"

@@ -199,5 +199,7 @@
   "import all": "Import multiple wallets",
   "account config error": "Config file parse failed",
   "or": "or",
+  "extension not found": "Polkadot-js extension not detected.",
+  "extension account empty": "Polkadot-js extension accounts empty.",
   "transfer": "Transfer"
 }

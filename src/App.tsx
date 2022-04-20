@@ -90,7 +90,7 @@ function App() {
               </span>
             )}
 
-            <HeadAccounts />
+            {networkStatus === 'success' && <HeadAccounts />}
 
             <Button
               className="flex justify-between items-center px-2 "
