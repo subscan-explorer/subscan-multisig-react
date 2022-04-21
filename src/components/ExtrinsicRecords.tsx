@@ -54,9 +54,20 @@ interface ConfirmedOrCancelledProps {
   nodes: MultisigRecord[];
   isConfirmed: boolean;
   loading: boolean;
+  totalCount: number;
+  currentPage?: number;
+  onChangePage?: (page: number) => void;
 }
 
-function ConfirmedOrCancelled({ nodes, account, loading, isConfirmed }: ConfirmedOrCancelledProps) {
+function ConfirmedOrCancelled({
+  nodes,
+  account,
+  loading,
+  isConfirmed,
+  totalCount,
+  currentPage,
+  onChangePage,
+}: ConfirmedOrCancelledProps) {
   const { api } = useApi();
 
   const extrinsic = useMemo(() => {
@@ -144,6 +155,9 @@ function ConfirmedOrCancelled({ nodes, account, loading, isConfirmed }: Confirme
       isConfirmed={isConfirmed}
       isCancelled={!isConfirmed}
       loading={loading}
+      totalCount={totalCount}
+      currentPage={currentPage}
+      onChangePage={onChangePage}
     />
   ) : (
     <Spin className="w-full mt-4" />
@@ -152,6 +166,7 @@ function ConfirmedOrCancelled({ nodes, account, loading, isConfirmed }: Confirme
 
 /* -----------------------------------extrinsic tabs------------------------------------ */
 
+// eslint-disable-next-line complexity
 export function ExtrinsicRecords() {
   const { rpc } = useApi();
   const { t } = useTranslation();
@@ -159,6 +174,8 @@ export function ExtrinsicRecords() {
   const { multisigAccount, inProgress, confirmedAccount, cancelledAccount, queryInProgress, loadingInProgress } =
     useMultisigContext();
   const [tabKey, setTabKey] = useState('inProgress');
+  const [confirmedPage, setConfirmedPage] = useState(1);
+  const [cancelledPage, setCancelledPage] = useState(1);
 
   const { isCustomNetwork } = useMemo(() => {
     return {
@@ -172,8 +189,8 @@ export function ExtrinsicRecords() {
       variables: {
         account: multiAddress,
         status: 'confirmed',
-        offset: 0,
-        limit: 100,
+        offset: (confirmedPage - 1) * 10,
+        limit: 10,
       },
     }
   );
@@ -184,8 +201,8 @@ export function ExtrinsicRecords() {
       variables: {
         account: multiAddress,
         status: 'cancelled',
-        offset: 0,
-        limit: 100,
+        offset: (cancelledPage - 1) * 10,
+        limit: 10,
       },
     }
   );
@@ -196,6 +213,14 @@ export function ExtrinsicRecords() {
       fetchCancelled();
     }
   }, [isCustomNetwork, fetchCancelled, fetchConfimed]);
+
+  useEffect(() => {
+    fetchConfimed();
+  }, [confirmedPage, fetchConfimed]);
+
+  useEffect(() => {
+    fetchCancelled();
+  }, [cancelledPage, fetchCancelled]);
 
   // eslint-disable-next-line complexity
   const handleChangeTab = (key: string) => {
@@ -237,7 +262,12 @@ export function ExtrinsicRecords() {
           key="inProgress"
         >
           {multisigAccount?.address ? (
-            <Entries source={inProgress} account={multisigAccount} loading={loadingInProgress} />
+            <Entries
+              source={inProgress}
+              account={multisigAccount}
+              loading={loadingInProgress}
+              totalCount={inProgress.length}
+            />
           ) : (
             <Spin className="w-full mt-4" />
           )}
@@ -259,6 +289,9 @@ export function ExtrinsicRecords() {
                 account={multisigAccount}
                 multiAddress={multiAddress}
                 isConfirmed
+                totalCount={confirmedData?.multisigRecords?.totalCount || 0}
+                currentPage={confirmedPage}
+                onChangePage={setConfirmedPage}
               />
             </TabPane>
             <TabPane
@@ -276,6 +309,9 @@ export function ExtrinsicRecords() {
                 account={multisigAccount}
                 multiAddress={multiAddress}
                 isConfirmed={false}
+                totalCount={cancelledData?.multisigRecords?.totalCount || 0}
+                currentPage={cancelledPage}
+                onChangePage={setCancelledPage}
               />
             </TabPane>
           </>
