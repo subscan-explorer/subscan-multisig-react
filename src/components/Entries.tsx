@@ -22,6 +22,9 @@ export interface EntriesProps {
   isConfirmed?: boolean;
   isCancelled?: boolean;
   loading?: boolean;
+  totalCount: number;
+  currentPage?: number;
+  onChangePage?: (page: number) => void;
 }
 
 const { Panel } = Collapse;
@@ -70,7 +73,16 @@ const renderMemberStatus = (entry: Entry, pair: KeyringJson, _network: Network, 
 };
 
 // eslint-disable-next-line complexity
-export function Entries({ source, isConfirmed, isCancelled, account, loading }: EntriesProps) {
+export function Entries({
+  source,
+  isConfirmed,
+  isCancelled,
+  account,
+  loading,
+  totalCount,
+  currentPage,
+  onChangePage,
+}: EntriesProps) {
   const { t } = useTranslation();
   const isInjected = useIsInjected();
   const { network } = useApi();
@@ -238,7 +250,16 @@ export function Entries({ source, isConfirmed, isCancelled, account, loading }: 
         dataSource={source}
         columns={columns}
         rowKey={(record) => record.callHash ?? (record.blockHash as string)}
-        pagination={false}
+        pagination={
+          isConfirmed || isCancelled
+            ? {
+                total: totalCount,
+                pageSize: 10,
+                current: currentPage,
+                onChange: onChangePage,
+              }
+            : false
+        }
         expandable={{
           expandedRowRender,
           expandIcon: genExpandIcon(),

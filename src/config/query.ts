@@ -18,7 +18,7 @@ export const MULTISIG_RECORD_COUNT_QUERY = `
 
 export const MULTISIG_RECORD_QUERY = `
   query multisigRecords($account: String!, $status: String!,$offset: Int, $limit: Int) {
-    multisigRecords(offset: $offset, last: $limit, filter: { multisigAccountId: { equalTo: $account }, status: {equalTo: $status}}, orderBy: TIMESTAMP_DESC) {
+    multisigRecords(offset: $offset, first: $limit, filter: { multisigAccountId: { equalTo: $account }, status: {equalTo: $status}}, orderBy: TIMESTAMP_DESC) {
       totalCount
       nodes {
         multisigAccountId
