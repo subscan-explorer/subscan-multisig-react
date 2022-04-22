@@ -21,6 +21,7 @@ import {
 import { SubscanLink } from './SubscanLink';
 
 interface ArgsProps {
+  section: string | undefined;
   args: Arg[];
   className?: string;
 }
@@ -82,7 +83,7 @@ function formatAddressValue(value: string | string[], chain: Chain) {
   return null;
 }
 
-export function Args({ args, className }: ArgsProps) {
+export function Args({ args, className, section }: ArgsProps) {
   const { t } = useTranslation();
   const { chain } = useApi();
   const columns: ColumnsType<ArgObj> = [
@@ -103,7 +104,12 @@ export function Args({ args, className }: ArgsProps) {
         const isAddr = type ? isAddressType(type) : isSS58Address(value);
 
         if (isObject(value)) {
-          return <Args args={Object.entries(value).map(([prop, propValue]) => ({ name: prop, value: propValue }))} />;
+          return (
+            <Args
+              args={Object.entries(value).map(([prop, propValue]) => ({ name: prop, value: propValue }))}
+              section={section}
+            />
+          );
           // return JSON.stringify(value);
         }
 
@@ -111,7 +117,7 @@ export function Args({ args, className }: ArgsProps) {
           return formatAddressValue(value, chain);
         }
 
-        if (isBalanceType(type || name) || isCrabValue(name)) {
+        if (isBalanceType(type || name) || isCrabValue(name) || section === 'balances') {
           return formatBalance(value, +chain.tokens[0].decimal, {
             noDecimal: false,
             withThousandSplit: true,
