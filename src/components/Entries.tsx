@@ -223,7 +223,6 @@ export function Entries({
     return (
       <div className="record-expand bg-gray-100 py-3 px-5">
         <div className=" text-black-800 text-base leading-none mb-3">{t('progress')}</div>
-
         <div className="members">
           <Table
             columns={progressColumnsNested}
@@ -235,10 +234,9 @@ export function Entries({
             className="mb-4 mx-4"
           />
         </div>
-
         <div className=" text-black-800 text-base leading-none my-3">{t('parameters')}</div>
 
-        <Args args={args} className="mb-4 mx-4" />
+        <Args args={args} className="mb-4 mx-4" section={entry.callDataJson?.section} />
       </div>
     );
   };
