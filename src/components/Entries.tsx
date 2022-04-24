@@ -236,7 +236,12 @@ export function Entries({
         </div>
         <div className=" text-black-800 text-base leading-none my-3">{t('parameters')}</div>
 
-        <Args args={args} className="mb-4 mx-4" section={entry.callDataJson?.section} />
+        <Args
+          args={args}
+          className="mb-4 mx-4"
+          section={entry.callDataJson?.section}
+          method={entry.callDataJson?.method}
+        />
       </div>
     );
   };

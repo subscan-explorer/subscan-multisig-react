@@ -4,9 +4,9 @@ import { useManualQuery } from 'graphql-hooks';
 import { createContext, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { MULTISIG_RECORD_COUNT_QUERY } from '../config';
-import { useMultisig, useApi } from '../hooks';
+import { useApi, useMultisig } from '../hooks';
 import { Entry } from '../model';
-import { empty, isCustomRpc } from '../utils';
+import { empty } from '../utils';
 
 export const MultisigContext = createContext<{
   inProgress: Entry[];
@@ -34,7 +34,7 @@ export const MultisigContext = createContext<{
 
 export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) => {
   const [isPageLocked, setIsPageLock] = useState<boolean>(false);
-  const { rpc } = useApi();
+  const { networkConfig } = useApi();
   const value = useMultisig();
   const { account } = useParams<{ account: string }>();
 
@@ -46,10 +46,10 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
     }
   );
   const refreshConfirmedAccount = useCallback(() => {
-    if (!isCustomRpc(rpc)) {
+    if (networkConfig?.api?.subql) {
       fetchData({ variables: { account, status: 'confirmed' }, skipCache: true });
     }
-  }, [account, fetchData, rpc]);
+  }, [account, fetchData, networkConfig]);
 
   const [fetchCancelledData, { data: cancelledData }] = useManualQuery<{ multisigRecords: { totalCount: number } }>(
     MULTISIG_RECORD_COUNT_QUERY,
@@ -60,10 +60,10 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
   );
 
   const refreshCancelledAccount = useCallback(() => {
-    if (!isCustomRpc(rpc)) {
+    if (networkConfig?.api?.subql) {
       fetchCancelledData({ variables: { account, status: 'cancelled' }, skipCache: true });
     }
-  }, [account, fetchCancelledData, rpc]);
+  }, [account, fetchCancelledData, networkConfig]);
 
   useEffect(() => {
     refreshConfirmedAccount();

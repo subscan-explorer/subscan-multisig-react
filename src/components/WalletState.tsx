@@ -13,7 +13,7 @@ import { LONG_DURATION } from '../config';
 import { useApi, useIsInjected } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
 import { getThemeVar } from '../utils';
-import { getMultiAccountScope, isCustomRpc } from '../utils/helper';
+import { getMultiAccountScope } from '../utils/helper';
 import { ExtrinsicLaunch } from './ExtrinsicLaunch';
 import { Members } from './Members';
 import { ConfirmDialog } from './modals/ConfirmDialog';
@@ -25,7 +25,7 @@ const { Text } = Typography;
 export function WalletState() {
   const { t } = useTranslation();
   const history = useHistory();
-  const { network, rpc, api } = useApi();
+  const { network, api, networkConfig } = useApi();
   const {
     multisigAccount,
     setMultisigAccount,
@@ -42,12 +42,12 @@ export function WalletState() {
   const [renameInput, setRenameInput] = useState('');
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
-  const { isCustomNetwork, mainColor } = useMemo(() => {
+  const { supportSubql, mainColor } = useMemo(() => {
     return {
-      isCustomNetwork: isCustomRpc(rpc),
+      supportSubql: !!networkConfig?.api?.subql,
       mainColor: getThemeVar(network, '@project-main-bg'),
     };
-  }, [rpc, network]);
+  }, [network, networkConfig]);
 
   const showTransferButton = useMemo(() => {
     return (
@@ -63,7 +63,7 @@ export function WalletState() {
       label: 'multisig.In Progress',
       count: inProgress.length,
     });
-    if (!isCustomNetwork) {
+    if (supportSubql) {
       res.push({ label: 'multisig.Confirmed Extrinsic', count: confirmedAccount });
     }
     res.push(
@@ -78,13 +78,7 @@ export function WalletState() {
       }
     );
     return res;
-  }, [
-    inProgress.length,
-    confirmedAccount,
-    multisigAccount?.meta.threshold,
-    multisigAccount?.meta.who,
-    isCustomNetwork,
-  ]);
+  }, [inProgress.length, confirmedAccount, multisigAccount?.meta.threshold, multisigAccount?.meta.who, supportSubql]);
   const renameWallet = useCallback(
     ({ name }: { name: string }) => {
       try {

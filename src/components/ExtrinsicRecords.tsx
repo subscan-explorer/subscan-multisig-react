@@ -9,7 +9,7 @@ import { useParams } from 'react-router-dom';
 import { MULTISIG_RECORD_QUERY } from '../config';
 import { useApi } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
-import { IExtrinsic, isCustomRpc, parseArgs } from '../utils';
+import { IExtrinsic, parseArgs } from '../utils';
 import { Entries } from './Entries';
 
 interface MultisigRecordsQueryRes {
@@ -168,7 +168,7 @@ function ConfirmedOrCancelled({
 
 // eslint-disable-next-line complexity
 export function ExtrinsicRecords() {
-  const { rpc } = useApi();
+  const { networkConfig } = useApi();
   const { t } = useTranslation();
   const { account: multiAddress } = useParams<{ account: string }>();
   const { multisigAccount, inProgress, confirmedAccount, cancelledAccount, queryInProgress, loadingInProgress } =
@@ -176,12 +176,6 @@ export function ExtrinsicRecords() {
   const [tabKey, setTabKey] = useState('inProgress');
   const [confirmedPage, setConfirmedPage] = useState(1);
   const [cancelledPage, setCancelledPage] = useState(1);
-
-  const { isCustomNetwork } = useMemo(() => {
-    return {
-      isCustomNetwork: isCustomRpc(rpc),
-    };
-  }, [rpc]);
 
   const [fetchConfimed, { data: confirmedData, loading: loadingConfirmed }] = useManualQuery<MultisigRecordsQueryRes>(
     MULTISIG_RECORD_QUERY,
@@ -208,19 +202,23 @@ export function ExtrinsicRecords() {
   );
 
   useEffect(() => {
-    if (!isCustomNetwork) {
+    if (networkConfig?.api?.subql) {
       fetchConfimed();
       fetchCancelled();
     }
-  }, [isCustomNetwork, fetchCancelled, fetchConfimed]);
+  }, [networkConfig, fetchCancelled, fetchConfimed]);
 
   useEffect(() => {
-    fetchConfimed();
-  }, [confirmedPage, fetchConfimed]);
+    if (networkConfig?.api?.subql) {
+      fetchConfimed();
+    }
+  }, [confirmedPage, fetchConfimed, networkConfig]);
 
   useEffect(() => {
-    fetchCancelled();
-  }, [cancelledPage, fetchCancelled]);
+    if (networkConfig?.api?.subql) {
+      fetchCancelled();
+    }
+  }, [cancelledPage, fetchCancelled, networkConfig]);
 
   // eslint-disable-next-line complexity
   const handleChangeTab = (key: string) => {
@@ -228,11 +226,11 @@ export function ExtrinsicRecords() {
     if (key === 'inProgress') {
       queryInProgress();
     } else if (key === 'confirmed') {
-      if (!isCustomNetwork) {
+      if (networkConfig?.api?.subql) {
         fetchConfimed();
       }
     } else if (key === 'cancelled') {
-      if (!isCustomNetwork) {
+      if (networkConfig?.api?.subql) {
         fetchCancelled();
       }
     }
@@ -240,7 +238,7 @@ export function ExtrinsicRecords() {
 
   const refreshData = () => {
     queryInProgress();
-    if (!isCustomNetwork) {
+    if (networkConfig?.api?.subql) {
       fetchConfimed();
       fetchCancelled();
     }
@@ -272,7 +270,7 @@ export function ExtrinsicRecords() {
             <Spin className="w-full mt-4" />
           )}
         </TabPane>
-        {!isCustomNetwork && (
+        {networkConfig?.api?.subql && (
           <>
             <TabPane
               tab={

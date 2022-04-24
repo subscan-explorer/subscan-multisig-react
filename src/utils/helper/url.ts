@@ -90,3 +90,7 @@ export function changeUrlHash(rpcUrl: string) {
     location.replace(`/#${encodeURIComponent(`r=${rpcUrl}`)}`);
   }
 }
+
+export function getExplorerUrl(hostName: string) {
+  return `https://${hostName}.subscan.io`;
+}
