@@ -3,18 +3,19 @@ import { ApiPromise } from '@polkadot/api';
 import { WsProvider } from '@polkadot/rpc-provider';
 import { Button, Col, Input, message, Row } from 'antd';
 import classNames from 'classnames';
+import _ from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NETWORK_CONFIG } from 'src/config';
+import { chains } from 'src/config/chains';
 import { useApi } from 'src/hooks';
-import { NetConfig } from 'src/model';
+import { NetConfigV2 } from 'src/model';
 import { changeUrlHash, getThemeVar } from 'src/utils';
 import { readStorage, updateStorage } from 'src/utils/helper/storage';
 import { ConfirmDialog } from './ConfirmDialog';
 
 interface AddCustomNetworkProps {
   onCancel: () => void;
-  editNetwork: NetConfig | null;
+  editNetwork: NetConfigV2 | null;
 }
 
 export const AddCustomNetwork = (props: AddCustomNetworkProps) => {
@@ -27,8 +28,9 @@ export const AddCustomNetwork = (props: AddCustomNetworkProps) => {
   const [rpcName, setRpcName] = useState('');
   const [rpcUrl, setRpcUrl] = useState('');
   const [explorerHostName, setExplorerHostName] = useState('');
+  // const [explorerUrl, setExplorerUrl] = useState('');
 
-  const networks = useMemo(() => Object.entries(NETWORK_CONFIG).map(([key, value]) => ({ name: key, ...value })), []);
+  const networks = useMemo(() => _.values(chains), []);
 
   const [addNetworkLoading, setAddNetworkLoading] = useState(false);
   const [addNetworkErrorDialogVisible, setAddNetworkErrorDialogVisible] = useState(false);
@@ -37,7 +39,7 @@ export const AddCustomNetwork = (props: AddCustomNetworkProps) => {
   // eslint-disable-next-line complexity
   useEffect(() => {
     if (props.editNetwork) {
-      setRpcName(props.editNetwork?.fullName || '');
+      setRpcName(props.editNetwork?.displayName || '');
       setRpcUrl(props.editNetwork?.rpc || '');
       setExplorerHostName(props.editNetwork?.explorerHostName || '');
     } else {
@@ -76,7 +78,7 @@ export const AddCustomNetwork = (props: AddCustomNetworkProps) => {
 
         let duplicate = false;
         networks.forEach((networkItem) => {
-          if (networkItem.rpc === rpcUrl.trim()) {
+          if (networkItem?.rpc === rpcUrl.trim()) {
             duplicate = true;
             return;
           }
@@ -94,7 +96,8 @@ export const AddCustomNetwork = (props: AddCustomNetworkProps) => {
         }
 
         const newNetwork = {
-          fullName: rpcName.trim(),
+          name: rpcName.trim(),
+          displayName: rpcName.trim(),
           rpc: rpcUrl.trim(),
           explorerHostName: explorerHostName.trim(),
         };
@@ -156,7 +159,7 @@ export const AddCustomNetwork = (props: AddCustomNetworkProps) => {
 
         let duplicate = false;
         networks.forEach((networkItem) => {
-          if (networkItem.rpc === rpcUrl.trim()) {
+          if (networkItem?.rpc === rpcUrl.trim()) {
             duplicate = true;
             return;
           }
@@ -175,7 +178,8 @@ export const AddCustomNetwork = (props: AddCustomNetworkProps) => {
 
         const networkIndex = oldCustomNetworks.findIndex((networkItem) => networkItem.rpc === props.editNetwork?.rpc);
         oldCustomNetworks.splice(networkIndex, 1, {
-          fullName: rpcName,
+          name: rpcName,
+          displayName: rpcName,
           rpc: rpcUrl,
           explorerHostName: explorerHostName.trim(),
         });
@@ -192,14 +196,15 @@ export const AddCustomNetwork = (props: AddCustomNetworkProps) => {
     }
   };
 
-  const selectCustomNetwork = (netConfig: NetConfig) => {
-    if (!netConfig.fullName || !netConfig.rpc) {
+  const selectCustomNetwork = (netConfig: NetConfigV2) => {
+    if (!netConfig.displayName || !netConfig.rpc) {
       return;
     }
 
     updateStorage({
       customNetwork: {
-        fullName: netConfig.fullName,
+        name: netConfig.name,
+        displayName: netConfig.displayName,
         rpc: netConfig.rpc,
       },
     });

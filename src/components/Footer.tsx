@@ -2,14 +2,15 @@ import { Dropdown, Layout, Menu, Typography } from 'antd';
 import { getYear } from 'date-fns';
 import { useMemo } from 'react';
 import { useApi } from 'src/hooks';
-import { NetConfig } from '../model';
+import { getDonateAddress } from 'src/utils';
+import { NetConfigV2 } from '../model';
 import { useTranslation } from '../packages/react-signer/src/translate';
 import { Language } from './Language';
 import { ThemeSwitch } from './ThemeSwitch';
 
-export function Footer({ networkConfig, className = '' }: { networkConfig?: NetConfig; className?: string }) {
+export function Footer({ className = '' }: { networkConfig?: NetConfigV2; className?: string }) {
   const { t } = useTranslation();
-  const { network } = useApi();
+  const { network, chain } = useApi();
 
   const contactIcons = useMemo(
     () => [
@@ -45,12 +46,16 @@ export function Footer({ networkConfig, className = '' }: { networkConfig?: NetC
           placement="topCenter"
           overlay={
             <Menu>
-              <Menu.Item>
-                <div className="flex flex-col items-center text-blue-400 hover:text-blue-600">
-                  <span>{t('donate_unit', { unit: networkConfig?.token?.native })}</span>
-                  <span>{networkConfig?.donate?.address}</span>
-                </div>
-              </Menu.Item>
+              {chain && (
+                <Menu.Item>
+                  <div className="flex flex-col items-center text-blue-400 hover:text-blue-600">
+                    <span>
+                      {t('donate_unit', { unit: chain.tokens.length > 0 ? chain.tokens[0].symbol : 'Unknown' })}
+                    </span>
+                    <span>{getDonateAddress(chain.ss58Format)}</span>
+                  </div>
+                </Menu.Item>
+              )}
 
               <Menu.Item className="text-center text-blue-400 hover:text-blue-600">
                 <a href="https://www.subscan.io/donate" target="__blank">

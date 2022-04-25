@@ -2,6 +2,7 @@ import { TypeRegistry } from '@polkadot/types';
 import { AccountId } from '@polkadot/types/interfaces';
 import { hexToU8a, numberToU8a, stringToU8a, u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+import { DONATE_ADDRESS } from 'src/config';
 
 export const registry = new TypeRegistry();
 
@@ -68,4 +69,8 @@ export function convertToEth(address: string): string | null {
 
   // eslint-disable-next-line no-magic-numbers
   return result.startsWith(PREFIX) ? '0x' + result.slice(-42, -2) : null;
+}
+
+export function getDonateAddress(ss58Prefix: string | number) {
+  return convertToSS58(DONATE_ADDRESS, Number(ss58Prefix));
 }

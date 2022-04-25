@@ -1,5 +1,6 @@
 import { partialRight } from 'lodash';
-import { NETWORK_LIGHT_THEME, ThemeVariable, NETWORK_CONFIG } from '../../config';
+import { chains } from 'src/config/chains';
+import { NETWORK_LIGHT_THEME, ThemeVariable } from '../../config';
 import { Network } from '../../model';
 
 export function swap<T, U>(value: T | U, value1: U, value2: T): T | U {
@@ -61,8 +62,8 @@ export function toShortString(str: string, maxLength: number): string {
 
 export function isCustomRpc(rpc: string): boolean {
   return (
-    Object.keys(NETWORK_CONFIG).filter((key) => {
-      return NETWORK_CONFIG[key as Network].rpc === rpc;
+    Object.keys(chains).filter((key) => {
+      return chains[key as Network]?.rpc === rpc;
     }).length === 0
   );
 }

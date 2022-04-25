@@ -5,8 +5,8 @@ import type { InjectedExtension } from '@polkadot/extension-inject/types';
 import { message } from 'antd';
 import React, { createContext, Dispatch, useCallback, useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NETWORK_CONFIG } from '../config';
-import { Action, ConnectStatus, InjectedAccountWithMeta, NetConfig, Network } from '../model';
+import { chains } from 'src/config/chains';
+import { Action, ConnectStatus, InjectedAccountWithMeta, NetConfigV2, Network } from '../model';
 import { convertToSS58, getInitialSetting, patchUrl } from '../utils';
 import { changeUrlHash } from '../utils/helper';
 import { readStorage, updateStorage } from '../utils/helper/storage';
@@ -74,7 +74,7 @@ export type ApiCtx = {
   switchNetwork: (type: Network) => void;
   setApi: (api: ApiPromise) => void;
   setRandom: (num: number) => void;
-  networkConfig: NetConfig | undefined;
+  networkConfig: NetConfigV2 | undefined;
   chain: Chain;
   extensions: InjectedExtension[] | undefined;
 };
@@ -97,7 +97,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
   const [chain, setChain] = useState<Chain>({ ss58Format: '', tokens: [] });
   const [random, setRandom] = useState<number>(0);
   const [extensions, setExtensions] = useState<InjectedExtension[] | undefined>(undefined);
-  const [networkConfig, setNetworkConfig] = useState(NETWORK_CONFIG[state.network]);
+  const [networkConfig, setNetworkConfig] = useState(chains[state.network]);
 
   // eslint-disable-next-line complexity
   useEffect(() => {
@@ -116,8 +116,8 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
     if (!state.rpc) {
       if (storage.selectedRpc) {
         let hasMatch = false;
-        Object.keys(NETWORK_CONFIG).forEach((key) => {
-          if (NETWORK_CONFIG[key as Network].rpc === storage.selectedRpc) {
+        Object.keys(chains).forEach((key) => {
+          if (chains[key]?.rpc === storage.selectedRpc) {
             hasMatch = true;
           }
         });
@@ -134,11 +134,11 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
       }
     }
 
-    let selectedNetwork: NetConfig | null = null;
+    let selectedNetwork: NetConfigV2 | undefined = undefined;
     let networkName: Network = 'polkadot';
-    Object.keys(NETWORK_CONFIG).forEach((key) => {
-      if (NETWORK_CONFIG[key as Network].rpc === state.rpc) {
-        selectedNetwork = NETWORK_CONFIG[key as Network];
+    Object.keys(chains).forEach((key) => {
+      if (chains[key]?.rpc === state.rpc) {
+        selectedNetwork = chains[key];
         networkName = key as Network;
       }
     });
@@ -150,7 +150,9 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
       }
     }
     if (!selectedNetwork) {
-      changeUrlHash(NETWORK_CONFIG['polkadot'].rpc);
+      if (chains['polkadot']) {
+        changeUrlHash(chains['polkadot'].rpc);
+      }
       return;
     }
 

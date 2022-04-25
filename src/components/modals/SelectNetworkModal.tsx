@@ -1,13 +1,14 @@
 import { CloseOutlined, SettingOutlined } from '@ant-design/icons';
 import { Button, Col, Dropdown, Menu, Modal, Row } from 'antd';
 import classNames from 'classnames';
+import * as _ from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import subscanLogo from 'src/assets/images/subscan_logo.png';
-import { NETWORK_CONFIG } from 'src/config';
 import { useApi } from 'src/hooks';
-import { NetConfig } from 'src/model';
+import { NetConfigV2 } from 'src/model';
 import { changeUrlHash, getThemeVar } from 'src/utils';
+import { chains } from 'src/config/chains';
 import { readStorage, updateStorage } from 'src/utils/helper/storage';
 import { AddCustomNetwork } from './AddCustomNetwork';
 import { ConfirmDialog } from './ConfirmDialog';
@@ -24,20 +25,20 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
     return getThemeVar(network, '@project-main-bg');
   }, [network]);
 
-  const networks = useMemo(() => Object.entries(NETWORK_CONFIG).map(([key, value]) => ({ name: key, ...value })), []);
+  const networks = useMemo(() => _.values(chains), []);
 
-  const [customNetworks, setCustomNetworks] = useState<NetConfig[]>([]);
+  const [customNetworks, setCustomNetworks] = useState<NetConfigV2[]>([]);
 
   const [addNetworkErrorDialogVisible, setAddNetworkErrorDialogVisible] = useState(false);
   const [addCustomNetworkVisible, setAddCustomNetworkVisible] = useState(false);
-  const [editingNetwork, setEditingNetwork] = useState<NetConfig | null>(null);
+  const [editingNetwork, setEditingNetwork] = useState<NetConfigV2 | null>(null);
 
   const updateCustomNetworks = () => {
     const storage = readStorage();
     setCustomNetworks(storage.addedCustomNetworks || []);
   };
 
-  const deleteCustomNetwork = (networkItem: NetConfig) => {
+  const deleteCustomNetwork = (networkItem: NetConfigV2) => {
     const storage = readStorage();
     const oldCustomNetworks = storage.addedCustomNetworks || [];
     const newCustomNetworks = oldCustomNetworks.filter((item) => {
@@ -51,8 +52,8 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
     updateCustomNetworks();
   }, [addCustomNetworkVisible]);
 
-  const selectPresetNetwork = (netConfig: NetConfig) => {
-    if (!netConfig.fullName || !netConfig.rpc) {
+  const selectPresetNetwork = (netConfig: NetConfigV2 | undefined) => {
+    if (!netConfig || !netConfig.displayName || !netConfig.rpc) {
       return;
     }
     props.onCancel();
@@ -62,14 +63,15 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
     });
   };
 
-  const selectCustomNetwork = (netConfig: NetConfig) => {
-    if (!netConfig.fullName || !netConfig.rpc) {
+  const selectCustomNetwork = (netConfig: NetConfigV2) => {
+    if (!netConfig.displayName || !netConfig.rpc) {
       return;
     }
 
     updateStorage({
       customNetwork: {
-        fullName: netConfig.fullName,
+        name: netConfig.name,
+        displayName: netConfig.displayName,
         rpc: netConfig.rpc,
         explorerHostName: netConfig.explorerHostName,
       },
@@ -110,49 +112,51 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
 
           <div className="mt-2 bg-divider" style={{ height: '1px' }} />
 
-          <div className="flex flex-wrap justify-between py-3">
+          <div className="flex flex-wrap py-3">
             {networks
-              .filter((item) => !item.isTest)
-              .map((networkItem) => (
+              .filter((item) => !item?.isTestnet)
+              .filter((item) => !!item)
+              .map((item) => (
                 <div
-                  key={networkItem.name}
-                  className="bg-gray-200 w-36 h-10 cursor-pointer flex items-center"
-                  onClick={() => selectPresetNetwork(networkItem)}
+                  key={item?.name}
+                  className="bg-gray-200 w-36 h-10 cursor-pointer flex items-center mr-5 mb-3"
+                  onClick={() => selectPresetNetwork(item)}
                 >
-                  <img src={networkItem.facade?.logo || subscanLogo} className="w-5 h-5 mx-3" alt="logo" />
+                  <img src={item?.logo || subscanLogo} className="w-5 h-5 mx-3" alt="logo" />
 
                   <div className="font-bold text-black-800 leading-none" style={{ fontSize: '14px' }}>
-                    {networkItem.fullName}
+                    {item?.displayName || item?.name}
                   </div>
                 </div>
               ))}
           </div>
 
-          <div className="mt-4 font-bold" style={{ color: mainColor, fontSize: '16px' }}>
+          <div className="mt-1 font-bold" style={{ color: mainColor, fontSize: '16px' }}>
             {t('testnet')}
           </div>
 
           <div className="mt-2 bg-divider" style={{ height: '1px' }} />
 
-          <div className="flex flex-wrap justify-between py-3">
+          <div className="flex flex-wrap py-3">
             {networks
-              .filter((item) => item.isTest)
-              .map((networkItem) => (
+              .filter((item) => item?.isTestnet)
+              .filter((item) => !!item)
+              .map((item) => (
                 <div
-                  key={networkItem.name}
-                  className="bg-gray-200 w-36 h-10 cursor-pointer flex items-center"
-                  onClick={() => selectPresetNetwork(networkItem)}
+                  key={item?.name}
+                  className="bg-gray-200 w-36 h-10 cursor-pointer flex items-center mr-5 mb-3"
+                  onClick={() => selectPresetNetwork(item)}
                 >
-                  <img src={networkItem.facade?.logo || subscanLogo} className="w-5 h-5 mx-3" alt="logo" />
+                  <img src={item?.logo || subscanLogo} className="w-5 h-5 mx-3" alt="logo" />
 
                   <div className="font-bold text-black-800 leading-none" style={{ fontSize: '14px' }}>
-                    {networkItem.fullName}
+                    {item?.displayName || item?.name}
                   </div>
                 </div>
               ))}
           </div>
 
-          <div className="mt-4 font-bold" style={{ color: mainColor, fontSize: '16px' }}>
+          <div className="mt-1 font-bold" style={{ color: mainColor, fontSize: '16px' }}>
             {t('custom network')}
           </div>
 
@@ -166,7 +170,7 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
               >
                 <div className="flex items-center flex-1" onClick={() => selectCustomNetwork(networkItem)}>
                   <div className="font-bold text-black-800 leading-none ml-3" style={{ fontSize: '14px' }}>
-                    {networkItem.fullName}
+                    {networkItem?.displayName || networkItem?.name}
                   </div>
 
                   <div className="leading-none opacity-40 ml-5" style={{ fontSize: '14px', color: mainColor }}>

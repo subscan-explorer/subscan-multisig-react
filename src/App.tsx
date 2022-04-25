@@ -14,12 +14,12 @@ import { HeadAccounts } from './components/HeadAccounts';
 import { DownIcon } from './components/icons';
 import { SelectNetworkModal } from './components/modals/SelectNetworkModal';
 import Status from './components/Status';
-import { NETWORK_CONFIG } from './config';
+import { chains } from './config/chains';
 import { Path, routes } from './config/routes';
 import { useApi } from './hooks';
 import { Network } from './model';
 import { Connecting } from './pages/Connecting';
-import { isCustomRpc } from './utils';
+import { getExplorerUrl, isCustomRpc } from './utils';
 
 const genHeaderLinkStyle = (classes: TemplateStringsArray, network: Network) => {
   return `text-white opacity-80 hover:opacity-100 leading-normal whitespace-nowrap cursor-pointer transition-all duration-200 mr-4 dark:text-${network}-main ${classes.join(
@@ -37,7 +37,6 @@ function App() {
     () => (networkStatus === 'success' ? '/image/polka-check.png' : '/image/polka-cross.png'),
     [networkStatus]
   );
-  // const networks = useMemo(() => Object.entries(NETWORK_CONFIG).map(([key, value]) => ({ name: key, ...value })), []);
   const uiHighlight = useMemo(
     () => (isDevelopment ? undefined : getSystemColor(systemChain, systemName, specName)),
     [isDevelopment, specName, systemChain, systemName]
@@ -45,7 +44,7 @@ function App() {
   const headerLinkStyle = useMemo(() => genHeaderLinkStyle`${network}`, [network]);
 
   const networkAlias = useMemo(() => {
-    return Object.keys(NETWORK_CONFIG).indexOf(network) >= 0 ? network : 'custom';
+    return Object.keys(chains).indexOf(network) >= 0 ? network : 'custom';
   }, [network]);
 
   const { isCustomNetwork } = useMemo(() => {
@@ -57,10 +56,8 @@ function App() {
   const [selectNetworkModalVisible, setSelectNetworkModalVisible] = useState(false);
 
   const openExplorer = () => {
-    if (isCustomNetwork) {
-      window.open(`https://${networkConfig?.explorerHostName}.subscan.io`, '_blank');
-    } else {
-      window.open(`https://${network}.subscan.io`, '_blank');
+    if (networkConfig?.explorerHostName) {
+      window.open(getExplorerUrl(networkConfig.explorerHostName), '_blank');
     }
   };
 
@@ -93,13 +90,13 @@ function App() {
             {networkStatus === 'success' && <HeadAccounts />}
 
             <Button
-              className="flex justify-between items-center px-2 "
+              className="flex justify-between items-center px-2"
               onClick={() => {
                 setSelectNetworkModalVisible(true);
               }}
             >
-              <img src={networkConfig?.facade?.logo || subscanLogo} className="w-6 h-6 mr-0 md:mr-2 " />
-              {networkConfig?.fullName}
+              <img src={networkConfig?.logo || subscanLogo} className="w-6 h-6 mr-0 md:mr-2 " />
+              {networkConfig?.displayName}
               <DownIcon />
             </Button>
           </div>

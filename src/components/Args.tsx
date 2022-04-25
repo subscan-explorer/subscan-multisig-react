@@ -4,7 +4,7 @@ import { ChainProperties } from '@polkadot/types/interfaces';
 import { encodeAddress } from '@polkadot/util-crypto';
 import { Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { isArray, isObject, isString } from 'lodash';
+import { isArray, isObject, isString, toString } from 'lodash';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApi } from '../hooks';
@@ -22,6 +22,7 @@ import { SubscanLink } from './SubscanLink';
 
 interface ArgsProps {
   section: string | undefined;
+  method: string | undefined;
   args: Arg[];
   className?: string;
 }
@@ -83,7 +84,7 @@ function formatAddressValue(value: string | string[], chain: Chain) {
   return null;
 }
 
-export function Args({ args, className, section }: ArgsProps) {
+export function Args({ args, className, section, method }: ArgsProps) {
   const { t } = useTranslation();
   const { chain } = useApi();
   const columns: ColumnsType<ArgObj> = [
@@ -108,6 +109,7 @@ export function Args({ args, className, section }: ArgsProps) {
             <Args
               args={Object.entries(value).map(([prop, propValue]) => ({ name: prop, value: propValue }))}
               section={section}
+              method={method}
             />
           );
           // return JSON.stringify(value);
@@ -117,8 +119,10 @@ export function Args({ args, className, section }: ArgsProps) {
           return formatAddressValue(value, chain);
         }
 
-        if (isBalanceType(type || name) || isCrabValue(name) || section === 'balances') {
-          return formatBalance(value, +chain.tokens[0].decimal, {
+        // balances(transfer) kton(transfer)
+        if (isBalanceType(type || name) || isCrabValue(name) || section === 'balances' || method === 'transfer') {
+          const formatValue = toString(value).replaceAll(',', '');
+          return formatBalance(formatValue, +chain.tokens[0].decimal, {
             noDecimal: false,
             withThousandSplit: true,
           }); // FIXME: decimal issue;

@@ -22,12 +22,14 @@ import {
 } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
 import { format } from 'date-fns';
+import { keys } from 'lodash';
 import { useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
 import iconDownFilled from 'src/assets/images/icon_down_filled.svg';
 import iconQuestion from 'src/assets/images/icon_question.svg';
-import { NETWORKS, validateMessages } from '../config';
+import { chains } from 'src/config/chains';
+import { validateMessages } from '../config';
 import i18n from '../config/i18n';
 import { useApi, useContacts } from '../hooks';
 import { MultisigAccountConfig, Network, ShareScope, WalletFormValue } from '../model';
@@ -100,6 +102,11 @@ export function WalletForm() {
   const mainColor = useMemo(() => {
     return getThemeVar(network, '@project-main-bg');
   }, [network]);
+
+  const presetNetworks = useMemo(() => {
+    return keys(chains);
+  }, []);
+
   const options = useMemo<{ label: string; value: string }[]>(() => {
     const accountOptions = accounts?.map(({ address, meta }) => ({
       label: meta?.name ? `${meta?.name} - ${address}` : address,
@@ -300,7 +307,7 @@ export function WalletForm() {
           {shareScope === ShareScope.custom && (
             <Form.Item name="scope" rules={[{ required: true }]} initialValue={[network]} className="mb-0 flex-1">
               <Select mode="multiple" disabled={shareScope !== ShareScope.custom}>
-                {NETWORKS.map((net) => (
+                {presetNetworks.map((net) => (
                   <Select.Option value={net} key={net}>
                     <Tag
                       color={getThemeVar(net as Network, '@project-main-bg')}

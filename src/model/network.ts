@@ -33,7 +33,19 @@ export interface NetConfig {
   explorerHostName?: string;
 }
 
+export interface NetConfigV2 {
+  name: string;
+  displayName: string;
+  rpc: string;
+  isTestnet?: boolean;
+  logo?: string;
+  api?: Api;
+  explorerHostName?: string;
+}
+
 export type NetworkConfig<T = NetConfig> = Config<Network, T>;
+
+export type NetworkConfigV2 = { [key: string]: NetConfigV2 | undefined };
 
 export type TxStatus =
   | 'future'
