@@ -58,6 +58,7 @@ export function SubscanLink({ address, extrinsic, children, copyable, block, ...
         }
         className="w-full"
         style={{
+          wordBreak: 'break-all',
           color: !isCustomNetwork || networkConfig?.explorerHostName ? linkColor : '#302B3C',
           height: '20px',
           cursor: !isCustomNetwork || networkConfig?.explorerHostName ? 'pointer' : 'default',

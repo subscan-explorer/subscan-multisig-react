@@ -102,7 +102,7 @@ function App() {
           </div>
         </Header>
         <Suspense fallback={<div></div>}>
-          <Content className="lg:px-40 sm:py-8 py-1 px-4 my-24 sm:my-20 relative">
+          <Content className="lg:px-40 sm:py-8 py-1 px-4 mt-24 mb-6 md:mb-24 sm:my-20 relative">
             {networkStatus === 'connecting' ? (
               <Connecting />
             ) : (

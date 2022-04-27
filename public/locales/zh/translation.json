@@ -199,5 +199,6 @@
   "or": "或",
   "extension not found": "未检测到 Polkadot-js 扩展",
   "extension account empty": "Polkadot-js 扩展中账号为空",
-  "transfer": "转账"
+  "transfer": "转账",
+  "wallet search placeholder": "钱包名称/地址"
 }

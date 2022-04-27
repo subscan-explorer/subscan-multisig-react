@@ -11,8 +11,8 @@ import { empty } from '../utils';
 export const MultisigContext = createContext<{
   inProgress: Entry[];
   multisigAccount: KeyringAddress | null;
-  confirmedAccount: number;
-  cancelledAccount: number;
+  confirmedAccount: number | undefined;
+  cancelledAccount: number | undefined;
   setMultisigAccount: React.Dispatch<React.SetStateAction<KeyringAddress | null>> | null;
   queryInProgress: () => Promise<void>;
   refreshConfirmedAccount: () => void;
@@ -38,13 +38,12 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
   const value = useMultisig();
   const { account } = useParams<{ account: string }>();
 
-  const [fetchData, { data }] = useManualQuery<{ multisigRecords: { totalCount: number } }>(
-    MULTISIG_RECORD_COUNT_QUERY,
-    {
-      variables: { account, status: 'confirmed' },
-      skipCache: true,
-    }
-  );
+  const [fetchData, { data }] = useManualQuery<{
+    multisigRecords: { totalCount: number };
+  }>(MULTISIG_RECORD_COUNT_QUERY, {
+    variables: { account, status: 'confirmed' },
+    skipCache: true,
+  });
   const refreshConfirmedAccount = useCallback(() => {
     if (networkConfig?.api?.subql) {
       fetchData({ variables: { account, status: 'confirmed' }, skipCache: true });
@@ -75,8 +74,8 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
       value={{
         ...value,
         setIsPageLock,
-        confirmedAccount: data?.multisigRecords.totalCount ?? 0,
-        cancelledAccount: cancelledData?.multisigRecords.totalCount ?? 0,
+        confirmedAccount: data ? data?.multisigRecords.totalCount : undefined,
+        cancelledAccount: cancelledData ? cancelledData.multisigRecords.totalCount : undefined,
         refreshConfirmedAccount,
         refreshCancelledAccount,
       }}
