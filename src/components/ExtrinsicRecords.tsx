@@ -176,6 +176,7 @@ export function ExtrinsicRecords() {
   const [tabKey, setTabKey] = useState('inProgress');
   const [confirmedPage, setConfirmedPage] = useState(1);
   const [cancelledPage, setCancelledPage] = useState(1);
+  const [first, setFirst] = useState(true);
 
   const [fetchConfimed, { data: confirmedData, loading: loadingConfirmed }] = useManualQuery<MultisigRecordsQueryRes>(
     MULTISIG_RECORD_QUERY,
@@ -200,6 +201,16 @@ export function ExtrinsicRecords() {
       },
     }
   );
+
+  // eslint-disable-next-line complexity
+  useEffect(() => {
+    if (!loadingInProgress && confirmedAccount !== undefined && first) {
+      setFirst(false);
+      if (inProgress.length === 0 && confirmedAccount > 0) {
+        setTabKey('confirmed');
+      }
+    }
+  }, [loadingInProgress, confirmedAccount, first, inProgress]);
 
   useEffect(() => {
     if (networkConfig?.api?.subql) {
