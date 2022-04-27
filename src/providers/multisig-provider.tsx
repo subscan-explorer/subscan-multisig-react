@@ -12,7 +12,7 @@ export const MultisigContext = createContext<{
   inProgress: Entry[];
   multisigAccount: KeyringAddress | null;
   confirmedAccount: number | undefined;
-  cancelledAccount: number;
+  cancelledAccount: number | undefined;
   setMultisigAccount: React.Dispatch<React.SetStateAction<KeyringAddress | null>> | null;
   queryInProgress: () => Promise<void>;
   refreshConfirmedAccount: () => void;
@@ -75,7 +75,7 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
         ...value,
         setIsPageLock,
         confirmedAccount: data ? data?.multisigRecords.totalCount : undefined,
-        cancelledAccount: cancelledData?.multisigRecords.totalCount ?? 0,
+        cancelledAccount: cancelledData ? cancelledData.multisigRecords.totalCount : undefined,
         refreshConfirmedAccount,
         refreshCancelledAccount,
       }}
