@@ -41,6 +41,8 @@ export interface NetConfigV2 {
   logo?: string;
   api?: Api;
   explorerHostName?: string;
+  themeColor?: string;
+  headerBackground?: string;
 }
 
 export type NetworkConfig<T = NetConfig> = Config<Network, T>;

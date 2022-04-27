@@ -3,9 +3,9 @@ import { Button, Col, Input, message, Modal, Row, Select, Typography } from 'ant
 import classNames from 'classnames';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getThemeColor } from 'src/config';
 import { useApi } from 'src/hooks';
 import { InjectedAccountWithMeta } from 'src/model';
-import { getThemeVar } from 'src/utils';
 
 interface InputCallDataModalProps {
   visible: boolean;
@@ -20,7 +20,7 @@ export const InputCallDataModal = (props: InputCallDataModalProps) => {
   const { t } = useTranslation();
   const { network } = useApi();
   const mainColor = useMemo(() => {
-    return getThemeVar(network, '@project-main-bg');
+    return getThemeColor(network);
   }, [network]);
 
   const [selectedAddress, setSelectedAddress] = useState('');

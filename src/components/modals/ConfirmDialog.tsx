@@ -1,7 +1,7 @@
 import { Modal, Row, Col, Button } from 'antd';
 import { useMemo } from 'react';
 import { useApi } from 'src/hooks';
-import { getThemeVar } from 'src/utils';
+import { getThemeColor } from 'src/config';
 
 interface ConfirmDialogProps {
   visible: boolean;
@@ -15,7 +15,7 @@ export const ConfirmDialog = (props: ConfirmDialogProps) => {
   const { network } = useApi();
 
   const mainColor = useMemo(() => {
-    return getThemeVar(network, '@project-main-bg');
+    return getThemeColor(network);
   }, [network]);
 
   return (

@@ -6,5 +6,7 @@
     "subql": "https://api.subquery.network/sq/itering/multisig_crab__aXRlc"
   },
   "logo": "/image/crab-button-mobile.png",
-  "explorerHostName": "crab"
+  "explorerHostName": "crab",
+  "themeColor": "#7C30DD",
+  "headerBackground": "url('/image/crab-banner.png')"
 }

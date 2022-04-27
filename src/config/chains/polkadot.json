@@ -6,5 +6,6 @@
     "subql": "https://api.subquery.network/sq/itering/multisig_polkadot__aXRlc"
   },
   "logo": "/image/polkadot-button-mobile.png",
-  "explorerHostName": "polkadot"
+  "explorerHostName": "polkadot",
+  "themeColor": "#e6007a"
 }

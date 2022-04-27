@@ -9,10 +9,9 @@ import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import iconDown from 'src/assets/images/icon_down.svg';
 import Transfer from '../components/modals/Transfer';
-import { LONG_DURATION } from '../config';
+import { LONG_DURATION, getThemeColor } from '../config';
 import { useApi, useIsInjected } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
-import { getThemeVar } from '../utils';
 import { getMultiAccountScope } from '../utils/helper';
 import { ExtrinsicLaunch } from './ExtrinsicLaunch';
 import { Members } from './Members';
@@ -45,7 +44,7 @@ export function WalletState() {
   const { supportSubql, mainColor } = useMemo(() => {
     return {
       supportSubql: !!networkConfig?.api?.subql,
-      mainColor: getThemeVar(network, '@project-main-bg'),
+      mainColor: getThemeColor(network),
     };
   }, [network, networkConfig]);
 
@@ -170,7 +169,7 @@ export function WalletState() {
     <Space direction="vertical" className="w-full">
       <div className="flex flex-col md:flex-row items-start md:items-center md:justify-between">
         <div>
-          <div className="flex flex-col md:flex-row md:items-center gap-4 md:w-auto w-full">
+          <div className="flex items-center gap-4 md:w-auto w-full">
             <Text className="whitespace-nowrap font-semibold text-xl leading-none" style={{ color: mainColor }}>
               {multisigAccount?.meta.name}
             </Text>

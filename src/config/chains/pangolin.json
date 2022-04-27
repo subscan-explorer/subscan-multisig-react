@@ -7,5 +7,6 @@
     "subql": "https://api.subquery.network/sq/itering/multisig_pangolin__aXRlc"
   },
   "logo": "/image/pangolin-button-mobile.png",
-  "explorerHostName": "pangolin"
+  "explorerHostName": "pangolin",
+  "themeColor": "#5745de"
 }

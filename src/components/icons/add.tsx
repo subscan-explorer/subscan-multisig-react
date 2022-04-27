@@ -1,5 +1,5 @@
+import { getThemeColor } from 'src/config';
 import { useApi } from 'src/hooks';
-import { getThemeVar } from 'src/utils';
 import { svgIconFactory } from './icon-factory';
 
 function Add(props: any) {
@@ -13,7 +13,7 @@ function Add(props: any) {
           <g
             id="插件内无账号"
             transform="translate(-753.000000, -330.000000)"
-            fill={getThemeVar(network, '@project-main-bg')}
+            fill={getThemeColor(network)}
             fillRule="nonzero"
           >
             <path
