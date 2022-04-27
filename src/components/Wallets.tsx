@@ -4,7 +4,7 @@ import BaseIdentityIcon from '@polkadot/react-identicon';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
 import { createKeyMulti, encodeAddress } from '@polkadot/util-crypto';
-import { Button, Collapse, Dropdown, Menu, message, Space, Table, Typography, Upload } from 'antd';
+import { Button, Collapse, Dropdown, Input, Menu, message, Space, Table, Typography, Upload } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { saveAs } from 'file-saver';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -89,6 +89,18 @@ export function Wallets() {
   const [multisigAccounts, setMultisigAccounts] = useState<KeyringAddress[]>([]);
   const isExtensionAccount = useIsInjected();
   const [isCalculating, setIsCalculating] = useState<boolean>(true);
+  const [searchKeyword, setSearchKeyword] = useState('');
+
+  const displayMultisigAccounts = useMemo(() => {
+    if (!searchKeyword.trim()) {
+      return multisigAccounts;
+    }
+    return multisigAccounts.filter(
+      (account) =>
+        (account.meta.name && account.meta.name.indexOf(searchKeyword.trim()) >= 0) ||
+        account.address.indexOf(searchKeyword.trim()) >= 0
+    );
+  }, [multisigAccounts, searchKeyword]);
 
   const { linkColor, mainColor } = useMemo(() => {
     return { linkColor: getLinkColor(network), mainColor: getThemeColor(network) };
@@ -382,25 +394,26 @@ export function Wallets() {
 
   return (
     <Space direction="vertical" className="absolute top-4 bottom-4 left-4 right-4 overflow-auto" id="wallets">
-      <div className="flex items-center">
-        <Link to={Path.wallet + history.location.hash}>
-          <Button type="primary" className="w-44">
-            {t('wallet.add')}
-          </Button>
-        </Link>
+      <div className="flex flex-col md:justify-between md:flex-row">
+        <div className="flex items-center">
+          <Link to={Path.wallet + history.location.hash}>
+            <Button type="primary" className="w-44">
+              {t('wallet.add')}
+            </Button>
+          </Link>
 
-        <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
-          <MoreOutlined
-            className="ml-4 rounded-full opacity-60 cursor-pointer p-1"
-            style={{
-              color: mainColor,
-              backgroundColor: mainColor + '40',
-            }}
-            onClick={(e) => e.preventDefault()}
-          />
-        </Dropdown>
+          <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
+            <MoreOutlined
+              className="ml-4 rounded-full opacity-60 cursor-pointer p-1"
+              style={{
+                color: mainColor,
+                backgroundColor: mainColor + '40',
+              }}
+              onClick={(e) => e.preventDefault()}
+            />
+          </Dropdown>
 
-        {/* {multisigAccounts && multisigAccounts.length >= 1 && (
+          {/* {multisigAccounts && multisigAccounts.length >= 1 && (
           <Tooltip title={t('export all')}>
             <ExportIcon className="ml-5 mt-1 w-8 h-8 cursor-pointer" onClick={exportAllWallets} />
           </Tooltip>
@@ -411,11 +424,22 @@ export function Wallets() {
             <ImportIcon className="ml-5 mt-1 w-8 h-8 cursor-pointer" />
           </Upload>
         </Tooltip> */}
+        </div>
+
+        <div className="w-56 mt-4 md:mt-0 md:w-72">
+          <Input
+            placeholder={t('wallet search placeholder')}
+            value={searchKeyword}
+            onChange={(e) => {
+              setSearchKeyword(e.target.value);
+            }}
+          />
+        </div>
       </div>
 
       <Table
         columns={columns}
-        dataSource={multisigAccounts}
+        dataSource={displayMultisigAccounts}
         rowKey="address"
         expandable={{ expandedRowRender, expandIcon: genExpandMembersIcon(t('members')), expandIconColumnIndex: 4 }}
         pagination={false}
@@ -424,7 +448,7 @@ export function Wallets() {
       />
 
       <Space direction="vertical" className="lg:hidden block">
-        {multisigAccounts.map((account) => {
+        {displayMultisigAccounts.map((account) => {
           const { address, meta } = account;
 
           return (

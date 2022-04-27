@@ -201,5 +201,6 @@
   "or": "or",
   "extension not found": "Polkadot-js extension not detected.",
   "extension account empty": "Polkadot-js extension accounts empty.",
-  "transfer": "Transfer"
+  "transfer": "Transfer",
+  "wallet search placeholder": "Wallet name/address"
 }
