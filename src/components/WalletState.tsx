@@ -194,7 +194,7 @@ export function WalletState() {
         {((multisigAccount?.meta.addressPair as KeyringJson[]) || []).some((pair) =>
           isExtensionAccount(pair.address)
         ) && (
-          <div className="flex items-center">
+          <div className="flex items-center mt-2 md:mt-0">
             {showTransferButton && (
               <Button
                 onClick={() => setIsTransferDisplay(true)}
