@@ -1,10 +1,10 @@
-import { DownOutlined, DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, DownOutlined } from '@ant-design/icons';
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import keyring from '@polkadot/ui-keyring';
-import { Popover, Tabs, Typography, Button, message } from 'antd';
+import { Button, message, Popover, Tabs, Typography } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getThemeVar } from 'src/utils';
+import { getThemeColor } from 'src/config';
 import { useApi, useContacts } from '../hooks';
 import { Network } from '../model';
 import { AddContactModal } from './AddContactModal';
@@ -27,7 +27,7 @@ export const HeadAccounts = () => {
   const headerLinkStyle = useMemo(() => genHeaderLinkStyle`${network}`, [network]);
 
   const mainColor = useMemo(() => {
-    return getThemeVar(network, '@project-main-bg');
+    return getThemeColor(network);
   }, [network]);
 
   useEffect(() => {

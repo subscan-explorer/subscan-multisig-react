@@ -29,12 +29,12 @@ import { Link, useHistory } from 'react-router-dom';
 import iconDownFilled from 'src/assets/images/icon_down_filled.svg';
 import iconQuestion from 'src/assets/images/icon_question.svg';
 import { chains } from 'src/config/chains';
-import { validateMessages } from '../config';
+import { validateMessages, getThemeColor } from '../config';
 import i18n from '../config/i18n';
 import { useApi, useContacts } from '../hooks';
 import { MultisigAccountConfig, Network, ShareScope, WalletFormValue } from '../model';
 import { InjectedAccountWithMeta } from '../model/account';
-import { convertToSS58, findMultiAccount, getThemeVar, updateMultiAccountScope } from '../utils';
+import { convertToSS58, findMultiAccount, updateMultiAccountScope } from '../utils';
 
 interface LabelWithTipProps {
   name: string;
@@ -100,7 +100,7 @@ export function WalletForm() {
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
   const [shareScope, setShareScope] = useState<ShareScope>(ShareScope.all);
   const mainColor = useMemo(() => {
-    return getThemeVar(network, '@project-main-bg');
+    return getThemeColor(network);
   }, [network]);
 
   const presetNetworks = useMemo(() => {
@@ -310,7 +310,7 @@ export function WalletForm() {
                 {presetNetworks.map((net) => (
                   <Select.Option value={net} key={net}>
                     <Tag
-                      color={getThemeVar(net as Network, '@project-main-bg')}
+                      color={getThemeColor(net as Network)}
                       style={{
                         borderRadius: '2px',
                       }}

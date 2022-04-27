@@ -6,5 +6,6 @@
     "subql": "https://api.subquery.network/sq/itering/multisig_darwinia__aXRlc"
   },
   "logo": "/image/darwinia-button-mobile.png",
-  "explorerHostName": "darwinia"
+  "explorerHostName": "darwinia",
+  "themeColor": "linear-gradient(-45deg, #fe3876 0%, #7c30dd 71%, #3a30dd 100%)"
 }

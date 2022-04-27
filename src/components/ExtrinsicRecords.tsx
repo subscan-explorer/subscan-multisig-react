@@ -246,7 +246,7 @@ export function ExtrinsicRecords() {
 
   return (
     <div className="relative">
-      <div onClick={refreshData} className="lg:absolute lg:right-2 lg:top-2 cursor-pointer z-50">
+      <div className="lg:absolute lg:right-2 lg:top-2 cursor-pointer z-50" onClick={refreshData}>
         <ReloadOutlined />
       </div>
       <Tabs activeKey={tabKey} onChange={handleChangeTab}>

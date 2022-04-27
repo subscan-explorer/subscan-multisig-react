@@ -6,5 +6,6 @@
     "subql": "https://api.subquery.network/sq/itering/multisig_ksm__aXRlc"
   },
   "logo": "/image/kusama-button-mobile.png",
-  "explorerHostName": "kusama"
+  "explorerHostName": "kusama",
+  "themeColor": "#000000"
 }

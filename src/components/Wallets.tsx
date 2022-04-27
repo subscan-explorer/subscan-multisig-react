@@ -10,6 +10,7 @@ import { saveAs } from 'file-saver';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
+import { getLinkColor, getThemeColor } from 'src/config';
 import { MultisigAccountConfig, ShareScope } from 'src/model';
 import { Path } from '../config/routes';
 import { useApi, useIsInjected } from '../hooks';
@@ -19,7 +20,6 @@ import {
   findMultiAccountFromKey,
   formatBalance,
   getMultiAccountScope,
-  getThemeVar,
   isInCurrentScope,
   updateMultiAccountScopeFromKey,
 } from '../utils';
@@ -91,7 +91,7 @@ export function Wallets() {
   const [isCalculating, setIsCalculating] = useState<boolean>(true);
 
   const { linkColor, mainColor } = useMemo(() => {
-    return { linkColor: getThemeVar(network, '@link-color'), mainColor: getThemeVar(network, '@project-main-bg') };
+    return { linkColor: getLinkColor(network), mainColor: getThemeColor(network) };
   }, [network]);
 
   const exportAllWallets = () => {

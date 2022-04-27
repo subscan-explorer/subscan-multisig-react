@@ -1,7 +1,8 @@
 import { Typography } from 'antd';
 import { CSSProperties, PropsWithChildren, useMemo } from 'react';
 import { CopyOutlined } from '@ant-design/icons';
-import { getThemeVar, isCustomRpc } from '../utils';
+import { getLinkColor, getThemeColor } from 'src/config';
+import { isCustomRpc } from '../utils';
 import { useApi } from '../hooks';
 
 const { Text } = Typography;
@@ -19,12 +20,8 @@ export interface SubscanLinkProps extends PropsWithChildren<unknown> {
 export function SubscanLink({ address, extrinsic, children, copyable, block, ...other }: SubscanLinkProps) {
   const { network, rpc, networkConfig } = useApi();
 
-  const mainColor = useMemo(() => {
-    return getThemeVar(network, '@project-main-bg');
-  }, [network]);
-
-  const linkColor = useMemo(() => {
-    return getThemeVar(network, '@link-color');
+  const [mainColor, linkColor] = useMemo(() => {
+    return [getThemeColor(network), getLinkColor(network)];
   }, [network]);
 
   const { isCustomNetwork } = useMemo(() => {

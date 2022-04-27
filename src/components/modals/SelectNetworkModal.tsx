@@ -7,9 +7,10 @@ import { useTranslation } from 'react-i18next';
 import subscanLogo from 'src/assets/images/subscan_logo.png';
 import { useApi } from 'src/hooks';
 import { NetConfigV2 } from 'src/model';
-import { changeUrlHash, getThemeVar } from 'src/utils';
+import { changeUrlHash } from 'src/utils';
 import { chains } from 'src/config/chains';
 import { readStorage, updateStorage } from 'src/utils/helper/storage';
+import { getThemeColor } from 'src/config';
 import { AddCustomNetwork } from './AddCustomNetwork';
 import { ConfirmDialog } from './ConfirmDialog';
 
@@ -22,7 +23,7 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
   const { t } = useTranslation();
   const { network } = useApi();
   const mainColor = useMemo(() => {
-    return getThemeVar(network, '@project-main-bg');
+    return getThemeColor(network);
   }, [network]);
 
   const networks = useMemo(() => _.values(chains), []);
