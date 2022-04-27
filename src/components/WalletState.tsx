@@ -168,7 +168,7 @@ export function WalletState() {
   return (
     <Space direction="vertical" className="w-full">
       <div className="flex flex-col md:flex-row items-start md:items-center md:justify-between">
-        <div>
+        <div className="self-stretch md:self-center">
           <div className="flex items-center gap-4 md:w-auto w-full">
             <Text className="whitespace-nowrap font-semibold text-xl leading-none" style={{ color: mainColor }}>
               {multisigAccount?.meta.name}
@@ -186,7 +186,7 @@ export function WalletState() {
             </Dropdown>
           </div>
 
-          <div className="flex flex-col md:flex-row md:items-center gap-4 md:w-auto w-full mt-2">
+          <div className="flex flex-col md:flex-row md:items-center gap-4 md:w-auto w-full mt-2 mb-4 md:mb-0">
             <SubscanLink address={multisigAccount?.address} copyable></SubscanLink>
           </div>
         </div>
