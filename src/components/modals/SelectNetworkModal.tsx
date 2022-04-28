@@ -26,7 +26,13 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
     return getThemeColor(network);
   }, [network]);
 
-  const networks = useMemo(() => _.values(chains), []);
+  const networks = useMemo(
+    () =>
+      _.values(chains).sort((chain1) => {
+        return chain1?.name === 'polkadot' ? -1 : chain1?.name === 'kusama' ? -1 : 0;
+      }),
+    []
+  );
 
   const [customNetworks, setCustomNetworks] = useState<NetConfigV2[]>([]);
 
