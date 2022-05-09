@@ -64,3 +64,16 @@ export const MULTISIG_RECORD_QUERY = `
     }
   }
 `;
+
+export const APPROVE_RECORD_QUERY = `
+query approveRecords($multisigRecordId: String!) {
+  approveRecords(first:100,filter:{multisigRecordId: {equalTo: $multisigRecordId}}) {
+    nodes {
+      id
+      multisigRecordId
+      account
+      approveTimepoint
+    }
+  }
+}
+`;
