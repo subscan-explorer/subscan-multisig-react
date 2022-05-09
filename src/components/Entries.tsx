@@ -2,19 +2,31 @@ import BaseIdentityIcon from '@polkadot/react-identicon';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
 import { Button, Collapse, Empty, Progress, Space, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
+import { useManualQuery } from 'graphql-hooks';
 import { intersection, isEmpty } from 'lodash';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import { APPROVE_RECORD_QUERY } from '../config';
 import { useApi, useIsInjected } from '../hooks';
-import { AddressPair, Entry, TxActionType, Network } from '../model';
+import { AddressPair, Entry, Network, TxActionType } from '../model';
 import { toShortString } from '../utils';
 import { ArgObj, Args } from './Args';
 import { genExpandIcon } from './expandIcon';
-import { ApproveRecord } from './ExtrinsicRecords';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
 import { TxApprove } from './TxApprove';
 import { TxCancel } from './TxCancel';
+
+interface ApproveRecordsQueryRes {
+  approveRecords: { totalCount: number; nodes: ApproveRecord[] };
+}
+
+interface ApproveRecord {
+  id: string;
+  multisigRecordId: string;
+  account: string;
+  approveTimepoint: string;
+}
 
 export interface EntriesProps {
   source: Entry[];
@@ -41,9 +53,30 @@ const renderMethod = (data: any | undefined | null) => {
 };
 
 const renderMemberStatus = (entry: Entry, pair: KeyringJson, _network: Network, isInProgress: boolean) => {
-  const { address } = pair;
-  const { approvals, when } = entry;
+  return <MemberStatus entry={entry} pair={pair} isInProgress={isInProgress} />;
+};
+
+// eslint-disable-next-line complexity
+function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: boolean }) {
+  const { entry, isInProgress } = props;
+  const { address } = props.pair;
+  const { approvals, when } = props.entry;
   const approved = approvals.includes(address);
+
+  const [fetchApproveRecords, { data: inProgressApproveRecords }] = useManualQuery<ApproveRecordsQueryRes>(
+    APPROVE_RECORD_QUERY,
+    {
+      variables: {
+        multisigRecordId: `${entry.address}-${when.height}-${when.index}`,
+      },
+    }
+  );
+
+  useEffect(() => {
+    if (isInProgress) {
+      fetchApproveRecords();
+    }
+  }, [fetchApproveRecords, isInProgress]);
 
   if (!isInProgress && entry.approveRecords) {
     const approveRecords = entry.approveRecords as ApproveRecord[];
@@ -63,14 +96,25 @@ const renderMemberStatus = (entry: Entry, pair: KeyringJson, _network: Network, 
     );
   }
 
+  const matched = inProgressApproveRecords?.approveRecords.nodes.find((item) => item.account === address);
+  const inProgressApproveTimepoint = {
+    height: matched?.approveTimepoint.split('-')[0] || '',
+    index: matched?.approveTimepoint.split('-')[1] || '',
+  };
+
   return approved ? (
-    <SubscanLink extrinsic={when}>
+    <div className="flex items-center">
       <Trans>status.approved</Trans>
-    </SubscanLink>
+      {matched && (
+        <div>
+          (<SubscanLink extrinsic={inProgressApproveTimepoint}>{matched.approveTimepoint}</SubscanLink>)
+        </div>
+      )}
+    </div>
   ) : (
     <div>-</div>
   );
-};
+}
 
 // eslint-disable-next-line complexity
 export function Entries({

@@ -28,9 +28,11 @@ export const toggleTheme = (theme: THEME, network: Network) => {
       '@tabs-hover-color': theme === THEME.LIGHT ? themeColor : '#F3F5F9',
       '@tabs-ink-bar-color': theme === THEME.LIGHT ? themeColor : '#F3F5F9',
       '@btn-default-bg': theme === THEME.LIGHT ? '#ffffff' : '#1f1f1f',
-      '@project-primary': theme === THEME.LIGHT ? 'transparent' : '#1f1f1f',
+      '@btn-primary-bg': theme === THEME.LIGHT ? themeColor : '#1f1f1f',
+      '@project-primary-bg': theme === THEME.LIGHT ? themeColor : '#1f1f1f',
+      '@project-primary': theme === THEME.LIGHT ? themeColor : '#1f1f1f',
       '@btn-default-border': theme === THEME.LIGHT ? themeColor : '#1f1f1f',
-      '@project-accent': theme === THEME.LIGHT ? 'transparent' : '#1f1f1f',
+      // '@project-accent': theme === THEME.LIGHT ? 'transparent' : '#1f1f1f',
       '@link-color': getLinkColor(networkName),
     })
     .then(() => {
