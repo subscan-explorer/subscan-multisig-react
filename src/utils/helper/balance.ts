@@ -67,7 +67,7 @@ export function formatBalance(
     result = (Number(origin) / Math.pow(10, radix)).toString();
   } else {
     const position = origin.length - radix;
-    const prefix = origin.slice(0, position + 1);
+    const prefix = origin.slice(0, position);
     // eslint-disable-next-line no-magic-numbers
     const suffix = origin.substr(position, 3);
 
