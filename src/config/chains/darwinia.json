@@ -3,7 +3,7 @@
   "displayName": "Darwinia",
   "rpc": "wss://rpc.darwinia.network",
   "api": {
-    "subql": "https://api.subquery.network/sq/itering/multisig_darwinia__aXRlc"
+    "subql": "https://api.subquery.network/sq/itering/multisig_darwinia"
   },
   "logo": "/image/darwinia-button-mobile.png",
   "explorerHostName": "darwinia",
