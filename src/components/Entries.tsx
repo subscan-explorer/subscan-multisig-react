@@ -105,7 +105,7 @@ function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: bo
         : 'status.approved';
 
     return (
-      <div className="flex items-center">
+      <div className="flex items-center flex-col lg:flex-row">
         <div className="flex flex-col items-center">
           <div className="flex items-center">
             <Trans>{approveTypeTrans}</Trans> (

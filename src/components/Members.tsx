@@ -69,7 +69,7 @@ export function MemberList({ data, statusRender }: MemberListProps) {
           <List.Item.Meta
             avatar={<BaseIdentityIcon theme="polkadot" size={24} value={item.address} />}
             title={
-              <Space>
+              <Space className="flex flex-col">
                 {/* eslint-disable-next-line  @typescript-eslint/no-explicit-any */}
                 <Typography.Text>{(item as any).name}</Typography.Text>
                 <Typography.Text>
