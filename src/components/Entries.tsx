@@ -9,7 +9,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { APPROVE_RECORD_QUERY } from '../config';
 import { useApi, useIsInjected } from '../hooks';
 import { AddressPair, Entry, Network, TxActionType } from '../model';
-import { toShortString } from '../utils';
+import { toShortString, formatDate } from '../utils';
 import { ArgObj, Args } from './Args';
 import { genExpandIcon } from './expandIcon';
 import { MemberList } from './Members';
@@ -26,6 +26,8 @@ interface ApproveRecord {
   multisigRecordId: string;
   account: string;
   approveTimepoint: string;
+  approveTimestamp: string;
+  approveType: string;
 }
 
 export interface EntriesProps {
@@ -88,31 +90,61 @@ function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: bo
       height: matchedApproveRecord.approveTimepoint.split('-')[0],
       index: matchedApproveRecord.approveTimepoint.split('-')[1],
     };
+
+    const approveTypeTrans =
+      matchedApproveRecord.approveType === 'initialize'
+        ? 'status.initialized'
+        : matchedApproveRecord.approveType === 'execute'
+        ? 'status.approvedAndExecuted'
+        : 'status.approved';
+
+    return (
+      <>
+        <div className="flex items-center">
+          <Trans>{approveTypeTrans}</Trans> (
+          <SubscanLink extrinsic={approveTimepoint}>{matchedApproveRecord.approveTimepoint}</SubscanLink>)
+        </div>
+        <div className="text-xs scale-90 origin-left">{formatDate(matchedApproveRecord.approveTimestamp)}</div>
+      </>
+    );
+  }
+
+  if (!approved) {
+    return <div>-</div>;
+  }
+
+  const matched = inProgressApproveRecords?.approveRecords.nodes.find((item) => item.account === address);
+
+  if (!matched) {
     return (
       <div className="flex items-center">
-        <Trans>status.approved</Trans> (
-        <SubscanLink extrinsic={approveTimepoint}>{matchedApproveRecord.approveTimepoint}</SubscanLink>)
+        <Trans>status.approved</Trans>
       </div>
     );
   }
 
-  const matched = inProgressApproveRecords?.approveRecords.nodes.find((item) => item.account === address);
   const inProgressApproveTimepoint = {
-    height: matched?.approveTimepoint.split('-')[0] || '',
-    index: matched?.approveTimepoint.split('-')[1] || '',
+    height: matched.approveTimepoint.split('-')[0] || '',
+    index: matched.approveTimepoint.split('-')[1] || '',
   };
 
-  return approved ? (
-    <div className="flex items-center">
-      <Trans>status.approved</Trans>
-      {matched && (
+  const approveTypeTrans =
+    matched.approveType === 'initialize'
+      ? 'status.initialized'
+      : matched.approveType === 'execute'
+      ? 'status.approvedAndExecuted'
+      : 'status.approved';
+
+  return (
+    <>
+      <div className="flex items-center">
+        <Trans>{approveTypeTrans}</Trans>
         <div>
           (<SubscanLink extrinsic={inProgressApproveTimepoint}>{matched.approveTimepoint}</SubscanLink>)
         </div>
-      )}
-    </div>
-  ) : (
-    <div>-</div>
+      </div>
+      <div className="text-xs scale-90 origin-left">{formatDate(matched.approveTimestamp)}</div>
+    </>
   );
 }
 

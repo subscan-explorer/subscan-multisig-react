@@ -42,6 +42,8 @@ interface MultisigRecord {
 export interface ApproveRecord {
   account: string;
   approveTimepoint: string;
+  approveTimestamp: string;
+  approveType: string;
 }
 
 const { TabPane } = Tabs;
