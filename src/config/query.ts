@@ -35,6 +35,14 @@ export const MULTISIG_RECORD_QUERY = `
           }
         }
 
+        cancelRecords {
+          nodes {
+            account
+            cancelTimepoint
+            cancelTimestamp
+          }
+        }
+
         block {
           id
           extrinsics {

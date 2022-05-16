@@ -25,6 +25,9 @@ interface MultisigRecord {
   approveRecords: {
     nodes: ApproveRecord[];
   };
+  cancelRecords: {
+    nodes: CancelRecord[];
+  };
   block: {
     id: string;
     extrinsics: {
@@ -40,10 +43,17 @@ interface MultisigRecord {
 }
 
 export interface ApproveRecord {
+  id: string;
   account: string;
   approveTimepoint: string;
   approveTimestamp: string;
   approveType: string;
+}
+
+export interface CancelRecord {
+  account: string;
+  cancelTimepoint: string;
+  cancelTimestamp: string;
 }
 
 const { TabPane } = Tabs;
@@ -83,9 +93,10 @@ function ConfirmedOrCancelled({
         multisigAccountId,
         timestamp,
         createExtrinsicIdx,
-        confirmExtrinsicIdx,
-        cancelExtrinsicIdx,
+        // confirmExtrinsicIdx,
+        // cancelExtrinsicIdx,
         approveRecords,
+        cancelRecords,
         block: {
           id: createBlockHash,
           extrinsics: { nodes: createExNodes },
@@ -133,7 +144,8 @@ function ConfirmedOrCancelled({
         hash: createBlockHash,
         callHash: null,
         address: multisigAccountId,
-        extrinsicIdx: isConfirmed ? confirmExtrinsicIdx : cancelExtrinsicIdx,
+        // extrinsicIdx: isConfirmed ? confirmExtrinsicIdx : cancelExtrinsicIdx,
+        extrinsicIdx: createExtrinsicIdx,
         approvals: approvalAccounts,
         // approvals: [
         //   ...multisigArgs
@@ -146,6 +158,7 @@ function ConfirmedOrCancelled({
         when: { height: isNumber(height) ? height : +height.replace(/,/g, ''), index: +index },
         depositor: '',
         approveRecords: approveRecords.nodes,
+        cancelRecords: cancelRecords.nodes,
       };
     });
   }, [api, nodes, isConfirmed]);

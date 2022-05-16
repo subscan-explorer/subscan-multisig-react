@@ -12,6 +12,7 @@ import { AddressPair, Entry, Network, TxActionType } from '../model';
 import { toShortString, formatDate } from '../utils';
 import { ArgObj, Args } from './Args';
 import { genExpandIcon } from './expandIcon';
+import { ApproveRecord, CancelRecord } from './ExtrinsicRecords';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
 import { TxApprove } from './TxApprove';
@@ -19,15 +20,6 @@ import { TxCancel } from './TxCancel';
 
 interface ApproveRecordsQueryRes {
   approveRecords: { totalCount: number; nodes: ApproveRecord[] };
-}
-
-interface ApproveRecord {
-  id: string;
-  multisigRecordId: string;
-  account: string;
-  approveTimepoint: string;
-  approveTimestamp: string;
-  approveType: string;
 }
 
 export interface EntriesProps {
@@ -55,7 +47,11 @@ const renderMethod = (data: any | undefined | null) => {
 };
 
 const renderMemberStatus = (entry: Entry, pair: KeyringJson, _network: Network, isInProgress: boolean) => {
-  return <MemberStatus entry={entry} pair={pair} isInProgress={isInProgress} />;
+  return (
+    <div className="flex justify-center">
+      <MemberStatus entry={entry} pair={pair} isInProgress={isInProgress} />
+    </div>
+  );
 };
 
 // eslint-disable-next-line complexity
@@ -82,13 +78,23 @@ function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: bo
 
   if (!isInProgress && entry.approveRecords) {
     const approveRecords = entry.approveRecords as ApproveRecord[];
+    const cancelRecords = entry.cancelRecords as CancelRecord[];
+
     const matchedApproveRecord = approveRecords.find((record) => record.account === address);
+
     if (!matchedApproveRecord) {
       return <div>-</div>;
     }
     const approveTimepoint = {
       height: matchedApproveRecord.approveTimepoint.split('-')[0],
       index: matchedApproveRecord.approveTimepoint.split('-')[1],
+    };
+
+    const matchedCancelRecord = cancelRecords.find((record) => record.account === address);
+
+    const cancelTimepoint = {
+      height: matchedCancelRecord?.cancelTimepoint.split('-')[0] || '',
+      index: matchedCancelRecord?.cancelTimepoint.split('-')[1] || '',
     };
 
     const approveTypeTrans =
@@ -99,13 +105,32 @@ function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: bo
         : 'status.approved';
 
     return (
-      <>
-        <div className="flex items-center">
-          <Trans>{approveTypeTrans}</Trans> (
-          <SubscanLink extrinsic={approveTimepoint}>{matchedApproveRecord.approveTimepoint}</SubscanLink>)
+      <div className="flex items-center flex-col lg:flex-row">
+        <div className="flex flex-col items-center">
+          <div className="flex items-center">
+            <Trans>{approveTypeTrans}</Trans> (
+            <SubscanLink extrinsic={approveTimepoint}>{matchedApproveRecord.approveTimepoint}</SubscanLink>)
+          </div>
+          <div className="text-xs scale-90 origin-left text-gray-500" style={{ marginTop: '2px' }}>
+            {formatDate(matchedApproveRecord.approveTimestamp)}
+          </div>
         </div>
-        <div className="text-xs scale-90 origin-left">{formatDate(matchedApproveRecord.approveTimestamp)}</div>
-      </>
+
+        {matchedCancelRecord && (
+          <>
+            <div className="mx-4">and</div>
+            <div className="flex flex-col items-center">
+              <div className="flex items-center">
+                <Trans>status.cancelled</Trans> (
+                <SubscanLink extrinsic={cancelTimepoint}>{matchedCancelRecord.cancelTimepoint}</SubscanLink>)
+              </div>
+              <div className="text-xs scale-90 origin-left text-gray-500" style={{ marginTop: '2px' }}>
+                {formatDate(matchedCancelRecord.cancelTimestamp)}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     );
   }
 
@@ -136,7 +161,7 @@ function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: bo
       : 'status.approved';
 
   return (
-    <>
+    <div className="flex flex-col items-center">
       <div className="flex items-center">
         <Trans>{approveTypeTrans}</Trans>
         <div>
@@ -144,7 +169,7 @@ function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: bo
         </div>
       </div>
       <div className="text-xs scale-90 origin-left">{formatDate(matched.approveTimestamp)}</div>
-    </>
+    </div>
   );
 }
 
@@ -273,8 +298,9 @@ export function Entries({
   const expandedRowRender = (entry: Entry) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const progressColumnsNested: ColumnsType<any> = [
-      { dataIndex: 'name' },
+      { dataIndex: 'name', width: 100 },
       {
+        width: 400,
         dataIndex: 'address',
         render: (address) => (
           <Space size="middle">
@@ -284,6 +310,7 @@ export function Entries({
         ),
       },
       {
+        width: 250,
         key: 'status',
         render: (_, pair) => renderMemberStatus(entry, pair, network, !isCancelled && !isConfirmed),
       },
