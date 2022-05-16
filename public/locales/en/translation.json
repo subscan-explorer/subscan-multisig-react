@@ -125,7 +125,9 @@
     "cancelled": "Cancelled",
     "executed": "Executed",
     "index": "Status",
-    "pending": "Pending"
+    "pending": "Pending",
+    "initialized": "Intialized",
+    "approvedAndExecuted": "Approved And Executed"
   },
   "save": "Save",
   "add": "Add",

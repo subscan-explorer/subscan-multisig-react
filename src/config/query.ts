@@ -30,6 +30,8 @@ export const MULTISIG_RECORD_QUERY = `
           nodes {
             account
             approveTimepoint
+            approveTimestamp
+            approveType
           }
         }
 
@@ -73,6 +75,8 @@ query approveRecords($multisigRecordId: String!) {
       multisigRecordId
       account
       approveTimepoint
+      approveTimestamp
+      approveType
     }
   }
 }

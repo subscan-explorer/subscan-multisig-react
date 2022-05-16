@@ -7,3 +7,4 @@ export * from './multisig';
 export * from './types';
 export * from './url';
 export * from './validate';
+export * from './time';
