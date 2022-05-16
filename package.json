@@ -117,6 +117,7 @@
     "husky": "^4.2.3",
     "i18next-scanner": "^3.0.0",
     "i18next-scanner-typescript": "^1.0.6",
+    "moment": "^2.29.3",
     "postcss": "^7.0.35",
     "prettier": "^2.2.1",
     "prettier-quick": "0.0.5",
