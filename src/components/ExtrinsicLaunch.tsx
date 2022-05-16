@@ -33,6 +33,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
   const [error, setError] = useState<string | null>(null);
   const [extrinsic, setExtrinsic] = useState<SubmittableExtrinsic<'promise'> | null>(null);
   const [hexCallData, setHexCallData] = useState('0x');
+  const [hexCallHash, setHexCallHash] = useState('0x');
   const [reserveAmount, setReserveAmount] = useState(0);
   const { multisigAccount } = useMultisig();
   const isExtensionAccount = useIsInjected();
@@ -88,6 +89,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
       const multiTx = module?.asMulti(...args);
 
       setHexCallData(ext.method.toHex());
+      setHexCallHash(ext.method.hash.toHex());
 
       // Estimate reserve amount
       try {
@@ -109,16 +111,16 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
 
   const _onExtrinsicError = useCallback((err?: Error | null) => setError(err ? err.message : null), []);
 
-  const [extrinsicHash] = useMemo((): [string] => {
-    if (!extrinsic) {
-      return ['0x'];
-    }
+  // const [extrinsicHash] = useMemo((): [string] => {
+  //   if (!extrinsic) {
+  //     return ['0x'];
+  //   }
 
-    const u8a = extrinsic.method.toU8a();
+  //   const u8a = extrinsic.method.toU8a();
 
-    // don't use the built-in hash, we only want to convert once
-    return [extrinsic.registry.hash(u8a).toHex()];
-  }, [extrinsic]);
+  //   // don't use the built-in hash, we only want to convert once
+  //   return [extrinsic.registry.hash(u8a).toHex()];
+  // }, [extrinsic]);
 
   const createMultiItem = useCallback(
     (option: Option): Option[] => {
@@ -175,7 +177,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
       />
       <Output isDisabled isTrimmed label="encoded call data" value={hexCallData} withCopy />
 
-      <Output isDisabled label="encoded call hash" value={extrinsicHash} withCopy />
+      <Output isDisabled label="encoded call hash" value={hexCallHash} withCopy />
 
       {error && !extrinsic && <MarkError content={error} />}
 
