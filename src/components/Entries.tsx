@@ -118,7 +118,7 @@ function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: bo
 
         {matchedCancelRecord && (
           <>
-            <div className="mx-4">and</div>
+            <div className="mx-4">&</div>
             <div className="flex flex-col items-center">
               <div className="flex items-center">
                 <Trans>status.cancelled</Trans> (
@@ -168,7 +168,7 @@ function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: bo
           (<SubscanLink extrinsic={inProgressApproveTimepoint}>{matched.approveTimepoint}</SubscanLink>)
         </div>
       </div>
-      <div className="text-xs scale-90 origin-left">{formatDate(matched.approveTimestamp)}</div>
+      <div className="text-xs scale-90 origin-left text-gray-500">{formatDate(matched.approveTimestamp)}</div>
     </div>
   );
 }
