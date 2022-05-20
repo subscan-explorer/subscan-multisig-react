@@ -78,6 +78,9 @@ module.exports = {
       },
     },
   ],
+  typescript: {
+    enableTypeChecking: false,
+  },
   webpack: {
     plugins: {
       add: [themePlugin],
