@@ -36,14 +36,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ${{ env.AWS_REGION }}
         SOURCE_DIR: './build'
-    - name: slack
-      uses: 8398a7/action-slack@v3
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      with:
-        status: ${{ job.status }}
-        fields: repo,message,commit,author,eventName,ref,workflow
-      if: always()
+    
   clear-cache:
     name: Clear-cache
     needs: deploy
