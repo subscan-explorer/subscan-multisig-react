@@ -13,8 +13,8 @@ jobs:
   deploy:
     name: Deploy to S3
     runs-on: ubuntu-latest
-    if: 78835349 || 13250462 == github.event.sender.id
-    # github.event.sender.id=Carlos Yvan
+    if: 78835349 || 13250462 || 12026976 == github.event.sender.id
+    # github.event.sender.id=Carlos Yvan Andrew
     steps:
     - uses: actions/checkout@v2
     - name: Use Node 14
