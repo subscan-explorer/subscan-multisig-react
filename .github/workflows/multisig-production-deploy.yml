@@ -1,0 +1,76 @@
+name: multisig-production-deploy
+
+on: 
+  workflow_dispatch:
+  
+env:
+  AWS_S3_BUCKET_NAME: multisig-production
+  AWS_REGION: us-east-2
+  AWS_CLOUDFRONT_DISTRIBUTION_ID: EOE2FT3RXE5GE
+  CLOUDFLARE_PURGE_URLS: '["https://multisig.parallel.fi/"]'
+
+jobs:
+  deploy:
+    name: Deploy to S3
+    runs-on: ubuntu-latest
+    if: 78835349 || 13250462 == github.event.sender.id
+    # github.event.sender.id=Carlos Yvan
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node 14
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14.18.1'
+        registry-url: 'https://registry.npmjs.org'
+        cache: 'yarn'
+    - name: Install dependencies
+      run: npm install
+    - name: Build
+      run: npm run build
+    - name: Upload to S3
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --follow-symlinks --delete
+      env:
+        AWS_S3_BUCKET: ${{ env.AWS_S3_BUCKET_NAME }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ env.AWS_REGION }}
+        SOURCE_DIR: './build'
+    - name: slack
+      uses: 8398a7/action-slack@v3
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      with:
+        status: ${{ job.status }}
+        fields: repo,message,commit,author,eventName,ref,workflow
+      if: always()
+  clear-cache:
+    name: Clear-cache
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Purge cloudflare cache
+        uses: jakejarvis/cloudflare-purge-action@master
+        env:
+          CLOUDFLARE_ZONE: ${{ secrets.CLOUDFLARE_ZONE }}
+          CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+          PURGE_URLS: ${{ env.CLOUDFLARE_PURGE_URLS }}
+
+      - name: Purge s3 cache
+        uses: leroy-merlin-br/action-s3-cache@v1
+        with:
+          action: delete
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          bucket: ${{ env.AWS_S3_BUCKET_NAME }}
+          key: ${{ hashFiles('yarn.lock') }}
+
+      - name: Purge cloudfront cache
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - run: aws cloudfront create-invalidation --distribution-id "${{env.AWS_CLOUDFRONT_DISTRIBUTION_ID}}" --paths '/*'
