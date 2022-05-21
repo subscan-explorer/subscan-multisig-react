@@ -22,7 +22,6 @@ jobs:
       with:
         node-version: '14.18.1'
         registry-url: 'https://registry.npmjs.org'
-        cache: 'yarn'
     - name: Install dependencies
       run: npm install
     - name: Build
@@ -65,7 +64,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
           bucket: ${{ env.AWS_S3_BUCKET_NAME }}
-          key: ${{ hashFiles('yarn.lock') }}
 
       - name: Purge cloudfront cache
         uses: aws-actions/configure-aws-credentials@v1
