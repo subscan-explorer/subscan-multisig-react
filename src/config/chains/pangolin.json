@@ -4,7 +4,7 @@
   "isTestnet": true,
   "rpc": "wss://pangolin-rpc.darwinia.network/",
   "api": {
-    "subql": "https://api.subquery.network/sq/itering/multisig_pangolin__aXRlc"
+    "subql": "https://api.subquery.network/sq/darwinia-network/multisig-pangolin"
   },
   "logo": "/image/pangolin-button-mobile.png",
   "explorerHostName": "pangolin",
