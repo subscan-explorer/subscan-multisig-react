@@ -50,9 +50,9 @@ export function WalletState() {
 
   const showTransferButton = useMemo(() => {
     return (
-      isFunction(api?.tx.balances.transfer) &&
-      isFunction(api?.tx.balances.transferKeepAlive) &&
-      isFunction(api?.tx.balances.transferAll)
+      isFunction(api?.tx?.balances?.transfer) &&
+      isFunction(api?.tx?.balances?.transferKeepAlive) &&
+      isFunction(api?.tx?.balances?.transferAll)
     );
   }, [api]);
 
