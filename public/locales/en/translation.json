@@ -204,5 +204,9 @@
   "extension not found": "Polkadot-js extension not detected.",
   "extension account empty": "Polkadot-js extension accounts empty.",
   "transfer": "Transfer",
-  "wallet search placeholder": "Wallet name/address"
+  "wallet search placeholder": "Wallet name/address",
+  "setting": "Setting",
+  "Favorite": "Favorite",
+  "Unfavorite": "Unfavorite",
+  "share link": "Share Link"
 }

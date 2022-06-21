@@ -99,7 +99,7 @@ export function findMultiAccount({
   threshold,
   members,
 }: Pick<WalletFormValue, 'members' | 'threshold'>): KeyringAddress | null {
-  const existsAccounts = keyring.getAccounts().filter((account) => account.meta.isMultisig);
+  const existsAccounts = keyring.getAccounts().filter((account) => account.meta.isMultisig && !account.meta.isTemp);
   const key = createKeyMulti(
     members.map((item) => item.address),
     threshold

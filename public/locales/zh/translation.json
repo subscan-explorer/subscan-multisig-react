@@ -202,5 +202,9 @@
   "extension not found": "未检测到 Polkadot-js 扩展",
   "extension account empty": "Polkadot-js 扩展中账号为空",
   "transfer": "转账",
-  "wallet search placeholder": "钱包名称/地址"
+  "wallet search placeholder": "钱包名称/地址",
+  "setting": "设置",
+  "favorite": "收藏",
+  "unfavorite": "取消收藏",
+  "share link": "分享链接"
 }
