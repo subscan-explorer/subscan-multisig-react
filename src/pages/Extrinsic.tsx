@@ -76,6 +76,7 @@ export default function Extrinsic() {
         name: walletName,
         addressPair,
         genesisHash: api?.genesisHash.toHex(),
+        isTemp: true,
       });
 
       updateMultiAccountScope(
@@ -113,7 +114,7 @@ export default function Extrinsic() {
           borderRadius: '2px',
         }}
       >
-        <WalletState />
+        <WalletState multisigAccount={multisig} changeMultisigAccount={setMultisig} />
       </Card>
       <Card>
         <ExtrinsicRecords />

@@ -320,7 +320,9 @@ export function Wallets() {
 
     const accounts = keyring
       .getAccounts()
-      .filter((account) => account.meta.isMultisig && isInCurrentScope(account.publicKey, network));
+      .filter(
+        (account) => account.meta.isMultisig && !account.meta.isTemp && isInCurrentScope(account.publicKey, network)
+      );
     const balances = await api?.query.system.account.multi(accounts.map(({ address }) => address));
     const entries = await Promise.all(
       accounts.map(async ({ address }) => await api?.query.multisig.multisigs.entries(address))

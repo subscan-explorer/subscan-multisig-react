@@ -1,8 +1,8 @@
 import { SettingOutlined } from '@ant-design/icons';
 import keyring from '@polkadot/ui-keyring';
-import { KeyringJson } from '@polkadot/ui-keyring/types';
+import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
 import { isFunction } from '@polkadot/util';
-import { Button, Col, Dropdown, Input, Menu, message, Modal, Row, Space, Statistic, Typography } from 'antd';
+import { Button, Col, Dropdown, Input, Menu, message, Modal, Row, Space, Statistic, Tooltip, Typography } from 'antd';
 import { saveAs } from 'file-saver';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,25 +14,25 @@ import { useApi, useIsInjected } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
 import { getMultiAccountScope } from '../utils/helper';
 import { ExtrinsicLaunch } from './ExtrinsicLaunch';
+import { MoonIcon } from './icons/MoonIcon';
 import { Members } from './Members';
 import { ConfirmDialog } from './modals/ConfirmDialog';
 import { SubscanLink } from './SubscanLink';
 
 const { Text } = Typography;
 
+interface WalletStateProps {
+  multisigAccount: KeyringAddress | undefined;
+  changeMultisigAccount: (multisigAccount: KeyringAddress) => void;
+}
+
 // eslint-disable-next-line complexity
-export function WalletState() {
+export function WalletState(props: WalletStateProps) {
   const { t } = useTranslation();
   const history = useHistory();
   const { network, api, networkConfig } = useApi();
-  const {
-    multisigAccount,
-    setMultisigAccount,
-    inProgress,
-    queryInProgress,
-    confirmedAccount,
-    refreshConfirmedAccount,
-  } = useMultisigContext();
+  const { multisigAccount, changeMultisigAccount } = props;
+  const { inProgress, queryInProgress, confirmedAccount, refreshConfirmedAccount } = useMultisigContext();
   const [isAccountsDisplay, setIsAccountsDisplay] = useState<boolean>(false);
   const [isExtrinsicDisplay, setIsExtrinsicDisplay] = useState(false);
   const [isTransferDisplay, setIsTransferDisplay] = useState(false);
@@ -78,6 +78,7 @@ export function WalletState() {
     );
     return res;
   }, [inProgress.length, confirmedAccount, multisigAccount?.meta.threshold, multisigAccount?.meta.who, supportSubql]);
+
   const renameWallet = useCallback(
     ({ name }: { name: string }) => {
       try {
@@ -91,8 +92,8 @@ export function WalletState() {
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const { meta, ...others } = multisigAccount!;
-        if (setMultisigAccount) {
-          setMultisigAccount({
+        if (changeMultisigAccount) {
+          changeMultisigAccount({
             ...others,
             meta: {
               ...meta,
@@ -106,7 +107,7 @@ export function WalletState() {
         }
       }
     },
-    [multisigAccount, t, setMultisigAccount]
+    [multisigAccount, t, changeMultisigAccount]
   );
   const deleteWallet = useCallback(() => {
     try {
@@ -175,15 +176,63 @@ export function WalletState() {
             </Text>
 
             <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
-              <SettingOutlined
-                className="rounded-full opacity-60 cursor-pointer p-1"
-                style={{
-                  color: mainColor,
-                  backgroundColor: mainColor + '40',
-                }}
-                onClick={(e) => e.preventDefault()}
-              />
+              <Tooltip title={t('setting')}>
+                <SettingOutlined
+                  className="rounded-full opacity-60 cursor-pointer p-1"
+                  style={{
+                    color: mainColor,
+                    backgroundColor: mainColor + '40',
+                  }}
+                  size={20}
+                  onClick={(e) => e.preventDefault()}
+                />
+              </Tooltip>
             </Dropdown>
+
+            {multisigAccount && (
+              <>
+                <Tooltip title={multisigAccount.meta.isTemp ? t('favorite') : t('unfavorite')}>
+                  <MoonIcon
+                    icon={multisigAccount.meta.isTemp ? 'collect' : 'collect_fill'}
+                    size={20}
+                    color={mainColor}
+                    className="rounded-full opacity-60 cursor-pointer"
+                    style={{ backgroundColor: mainColor + '40', padding: '2px' }}
+                    onClick={() => {
+                      const pair = keyring.getPair(multisigAccount.address as string);
+                      keyring.saveAccountMeta(pair, {
+                        ...multisigAccount.meta,
+                        isTemp: !multisigAccount.meta.isTemp,
+                      });
+
+                      const { meta, ...others } = multisigAccount;
+
+                      changeMultisigAccount({
+                        ...others,
+                        meta: {
+                          ...meta,
+                          isTemp: !meta.isTemp,
+                        },
+                      });
+                    }}
+                  />
+                </Tooltip>
+
+                <Tooltip title={t('share link')}>
+                  <MoonIcon
+                    icon="share"
+                    size={20}
+                    color={mainColor}
+                    className="rounded-full opacity-60 cursor-pointer"
+                    style={{ backgroundColor: mainColor + '40', padding: '2px' }}
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      message.success('copy_success');
+                    }}
+                  />
+                </Tooltip>
+              </>
+            )}
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-4 md:w-auto w-full mt-2 mb-4 md:mb-0">
