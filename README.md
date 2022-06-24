@@ -185,6 +185,11 @@ After completing the above json config file, you can place it under `src/config/
     <img src="./docs/13_select_network.png" style="width:800px";>
   </p>
 
+#### 3.Deploy your own subquery endpoint
+
+In order to support advanced features such as transaction history, you need to deploy your own [subquery](https://doc.subquery.network/) endpoint.
+You can fork from the [subscan multisig subquery repo](https://github.com/itering/subql-multisig) and add support for your network.
+
 ## QuickStart
 
 ### Requirement
