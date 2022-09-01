@@ -1,0 +1,13 @@
+{
+  "name": "kintsugi",
+  "displayName": "Kintsugi",
+  "rpc": "wss://api-kusama.interlay.io:443/parachain",
+  // Optional
+  "api": {
+    "subql": ""
+  },
+  "logo": "/image/kintsugi.png",
+  // Optional
+  "explorerHostName": "kintsugi",
+  "themeColor": "#041333"
+}
