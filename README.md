@@ -166,12 +166,12 @@ All networks are configured in `src/config/chains` folder, You can take `polkado
   "name": "polkadot",
   "displayName": "Polkadot",
   "rpc": "wss://rpc.polkadot.io",
-  // Optional
+  // Optional (Delete this line in PR!)
   "api": {
     "subql": "https://api.subquery.network/sq/itering/multisig_polkadot__aXRlc"
   },
   "logo": "/image/polkadot-button-mobile.png",
-  // Optional
+  // Optional (Delete this line in PR!)
   "explorerHostName": "polkadot",
   "themeColor": "#e6007a"
 }
