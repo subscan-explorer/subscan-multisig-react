@@ -164,6 +164,42 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
     const nApi = new ApiPromise({
       provider,
       // typesBundle,
+      typesBundle: {
+        chain: {
+          Polkadot: {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: 'WeightV2',
+                },
+              },
+            ],
+          },
+          Kusama: {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: 'WeightV2',
+                },
+              },
+            ],
+          },
+        },
+      },
       typesChain,
     });
 
