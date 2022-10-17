@@ -78,7 +78,15 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
       const timepoint = (info as any).isSome ? (info as any)?.unwrap().when : null;
       const { threshold, who } = extractExternal(multiRoot);
       const others: string[] = who.filter((item) => item !== accountId);
-      const { weight } = (await ext?.paymentInfo(multiRoot)) || { weight: 0 };
+      // queryInfo(extrinsic: Bytes, at?: BlockHash): RuntimeDispatchInfo:: createType(RuntimeDispatchInfo):: Struct: failed on weight: u64:: Assertion failed
+      // https://github.com/polkadot-js/api/issues/5258
+      const { weight } = (await ext
+        ?.paymentInfo(multiRoot)
+        .then((data) => data)
+        .catch((err) => {
+          console.info('ExtrinsicLaunch::paymentInfo err', err);
+          return { weight: 0 };
+        })) || { weight: 0 };
       const module = api?.tx.multisig;
       const argsLength = module?.asMulti.meta.args.length || 0;
       const generalParams = [threshold, others, timepoint];
@@ -101,6 +109,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
           );
         }
       } catch (err) {
+        console.info('ExtrinsicLaunch::setReserveAmount err', err);
         setReserveAmount(0);
       }
 
