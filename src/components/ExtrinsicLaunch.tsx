@@ -16,7 +16,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApi, useIsInjected, useMultisig } from '../hooks';
 import { AddressPair } from '../model';
-import { extractExternal } from '../utils';
+import { convertWeight, extractExternal } from '../utils';
 
 const { Text } = Typography;
 
@@ -87,11 +87,15 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
           console.info('ExtrinsicLaunch::paymentInfo err', err);
           return { weight: 0 };
         })) || { weight: 0 };
+      const weightAll = convertWeight(weight);
+
       const module = api?.tx.multisig;
       const argsLength = module?.asMulti.meta.args.length || 0;
       const generalParams = [threshold, others, timepoint];
       const args =
-        argsLength === ARG_LENGTH ? [...generalParams, ext.method.toHex(), true, weight] : [...generalParams, ext];
+        argsLength === ARG_LENGTH
+          ? [...generalParams, ext.method.toHex(), true, weightAll.v1Weight]
+          : [...generalParams, ext];
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const multiTx = module?.asMulti(...args);

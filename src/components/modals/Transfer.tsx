@@ -31,7 +31,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIsInjected, useMultisig } from 'src/hooks';
 import { AddressPair } from 'src/model';
-import { extractExternal } from 'src/utils';
+import { convertWeight, extractExternal } from 'src/utils';
 import styled from 'styled-components';
 
 const { Text } = Typography;
@@ -231,11 +231,14 @@ function Transfer({
       const { threshold, who } = extractExternal(propSenderId);
       const others: string[] = who.filter((item) => item !== accountId);
       const { weight } = (await ext?.paymentInfo(propSenderId)) || { weight: 0 };
+      const weightAll = convertWeight(weight);
       const module = api?.tx.multisig;
       const argsLength = module?.asMulti.meta.args.length || 0;
       const generalParams = [threshold, others, timepoint];
       const args =
-        argsLength === ARG_LENGTH ? [...generalParams, ext.method.toHex(), true, weight] : [...generalParams, ext];
+        argsLength === ARG_LENGTH
+          ? [...generalParams, ext.method.toHex(), true, weightAll.v1Weight]
+          : [...generalParams, ext];
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const multiTx = module?.asMulti(...args);
