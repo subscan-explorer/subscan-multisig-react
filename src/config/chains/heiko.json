@@ -1,0 +1,11 @@
+{
+  "name": "parallel-heiko",
+  "displayName": "Parallel",
+  "rpc": "wss://heiko-rpc.parallel.fi",
+  "api": {
+    "subql": ""
+  },
+  "logo": "/image/parallel.svg",
+  "explorerHostName": "parallel-heiko",
+  "themeColor": "#42d5de"
+}
