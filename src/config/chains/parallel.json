@@ -1,0 +1,11 @@
+{
+  "name": "parallel",
+  "displayName": "Parallel",
+  "rpc": "wss://rpc.parallel.fi",
+  "api": {
+    "subql": ""
+  },
+  "logo": "/image/parallel.svg",
+  "explorerHostName": "parallel",
+  "themeColor": "#ef18ac"
+}
