@@ -1,6 +1,6 @@
 {
   "name": "parallel-heiko",
-  "displayName": "Parallel",
+  "displayName": "Parallel Heiko",
   "rpc": "wss://heiko-rpc.parallel.fi",
   "api": {
     "subql": ""
