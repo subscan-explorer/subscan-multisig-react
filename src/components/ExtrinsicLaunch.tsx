@@ -98,7 +98,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
       const generalParams = [threshold, others, timepoint];
       const args =
         argsLength === ARG_LENGTH
-          ? [...generalParams, ext.method.toHex(), true, weightAll.v1Weight]
+          ? [...generalParams, ext.method.toHex(), true, weightAll.compatibleWeight]
           : [...generalParams, ext];
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore

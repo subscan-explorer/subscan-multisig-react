@@ -1,8 +1,7 @@
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
-import BN from 'bn.js';
 import { useCallback } from 'react';
 import { Entry } from '../model';
-import { convertWeight, extractExternal } from '../utils';
+import { CompatibleWeight, convertWeight, extractExternal } from '../utils';
 import { useApi } from './api';
 import { useMultisig } from './multisig';
 
@@ -22,12 +21,12 @@ export function useMultiApprove() {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const info = await api?.query.multisig.multisigs(multiRoot, data.callHash!);
       let callData = null;
-      let weight: BN | undefined = new BN(0);
+      let weight: CompatibleWeight = convertWeight(0).compatibleWeight;
 
       if (data.callData) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const payment = await api?.tx(data.callData as any).paymentInfo(ZERO_ACCOUNT);
-        weight = convertWeight(payment?.weight || 0).v1Weight;
+        weight = convertWeight(payment?.weight || 0).compatibleWeight;
         callData = api?.registry.createType('Call', data.callData);
       }
 

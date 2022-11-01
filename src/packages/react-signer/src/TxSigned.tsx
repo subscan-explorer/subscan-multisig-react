@@ -158,12 +158,19 @@ async function wrapTx(
     tx = isMultiCall
       ? api.tx[multiModule].asMulti.meta.args.length === 6
         ? // We are doing toHex here since we have a Vec<u8> input
-          api.tx[multiModule].asMulti(threshold, others, timepoint, tx.method.toHex(), false, weightAll)
+          api.tx[multiModule].asMulti(
+            threshold,
+            others,
+            timepoint,
+            tx.method.toHex(),
+            false,
+            weightAll.compatibleWeight
+          )
         : // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           api.tx[multiModule].asMulti(threshold, others, timepoint, tx.method)
       : api.tx[multiModule].approveAsMulti.meta.args.length === 5
-      ? api.tx[multiModule].approveAsMulti(threshold, others, timepoint, tx.method.hash, weightAll)
+      ? api.tx[multiModule].approveAsMulti(threshold, others, timepoint, tx.method.hash, weightAll.compatibleWeight)
       : // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         api.tx[multiModule].approveAsMulti(threshold, others, timepoint, tx.method.hash);

@@ -1,5 +1,5 @@
 import type { Compact, Struct, u64 } from '@polkadot/types-codec';
-import type { BN } from '@polkadot/util';
+import { BN } from '@polkadot/util';
 import { bnToBn } from '@polkadot/util';
 
 export type WeightV1 = u64;
@@ -9,11 +9,17 @@ export interface WeightV2 extends Struct {
   readonly proofSize: Compact<u64>;
 }
 
+export type CompatibleWeight =
+  | BN
+  | {
+      refTime: BN;
+    };
 export interface WeightAll {
   v1Weight: BN;
   v2Weight: {
     refTime: BN;
   };
+  compatibleWeight: CompatibleWeight;
 }
 
 export function convertWeight(orig: WeightV1 | WeightV2 | bigint | string | number | BN): WeightAll {
@@ -22,5 +28,6 @@ export function convertWeight(orig: WeightV1 | WeightV2 | bigint | string | numb
   return {
     v1Weight: refTime,
     v2Weight: { refTime },
+    compatibleWeight: (orig as WeightV2).proofSize ? { refTime } : refTime,
   };
 }
