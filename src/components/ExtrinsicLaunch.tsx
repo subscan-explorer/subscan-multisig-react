@@ -37,6 +37,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
   const [reserveAmount, setReserveAmount] = useState(0);
   const { multisigAccount } = useMultisig();
   const isExtensionAccount = useIsInjected();
+  const [isBusy, SetIsBusy] = useState<boolean>(true);
 
   const [depositBase, depositFactor] = useMemo(() => {
     return [Number(api?.consts.multisig.depositBase.toJSON()), Number(api?.consts.multisig.depositFactor.toJSON())];
@@ -63,10 +64,13 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
   const _onExtrinsicChange = useCallback(
     // eslint-disable-next-line complexity
     async (ext?: SubmittableExtrinsic<'promise'>) => {
+      SetIsBusy(true);
       if (!ext) {
+        SetIsBusy(false);
         return setExtrinsic(null);
       }
       if (!multisigAccount) {
+        SetIsBusy(false);
         return setExtrinsic(null);
       }
 
@@ -102,6 +106,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
 
       setHexCallData(ext.method.toHex());
       setHexCallHash(ext.method.hash.toHex());
+      SetIsBusy(false);
 
       // Estimate reserve amount
       try {
@@ -206,6 +211,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
             isUnsigned
             label={t<string>('Submit Unsigned')}
             withSpinner
+            isBusy={isBusy}
           />
           <TxButton
             accountId={accountId}
@@ -213,6 +219,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
             icon="sign-in-alt"
             label={t<string>('Submit Transaction')}
             onSuccess={onTxSuccess}
+            isBusy={isBusy}
           />
         </Button.Group>
       </div>

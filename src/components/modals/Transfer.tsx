@@ -91,6 +91,7 @@ function Transfer({
   const [accountId, setAccountId] = useState<string | null>(null);
   const isExtensionAccount = useIsInjected();
   const [reserveAmount, setReserveAmount] = useState(0);
+  const [isBusy, SetIsBusy] = useState<boolean>(true);
 
   const options = useMemo<KeyringSectionOption[]>(
     () =>
@@ -200,6 +201,7 @@ function Transfer({
   useEffect(() => {
     // eslint-disable-next-line complexity
     (async () => {
+      SetIsBusy(true);
       const fn =
         canToggleAll && isAll && isFunction(api.tx.balances?.transferAll)
           ? api.tx.balances?.transferAll
@@ -209,6 +211,7 @@ function Transfer({
 
       if (!fn || !propSenderId) {
         setMultisigExtrinsic(null);
+        SetIsBusy(false);
         return;
       }
 
@@ -247,6 +250,7 @@ function Transfer({
       // console.log('hexCallData', ext.method.toHex());
 
       setMultisigExtrinsic(multiTx);
+      SetIsBusy(false);
 
       // Estimate reserve amount
       try {
@@ -413,6 +417,7 @@ function Transfer({
             accountId={accountId}
             icon="paper-plane"
             isDisabled={!hasAvailable || !(propRecipientId || recipientId) || !amount || !!recipientPhish}
+            isBusy={isBusy}
             label={t<string>('Make Transfer')}
             onStart={onClose}
             extrinsic={multisigExtrinsic}
