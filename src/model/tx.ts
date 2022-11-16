@@ -33,4 +33,5 @@ export interface TxOperationComponentProps {
   entry: Entry;
   txSpy?: (tx: PartialQueueTxExtrinsic | null) => void;
   onOperation?: (operation: TxOperation) => void;
+  beforeOperation?: (operation: TxOperation, cb: () => void) => void;
 }

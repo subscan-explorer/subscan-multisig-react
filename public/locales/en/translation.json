@@ -208,5 +208,7 @@
   "setting": "Setting",
   "Favorite": "Favorite",
   "Unfavorite": "Unfavorite",
-  "share link": "Share Link"
+  "share link": "Share Link",
+  "Mulitsig Transaction Details": "Mulitsig Transaction Details",
+  "Please be sure to double-check the mulitsig transaction progress and parameters carefully before approving.": "Please be sure to double-check the mulitsig transaction progress and parameters carefully before approving."
 }

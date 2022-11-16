@@ -80,7 +80,7 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
         refreshCancelledAccount,
       }}
     >
-      <Spin size="large" spinning={isPageLocked}>
+      <Spin size="large" spinning={isPageLocked} style={{ zIndex: 1001 }}>
         {children}
       </Spin>
     </MultisigContext.Provider>
