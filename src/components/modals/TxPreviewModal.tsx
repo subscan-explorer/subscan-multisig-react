@@ -43,7 +43,7 @@ export const TxPreviewModal = (props: TxPreviewModalProps) => {
           'Please be sure to double-check the mulitsig transaction progress and parameters carefully before approving.'
         )}
       </p>
-      <div className="overflow-auto max-h-96">
+      <div className="overflow-auto max-h-96 border-gray-100 border-2">
         <div className="min-w-max">
           <TxProgressAndParameters entry={entry} isInProgress={isInProgress} account={account} />
         </div>
