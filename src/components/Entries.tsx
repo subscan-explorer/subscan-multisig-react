@@ -4,16 +4,17 @@ import { Button, Collapse, Empty, Progress, Space, Table, Typography } from 'ant
 import { ColumnsType } from 'antd/lib/table';
 import { useManualQuery } from 'graphql-hooks';
 import { intersection, isEmpty } from 'lodash';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { APPROVE_RECORD_QUERY } from '../config';
 import { useApi, useIsInjected } from '../hooks';
-import { AddressPair, Entry, Network, TxActionType } from '../model';
+import { AddressPair, Entry, Network, TxActionType, TxOperationComponentProps } from '../model';
 import { toShortString, formatDate } from '../utils';
 import { ArgObj, Args } from './Args';
 import { genExpandIcon } from './expandIcon';
 import { ApproveRecord, CancelRecord } from './ExtrinsicRecords';
 import { MemberList } from './Members';
+import { TxPreviewModal } from './modals/TxPreviewModal';
 import { SubscanLink } from './SubscanLink';
 import { TxApprove } from './TxApprove';
 import { TxCancel } from './TxCancel';
@@ -46,7 +47,7 @@ const renderMethod = (data: any | undefined | null) => {
   }
 };
 
-const renderMemberStatus = (entry: Entry, pair: KeyringJson, _network: Network, isInProgress: boolean) => {
+export const renderMemberStatus = (entry: Entry, pair: KeyringJson, _network: Network, isInProgress: boolean) => {
   return (
     <div className="flex justify-center">
       <MemberStatus entry={entry} pair={pair} isInProgress={isInProgress} />
@@ -187,6 +188,16 @@ export function Entries({
   const { t } = useTranslation();
   const isInjected = useIsInjected();
   const { network } = useApi();
+  const [isTxPreviewModalVisible, setIsTxPreviewModalVisible] = useState(false);
+  const [txEntry, setTxEntry] = useState<Entry>();
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const approveTxCallbackRef = useRef(() => {});
+
+  const showTxPreview: TxOperationComponentProps['beforeOperation'] = useCallback((operation, cb) => {
+    setIsTxPreviewModalVisible(true);
+    setTxEntry(operation.entry);
+    approveTxCallbackRef.current = cb;
+  }, []);
 
   const renderAction = useCallback(
     // eslint-disable-next-line complexity
@@ -231,7 +242,7 @@ export function Entries({
                 </Button>
               );
             } else if (action === 'approve') {
-              return <TxApprove key={action} entry={row} />;
+              return <TxApprove key={action} entry={row} beforeOperation={showTxPreview} />;
             } else {
               return <TxCancel key={action} entry={row} />;
             }
@@ -239,7 +250,7 @@ export function Entries({
         </Space>
       );
     },
-    [account.meta?.addressPair, account.meta.threshold, isInjected, t]
+    [account.meta?.addressPair, account.meta.threshold, isInjected, t, showTxPreview]
   );
 
   const columns: ColumnsType<Entry> = [
@@ -413,7 +424,21 @@ export function Entries({
             </Collapse>
           );
         })}
-
+        {txEntry ? (
+          <TxPreviewModal
+            visible={isTxPreviewModalVisible}
+            onCancel={() => {
+              setIsTxPreviewModalVisible(false);
+            }}
+            onConfirm={() => {
+              approveTxCallbackRef.current();
+              setIsTxPreviewModalVisible(false);
+            }}
+            entry={txEntry}
+            isInProgress={!isCancelled && !isConfirmed}
+            account={account}
+          />
+        ) : null}
         {!source.length && <Empty />}
       </Space>
     </div>

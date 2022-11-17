@@ -11,7 +11,7 @@ import { PartialQueueTxExtrinsic } from '../packages/react-components/src/Status
 import { makeSure } from '../utils';
 
 // eslint-disable-next-line complexity
-export function TxApprove({ entry, txSpy, onOperation }: TxOperationComponentProps) {
+export function TxApprove({ entry, txSpy, onOperation, beforeOperation }: TxOperationComponentProps) {
   const { t } = useTranslation();
   const { accounts, api } = useApi();
   const [getApproveTx] = useMultiApprove();
@@ -24,33 +24,40 @@ export function TxApprove({ entry, txSpy, onOperation }: TxOperationComponentPro
 
   const handleApprove = useCallback(
     (accountId: string, target: Entry) => {
-      setIsPageLock(true);
-      setInputCallDataModalVisible(false);
+      makeSure(beforeOperation)(
+        {
+          entry: target,
+          type: 'approve',
+          accounts: availableAccounts.map((o) => o.address),
+        },
+        () => {
+          setIsPageLock(true);
+          setInputCallDataModalVisible(false);
+          getApproveTx(target, accountId).then((tx) => {
+            const queueTx: PartialQueueTxExtrinsic = {
+              extrinsic: tx,
+              accountId,
+              txSuccessCb: () => {
+                makeSure(txSpy)(null);
+                queryInProgress();
+                setTimeout(() => {
+                  refreshConfirmedAccount();
+                  // eslint-disable-next-line no-magic-numbers
+                }, 6000);
+              },
+            };
 
-      getApproveTx(target, accountId).then((tx) => {
-        const queueTx: PartialQueueTxExtrinsic = {
-          extrinsic: tx,
-          accountId,
-          txSuccessCb: () => {
-            makeSure(txSpy)(null);
-            queryInProgress();
-            setTimeout(() => {
-              refreshConfirmedAccount();
-              // eslint-disable-next-line no-magic-numbers
-            }, 6000);
-          },
-        };
-
-        queueExtrinsic(queueTx);
-        setIsPageLock(false);
-        makeSure(txSpy)(queueTx);
-      });
-
-      makeSure(onOperation)({
-        entry: target,
-        type: 'approve',
-        accounts: availableAccounts.map((account) => account.address),
-      });
+            queueExtrinsic(queueTx);
+            setIsPageLock(false);
+            makeSure(txSpy)(queueTx);
+          });
+          makeSure(onOperation)({
+            entry: target,
+            type: 'approve',
+            accounts: availableAccounts.map((o) => o.address),
+          });
+        }
+      );
     },
     [
       availableAccounts,
@@ -68,7 +75,6 @@ export function TxApprove({ entry, txSpy, onOperation }: TxOperationComponentPro
     return (
       <>
         <Button onClick={() => setInputCallDataModalVisible(true)}>{t('approve')}</Button>
-
         <InputCallDataModal
           visible={inputCallDataModalVisible}
           onCancel={() => setInputCallDataModalVisible(false)}
@@ -89,32 +95,34 @@ export function TxApprove({ entry, txSpy, onOperation }: TxOperationComponentPro
     return <Button onClick={() => handleApprove(availableAccounts[0].address, entry)}>{t('approve')}</Button>;
   } else {
     return (
-      <Popover
-        content={
-          <Radio.Group
-            onChange={(event) => {
-              handleApprove(event.target.value, entry);
-            }}
-            value={null}
-          >
-            <Space direction="vertical">
-              {availableAccounts.map((acc) => (
-                <Radio.Button
-                  value={acc.address}
-                  key={acc.address}
-                  className="max-w-xs md:max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap"
-                >
-                  {acc.meta.name} - {acc.address}
-                </Radio.Button>
-              ))}
-            </Space>
-          </Radio.Group>
-        }
-        title={t('Select approve account')}
-        trigger="focus"
-      >
-        <Button>{t('approve')}</Button>
-      </Popover>
+      <>
+        <Popover
+          content={
+            <Radio.Group
+              onChange={(event) => {
+                handleApprove(event.target.value, entry);
+              }}
+              value={null}
+            >
+              <Space direction="vertical">
+                {availableAccounts.map((acc) => (
+                  <Radio.Button
+                    value={acc.address}
+                    key={acc.address}
+                    className="max-w-xs md:max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap"
+                  >
+                    {acc.meta.name} - {acc.address}
+                  </Radio.Button>
+                ))}
+              </Space>
+            </Radio.Group>
+          }
+          title={t('Select approve account')}
+          trigger="focus"
+        >
+          <Button>{t('approve')}</Button>
+        </Popover>
+      </>
     );
   }
 }
