@@ -146,7 +146,7 @@ async function wrapTx(
     const multiModule = api.tx.multisig ? 'multisig' : 'utility';
     const info = await api.query[multiModule].multisigs<Option<Multisig>>(multiRoot, tx.method.hash);
     const { weight } = await tx.paymentInfo(multiRoot);
-    const weightAll = convertWeight(weight);
+    const weightAll = convertWeight(api, weight);
     const { threshold, who } = extractExternal(multiRoot);
     const others = who.filter((w) => w !== signAddress);
     let timepoint: Timepoint | null = null;

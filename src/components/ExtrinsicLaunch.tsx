@@ -91,7 +91,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
           console.info('ExtrinsicLaunch::paymentInfo err', err);
           return { weight: 0 };
         })) || { weight: 0 };
-      const weightAll = convertWeight(weight);
+      const weightAll = convertWeight(api, weight);
 
       const module = api?.tx.multisig;
       const argsLength = module?.asMulti.meta.args.length || 0;

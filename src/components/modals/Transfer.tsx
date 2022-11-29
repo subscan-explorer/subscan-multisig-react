@@ -234,7 +234,7 @@ function Transfer({
       const { threshold, who } = extractExternal(propSenderId);
       const others: string[] = who.filter((item) => item !== accountId);
       const { weight } = (await ext?.paymentInfo(propSenderId)) || { weight: 0 };
-      const weightAll = convertWeight(weight);
+      const weightAll = convertWeight(api, weight);
       const module = api?.tx.multisig;
       const argsLength = module?.asMulti.meta.args.length || 0;
       const generalParams = [threshold, others, timepoint];
