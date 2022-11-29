@@ -1,3 +1,4 @@
+import { ApiPromise } from '@polkadot/api';
 import type { Compact, Struct, u64 } from '@polkadot/types-codec';
 import { BN } from '@polkadot/util';
 import { bnToBn } from '@polkadot/util';
@@ -22,12 +23,23 @@ export interface WeightAll {
   compatibleWeight: CompatibleWeight;
 }
 
-export function convertWeight(orig: WeightV1 | WeightV2 | bigint | string | number | BN): WeightAll {
+export function convertWeight(
+  api: ApiPromise | null,
+  orig: WeightV1 | WeightV2 | bigint | string | number | BN
+): WeightAll {
+  let isWeightV2 = false;
+  try {
+    api?.createType('WeightV2', { refTime: 0 });
+    isWeightV2 = true;
+  } catch (error) {
+    isWeightV2 = false;
+  }
+
   const refTime = (orig as WeightV2).proofSize ? (orig as WeightV2).refTime.toBn() : bnToBn(orig as BN);
 
   return {
     v1Weight: refTime,
     v2Weight: { refTime },
-    compatibleWeight: (orig as WeightV2).proofSize ? { refTime } : refTime,
+    compatibleWeight: isWeightV2 ? { refTime } : refTime,
   };
 }
