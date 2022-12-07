@@ -17,8 +17,9 @@ interface InputCallDataModalProps {
 
 // eslint-disable-next-line complexity
 export const InputCallDataModal = (props: InputCallDataModalProps) => {
+  const { callHash } = props;
   const { t } = useTranslation();
-  const { network } = useApi();
+  const { api, network } = useApi();
   const mainColor = useMemo(() => {
     return getThemeColor(network);
   }, [network]);
@@ -39,6 +40,17 @@ export const InputCallDataModal = (props: InputCallDataModalProps) => {
     }
     if (!callData.trim()) {
       message.warn(t('missing call data'));
+      return;
+    }
+
+    try {
+      if (api?.registry.createType('Call', callData.trim()).hash.toHex() !== callHash) {
+        message.warn(t('Call data does not match the existing call hash'));
+        return;
+      }
+    } catch (error) {
+      console.info('check call data', error);
+      message.warn(t('Call data does not match the existing call hash'));
       return;
     }
 

@@ -1,15 +1,18 @@
-import { AnyJson } from '@polkadot/types/types';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
 import { encodeAddress } from '@polkadot/util-crypto';
+import { useManualQuery } from 'graphql-hooks';
 import { difference, intersection } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { MultisigRecordsQueryRes } from '../components/ExtrinsicRecords';
 import { Entry } from '../model';
 import { convertToSS58 } from '../utils';
+import { MULTISIG_RECORD_QUERY } from '../config';
 import { useApi } from './api';
 
 export function useMultisig(acc?: string) {
+  const { networkConfig } = useApi();
   const [multisigAccount, setMultisigAccount] = useState<KeyringAddress | null>(null);
   const { api, networkStatus, chain } = useApi();
   const { account } = useParams<{ account: string }>();
@@ -17,6 +20,22 @@ export function useMultisig(acc?: string) {
 
   const [inProgress, setInProgress] = useState<Entry[]>([]);
   const [loadingInProgress, setLoadingInProgress] = useState(false);
+
+  const [fetchInProgress, { data: inProgressData }] = useManualQuery<MultisigRecordsQueryRes>(MULTISIG_RECORD_QUERY, {
+    variables: {
+      account,
+      status: 'default',
+      offset: 0,
+      limit: 100,
+    },
+  });
+
+  useEffect(() => {
+    if (networkConfig?.api?.subql) {
+      fetchInProgress();
+    }
+  }, [networkConfig, fetchInProgress]);
+
   const queryInProgress = useCallback(async () => {
     if (!api) {
       return;
@@ -31,6 +50,7 @@ export function useMultisig(acc?: string) {
     });
 
     const data = await api.query.multisig.multisigs.entries(multisig?.address);
+
     const result: Pick<Entry, 'when' | 'depositor' | 'approvals' | 'address' | 'callHash'>[] = data?.map((entry) => {
       const [address, callHash] = entry[0].toHuman() as string[];
 
@@ -41,33 +61,37 @@ export function useMultisig(acc?: string) {
         callHash,
       };
     });
-
-    const callInfos = await api?.query.multisig.calls.multi(result.map((item) => item.callHash || ''));
     // eslint-disable-next-line complexity
-    const calls: Entry[] = callInfos?.map((callInfo, index) => {
-      const call = callInfo.toJSON() as AnyJson[];
+    const calls: Entry[] | undefined = result.map((multisigEntry) => {
+      const record = inProgressData?.multisigRecords.nodes?.filter((r) => r.callHash === multisigEntry.callHash);
 
-      if (!call) {
-        return { ...result[index], callDataJson: {}, meta: {}, hash: result[index].callHash };
+      if (!record) {
+        return { ...multisigEntry, callDataJson: {}, meta: {}, hash: multisigEntry.callHash };
       }
 
       try {
-        const callData = api.registry.createType('Call', call[0]);
+        const asMultiExtrinsic = record[0]?.block?.extrinsics?.nodes?.filter((extrinsic) => extrinsic.multisigCall);
+
+        if (!asMultiExtrinsic || asMultiExtrinsic.length === 0) {
+          return { ...multisigEntry, callDataJson: {}, meta: {}, hash: multisigEntry.callHash };
+        }
+
+        const callData = api.registry.createType('Call', asMultiExtrinsic[0].multisigCall);
         const { section, method } = api.registry.findMetaCall(callData.callIndex);
         const callDataJson = { ...callData.toJSON(), section, method };
-        const hexCallData = call[0];
+        const hexCallData = callData.toHex();
         const meta = api?.tx[callDataJson?.section][callDataJson.method].meta.toJSON();
 
-        return { ...result[index], callDataJson, callData, meta, hash: result[index].callHash, hexCallData };
-      } catch {
-        return { ...result[index], callDataJson: {}, meta: {}, hash: result[index].callHash };
+        return { ...multisigEntry, callDataJson, callData, meta, hash: multisigEntry.callHash, hexCallData };
+      } catch (error) {
+        return { ...multisigEntry, callDataJson: {}, meta: {}, hash: multisigEntry.callHash };
       }
     });
 
     setMultisigAccount(multisig || null);
     setInProgress(calls || []);
     setLoadingInProgress(false);
-  }, [api, acc, ss58Account, chain]);
+  }, [api, acc, ss58Account, inProgressData?.multisigRecords.nodes, chain.ss58Format]);
 
   useEffect(() => {
     if (networkStatus !== 'success') {

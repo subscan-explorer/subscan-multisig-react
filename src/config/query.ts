@@ -23,6 +23,7 @@ export const MULTISIG_RECORD_QUERY = `
       nodes {
         multisigAccountId
         timestamp
+        callHash
         createExtrinsicIdx
         cancelExtrinsicIdx
         confirmExtrinsicIdx
@@ -50,6 +51,7 @@ export const MULTISIG_RECORD_QUERY = `
               id
               method
               section
+              multisigCall
               args
               signerId # 验证人account
               isSuccess

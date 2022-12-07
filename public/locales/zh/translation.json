@@ -192,6 +192,7 @@
   "unavailable endpoint": "无效的节点",
   "decode call data error": "解析 call data 失败",
   "missing call data": "请输入 call data",
+  "Call data does not match the existing call hash": "Call data 与 call hash 不匹配",
   "missing selected account": "请选择批准的账号",
   "endpoint connect timeout": "节点连接超时",
   "watch only": "阅览模式",

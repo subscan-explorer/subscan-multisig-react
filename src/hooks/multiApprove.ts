@@ -50,7 +50,7 @@ export function useMultiApprove() {
         args =
           multiModule?.asMulti.meta.args.length === AS_MULTI_ARG_LENGTH
             ? [...generalParams, callData?.toHex(), true, weight]
-            : [callData];
+            : [...generalParams, callData?.toHex(), weight];
         extFn = multiModule?.asMulti;
       } else {
         args =

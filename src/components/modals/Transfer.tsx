@@ -239,7 +239,10 @@ function Transfer({
       const argsLength = module?.asMulti.meta.args.length || 0;
       const generalParams = [threshold, others, timepoint];
       const args =
-        argsLength === ARG_LENGTH
+        // eslint-disable-next-line no-magic-numbers
+        argsLength === 5
+          ? [...generalParams, ext.method.toHex(), weightAll.compatibleWeight]
+          : argsLength === ARG_LENGTH
           ? [...generalParams, ext.method.toHex(), true, weightAll.compatibleWeight]
           : [...generalParams, ext];
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
