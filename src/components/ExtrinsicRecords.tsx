@@ -12,13 +12,14 @@ import { useMultisigContext } from '../hooks/multisigContext';
 import { IExtrinsic, parseArgs } from '../utils';
 import { Entries } from './Entries';
 
-interface MultisigRecordsQueryRes {
+export interface MultisigRecordsQueryRes {
   multisigRecords: { totalCount: number; nodes: MultisigRecord[] };
 }
 
 interface MultisigRecord {
   multisigAccountId: string;
   timestamp: string;
+  callHash: string;
   createExtrinsicIdx: string;
   confirmExtrinsicIdx: string;
   cancelExtrinsicIdx: string;

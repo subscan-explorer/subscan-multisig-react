@@ -2,6 +2,7 @@ import { ApiPromise } from '@polkadot/api';
 
 export interface IExtrinsic {
   id: string;
+  multisigCall: string;
   method: string;
   section: string;
   args: string;

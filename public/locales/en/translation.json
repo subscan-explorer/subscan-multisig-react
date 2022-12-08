@@ -194,6 +194,7 @@
   "unavailable endpoint": "Unavailable Endpoint",
   "decode call data error": "Decode call data error",
   "missing call data": "Please input call data first",
+  "Call data does not match the existing call hash": "Call data does not match the existing call hash",
   "missing selected account": "Please choose approve account first",
   "endpoint connect timeout": "Endpoint connect timeout",
   "watch only": "Watch Only",

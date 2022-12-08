@@ -4,7 +4,7 @@ import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
 import { isFunction } from '@polkadot/util';
 import { Button, Col, Dropdown, Input, Menu, message, Modal, Row, Space, Statistic, Tooltip, Typography } from 'antd';
 import { saveAs } from 'file-saver';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import iconDown from 'src/assets/images/icon_down.svg';
@@ -32,7 +32,8 @@ export function WalletState(props: WalletStateProps) {
   const history = useHistory();
   const { network, api, networkConfig } = useApi();
   const { multisigAccount, changeMultisigAccount } = props;
-  const { inProgress, queryInProgress, confirmedAccount, refreshConfirmedAccount } = useMultisigContext();
+  const { inProgress, queryInProgress, confirmedAccount, refreshConfirmedAccount, fetchInProgress } =
+    useMultisigContext();
   const [isAccountsDisplay, setIsAccountsDisplay] = useState<boolean>(false);
   const [isExtrinsicDisplay, setIsExtrinsicDisplay] = useState(false);
   const [isTransferDisplay, setIsTransferDisplay] = useState(false);
@@ -121,8 +122,22 @@ export function WalletState(props: WalletStateProps) {
     }
   }, [multisigAccount?.address, t, history]);
 
+  const queryInProgressRef = useRef<(silent: boolean) => Promise<void>>(queryInProgress);
+
   useEffect(() => {
-    const id = setInterval(() => refreshConfirmedAccount(), LONG_DURATION);
+    queryInProgressRef.current = queryInProgress;
+  }, [queryInProgress]);
+
+  useEffect(() => {
+    function tick() {
+      fetchInProgress();
+      queryInProgressRef.current(true);
+    }
+
+    const id = setInterval(() => {
+      tick();
+      refreshConfirmedAccount();
+    }, LONG_DURATION);
 
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
