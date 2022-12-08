@@ -49,7 +49,7 @@ export function useMultiApprove() {
       if (data.approvals.length + 1 >= (multisigAccount?.meta as any).threshold) {
         args =
           multiModule?.asMulti.meta.args.length === AS_MULTI_ARG_LENGTH
-            ? [...generalParams, callData?.toHex(), true, weight]
+            ? [...generalParams, callData?.toHex(), false, weight]
             : [...generalParams, callData?.toHex(), weight];
         extFn = multiModule?.asMulti;
       } else {

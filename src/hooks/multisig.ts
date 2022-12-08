@@ -28,6 +28,7 @@ export function useMultisig(acc?: string) {
       offset: 0,
       limit: 100,
     },
+    skipCache: true,
   });
 
   useEffect(() => {
@@ -36,69 +37,72 @@ export function useMultisig(acc?: string) {
     }
   }, [networkConfig, fetchInProgress]);
 
-  const queryInProgress = useCallback(async () => {
-    if (!api) {
-      return;
-    }
-
-    setLoadingInProgress(true);
-
-    const multisig = keyring.getAccount(acc ?? ss58Account);
-    // Use different ss58 addresses
-    (multisig?.meta.addressPair as KeyringJson[])?.forEach((key) => {
-      key.address = convertToSS58(key.address, Number(chain.ss58Format));
-    });
-
-    const data = await api.query.multisig.multisigs.entries(multisig?.address);
-
-    const result: Pick<Entry, 'when' | 'depositor' | 'approvals' | 'address' | 'callHash'>[] = data?.map((entry) => {
-      const [address, callHash] = entry[0].toHuman() as string[];
-
-      return {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ...(entry[1] as unknown as any).toJSON(),
-        address,
-        callHash,
-      };
-    });
+  const queryInProgress = useCallback(
     // eslint-disable-next-line complexity
-    const calls: Entry[] | undefined = result.map((multisigEntry) => {
-      const record = inProgressData?.multisigRecords.nodes?.filter((r) => r.callHash === multisigEntry.callHash);
-
-      if (!record) {
-        return { ...multisigEntry, callDataJson: {}, meta: {}, hash: multisigEntry.callHash };
+    async (silent = false) => {
+      if (!api) {
+        return;
       }
 
-      try {
-        const asMultiExtrinsic = record[0]?.block?.extrinsics?.nodes?.filter((extrinsic) => extrinsic.multisigCall);
+      if (!silent) setLoadingInProgress(true);
+      const multisig = keyring.getAccount(acc ?? ss58Account);
+      // Use different ss58 addresses
+      (multisig?.meta.addressPair as KeyringJson[])?.forEach((key) => {
+        key.address = convertToSS58(key.address, Number(chain.ss58Format));
+      });
 
-        if (!asMultiExtrinsic || asMultiExtrinsic.length === 0) {
+      const data = await api.query.multisig.multisigs.entries(multisig?.address);
+
+      const result: Pick<Entry, 'when' | 'depositor' | 'approvals' | 'address' | 'callHash'>[] = data?.map((entry) => {
+        const [address, callHash] = entry[0].toHuman() as string[];
+
+        return {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ...(entry[1] as unknown as any).toJSON(),
+          address,
+          callHash,
+        };
+      });
+      // eslint-disable-next-line complexity
+      const calls: Entry[] | undefined = result.map((multisigEntry) => {
+        const record = inProgressData?.multisigRecords.nodes?.filter((r) => r.callHash === multisigEntry.callHash);
+        console.info('11114', inProgressData, record);
+        if (!record) {
           return { ...multisigEntry, callDataJson: {}, meta: {}, hash: multisigEntry.callHash };
         }
 
-        const callData = api.registry.createType('Call', asMultiExtrinsic[0].multisigCall);
-        const { section, method } = api.registry.findMetaCall(callData.callIndex);
-        const callDataJson = { ...callData.toJSON(), section, method };
-        const hexCallData = callData.toHex();
-        const meta = api?.tx[callDataJson?.section][callDataJson.method].meta.toJSON();
+        try {
+          const asMultiExtrinsic = record[0]?.block?.extrinsics?.nodes?.filter((extrinsic) => extrinsic.multisigCall);
 
-        return { ...multisigEntry, callDataJson, callData, meta, hash: multisigEntry.callHash, hexCallData };
-      } catch (error) {
-        return { ...multisigEntry, callDataJson: {}, meta: {}, hash: multisigEntry.callHash };
-      }
-    });
+          if (!asMultiExtrinsic || asMultiExtrinsic.length === 0) {
+            return { ...multisigEntry, callDataJson: {}, meta: {}, hash: multisigEntry.callHash };
+          }
 
-    setMultisigAccount(multisig || null);
-    setInProgress(calls || []);
-    setLoadingInProgress(false);
-  }, [api, acc, ss58Account, inProgressData?.multisigRecords.nodes, chain.ss58Format]);
+          const callData = api.registry.createType('Call', asMultiExtrinsic[0].multisigCall);
+          const { section, method } = api.registry.findMetaCall(callData.callIndex);
+          const callDataJson = { ...callData.toJSON(), section, method };
+          const hexCallData = callData.toHex();
+          const meta = api?.tx[callDataJson?.section][callDataJson.method].meta.toJSON();
+
+          return { ...multisigEntry, callDataJson, callData, meta, hash: multisigEntry.callHash, hexCallData };
+        } catch (error) {
+          return { ...multisigEntry, callDataJson: {}, meta: {}, hash: multisigEntry.callHash };
+        }
+      });
+
+      setMultisigAccount(multisig || null);
+      setInProgress(calls || []);
+      if (!silent) setLoadingInProgress(false);
+    },
+    [api, acc, ss58Account, chain.ss58Format, inProgressData]
+  );
 
   useEffect(() => {
     if (networkStatus !== 'success') {
       return;
     }
 
-    queryInProgress();
+    queryInProgress(true);
   }, [networkStatus, queryInProgress]);
 
   return {
@@ -107,6 +111,7 @@ export function useMultisig(acc?: string) {
     setMultisigAccount,
     queryInProgress,
     loadingInProgress,
+    fetchInProgress,
   };
 }
 

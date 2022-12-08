@@ -243,7 +243,7 @@ function Transfer({
         argsLength === 5
           ? [...generalParams, ext.method.toHex(), weightAll.compatibleWeight]
           : argsLength === ARG_LENGTH
-          ? [...generalParams, ext.method.toHex(), true, weightAll.compatibleWeight]
+          ? [...generalParams, ext.method.toHex(), false, weightAll.compatibleWeight]
           : [...generalParams, ext];
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore

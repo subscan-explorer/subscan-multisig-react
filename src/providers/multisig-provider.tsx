@@ -14,11 +14,12 @@ export const MultisigContext = createContext<{
   confirmedAccount: number | undefined;
   cancelledAccount: number | undefined;
   setMultisigAccount: React.Dispatch<React.SetStateAction<KeyringAddress | null>> | null;
-  queryInProgress: () => Promise<void>;
+  queryInProgress: (silent?: boolean) => Promise<void>;
   refreshConfirmedAccount: () => void;
   refreshCancelledAccount: () => void;
   setIsPageLock: (lock: boolean) => void;
   loadingInProgress: boolean;
+  fetchInProgress: any;
 }>({
   inProgress: [],
   multisigAccount: null,
@@ -30,6 +31,8 @@ export const MultisigContext = createContext<{
   refreshConfirmedAccount: empty,
   refreshCancelledAccount: empty,
   loadingInProgress: false,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  fetchInProgress: () => {},
 });
 
 export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) => {

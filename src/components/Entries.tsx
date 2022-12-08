@@ -388,7 +388,7 @@ export function Entries({
       <Space direction="vertical" className="lg:hidden block">
         {source.map((data) => {
           const { address, hash, callData, approvals } = data;
-          const approvedCount = approvals.length || 0;
+          const approvedCount = approvals?.length || 0;
           const threshold = (account.meta.threshold as number) || 1;
 
           return (
