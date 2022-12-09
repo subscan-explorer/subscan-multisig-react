@@ -3,7 +3,7 @@
   "displayName": "Polkadot",
   "rpc": "wss://rpc.polkadot.io",
   "api": {
-    "subql": "https://api.subquery.network/sq/WoeOm/multisig-polkadot"
+    "subql": "https://api.subquery.network/sq/itering/multisig-polkadot"
   },
   "logo": "/image/polkadot-button-mobile.png",
   "explorerHostName": "polkadot",
