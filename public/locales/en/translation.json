@@ -12,7 +12,7 @@
   "Invalid call data": "Invalid call data",
   "Invalid call hash": "Invalid call hash",
   "Member name is required": "Member name is required",
-  "Only one wallet with the same member and threshold can be registered, but you can share it between different networks": "Only one wallet with the same member and threshold can be registered, but you can share it between different networks",
+  "Only one wallet with the same members and threshold can be registered, but you can share it between different networks": "Only one wallet with the same members and threshold can be registered, but you can share it between different networks",
   "Origin Account": "Origin Account",
   "Select approve account": "Select approve account",
   "Submission": "Submission",

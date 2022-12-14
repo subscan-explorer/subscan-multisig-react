@@ -12,7 +12,7 @@
   "Invalid call data": "无效的 data 值",
   "Invalid call hash": "无效的 hash 值",
   "Member name is required": "成员名称是必须的",
-  "Only one wallet with the same member and threshold can be registered, but you can share it between different networks": "相同成员及阈值的钱包只能注册一个，但是你可以在不同的网络之间共享它",
+  "Only one wallet with the same members and threshold can be registered, but you can share it between different networks": "相同成员及阈值的钱包只能注册一个，但是你可以在不同的网络之间共享它",
   "Origin Account": "已存在账号",
   "Select approve account": "选择批准账户",
   "Submission": "Submission",

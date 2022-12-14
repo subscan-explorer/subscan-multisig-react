@@ -66,7 +66,6 @@ export function useMultisig(acc?: string) {
       // eslint-disable-next-line complexity
       const calls: Entry[] | undefined = result.map((multisigEntry) => {
         const record = inProgressData?.multisigRecords.nodes?.filter((r) => r.callHash === multisigEntry.callHash);
-        console.info('11114', inProgressData, record);
         if (!record) {
           return { ...multisigEntry, callDataJson: {}, meta: {}, hash: multisigEntry.callHash };
         }
