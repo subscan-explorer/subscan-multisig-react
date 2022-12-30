@@ -3,7 +3,7 @@
   "displayName": "Crab",
   "rpc": "wss://crab-rpc.darwinia.network",
   "api": {
-    "subql": "https://api.subquery.network/sq/darwinia-network/multisig-crab"
+    "subql": "https://subql.darwinia.network/subql-multisig-crab"
   },
   "logo": "/image/crab-button-mobile.png",
   "explorerHostName": "crab",
