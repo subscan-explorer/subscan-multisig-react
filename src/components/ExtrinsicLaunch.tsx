@@ -96,8 +96,16 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
       const module = api?.tx.multisig;
       const argsLength = module?.asMulti.meta.args.length || 0;
       const generalParams = [threshold, others, timepoint];
+
+      // argsLength = 4 as_multi(threshold, other_signatories, maybe_timepoint, call)
+      // argsLength = 5 as_multi(threshold, other_signatories, maybe_timepoint, call, max_weight)
+      // argsLength = 6 as_multi(threshold, other_signatories, maybe_timepoint, call, store_call, max_weight)
+
       const args =
-        argsLength === ARG_LENGTH
+        // eslint-disable-next-line no-magic-numbers
+        argsLength === 5
+          ? [...generalParams, ext.method.toHex(), weightAll.compatibleWeight]
+          : argsLength === ARG_LENGTH
           ? [...generalParams, ext.method.toHex(), false, weightAll.compatibleWeight]
           : [...generalParams, ext];
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
