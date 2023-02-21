@@ -3,23 +3,37 @@ import { Button, message, Popover, Radio, Space } from 'antd';
 import { useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InputCallDataModal } from '../components/modals/InputCallDataModal';
-import { useApi, useMultiApprove, useUnapprovedAccounts } from '../hooks';
+import { useApi, useIsInjected, useMultiApprove, useUnapprovedAccounts } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
-import { Entry, TxOperationComponentProps } from '../model';
+import { AddressPair, Entry, TxOperationComponentProps } from '../model';
 import { StatusContext } from '../packages/react-components/src';
 import { PartialQueueTxExtrinsic } from '../packages/react-components/src/Status/types';
 import { makeSure } from '../utils';
 
 // eslint-disable-next-line complexity
-export function TxApprove({ entry, txSpy, onOperation, beforeOperation }: TxOperationComponentProps) {
+export function TxApprove({
+  account,
+  entry,
+  txSpy,
+  onOperation,
+  beforeOperation,
+  isExecute,
+}: TxOperationComponentProps) {
   const { t } = useTranslation();
+  const isInjected = useIsInjected();
   const { accounts, api } = useApi();
   const [getApproveTx] = useMultiApprove();
   const { queueExtrinsic } = useContext(StatusContext);
   const [getUnapprovedInjectedList] = useUnapprovedAccounts();
   const { setIsPageLock, queryInProgress, refreshConfirmedAccount } = useMultisigContext();
   const unapprovedAddresses = getUnapprovedInjectedList(entry);
-  const availableAccounts = (accounts ?? []).filter((extAddr) => unapprovedAddresses.includes(extAddr.address));
+  const memberPairs = (account.meta?.addressPair ?? []) as AddressPair[];
+  const injectedMemberAccounts: string[] = memberPairs
+    .filter((pair) => isInjected(pair.address))
+    .map((pair) => pair.address);
+  const availableAccounts = (accounts ?? []).filter((extAddr) =>
+    isExecute ? injectedMemberAccounts.includes(extAddr.address) : unapprovedAddresses.includes(extAddr.address)
+  );
   const [inputCallDataModalVisible, setInputCallDataModalVisible] = useState(false);
 
   const handleApprove = useCallback(
@@ -74,7 +88,7 @@ export function TxApprove({ entry, txSpy, onOperation, beforeOperation }: TxOper
   if (!entry.callHash || !entry.callData) {
     return (
       <>
-        <Button onClick={() => setInputCallDataModalVisible(true)}>{t('approve')}</Button>
+        <Button onClick={() => setInputCallDataModalVisible(true)}>{isExecute ? t('execute') : t('approve')}</Button>
         <InputCallDataModal
           visible={inputCallDataModalVisible}
           onCancel={() => setInputCallDataModalVisible(false)}
@@ -92,7 +106,11 @@ export function TxApprove({ entry, txSpy, onOperation, beforeOperation }: TxOper
       </>
     );
   } else if (availableAccounts.length === 1) {
-    return <Button onClick={() => handleApprove(availableAccounts[0].address, entry)}>{t('approve')}</Button>;
+    return (
+      <Button onClick={() => handleApprove(availableAccounts[0].address, entry)}>
+        {isExecute ? t('execute') : t('approve')}
+      </Button>
+    );
   } else {
     return (
       <>
@@ -120,7 +138,7 @@ export function TxApprove({ entry, txSpy, onOperation, beforeOperation }: TxOper
           title={t('Select approve account')}
           trigger="focus"
         >
-          <Button>{t('approve')}</Button>
+          <Button>{isExecute ? t('execute') : t('approve')}</Button>
         </Popover>
       </>
     );
