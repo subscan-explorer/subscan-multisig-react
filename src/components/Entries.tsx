@@ -207,10 +207,8 @@ export function Entries({
       }
 
       const actions: TxActionType[] = [];
-      // eslint-disable-next-line react/prop-types
       const pairs = (account.meta?.addressPair ?? []) as AddressPair[];
       const injectedAccounts: string[] = pairs.filter((pair) => isInjected(pair.address)).map((pair) => pair.address);
-
       if (injectedAccounts.includes(row.depositor)) {
         actions.push('cancel');
       }
@@ -220,17 +218,28 @@ export function Entries({
         pairs.map((pair) => pair.address)
       );
       const approvedLocalAccounts = intersection(localAccountInMultisigPairList, row.approvals);
-
-      if (approvedLocalAccounts.length !== localAccountInMultisigPairList.length) {
-        actions.push('approve');
-      }
-
-      if (actions.length === 0) {
-        // eslint-disable-next-line react/prop-types
-        if (row.approvals && row.approvals.length === account.meta.threshold) {
-          actions.push('pending');
+      // The number of approveed is sufficient, and any member can initiate an execution operation
+      if (
+        row.approvals &&
+        row.approvals.length >= (account.meta.threshold as number) &&
+        localAccountInMultisigPairList.length
+      ) {
+        actions.push('execute');
+      } else {
+        if (
+          approvedLocalAccounts.length !== localAccountInMultisigPairList.length &&
+          localAccountInMultisigPairList.length
+        ) {
+          actions.push('approve');
         }
       }
+
+      // if (actions.length === 0) {
+      //   // eslint-disable-next-line react/prop-types
+      //   if (row.approvals && row.approvals.length >= (account.meta.threshold as number)) {
+      //     actions.push('pending');
+      //   }
+      // }
 
       return (
         <Space>
@@ -241,10 +250,18 @@ export function Entries({
                   {t(action)}
                 </Button>
               );
-            } else if (action === 'approve') {
-              return <TxApprove key={action} entry={row} beforeOperation={showTxPreview} />;
+            } else if (action === 'approve' || action === 'execute') {
+              return (
+                <TxApprove
+                  account={account}
+                  key={action}
+                  entry={row}
+                  beforeOperation={showTxPreview}
+                  isExecute={action === 'execute'}
+                />
+              );
             } else {
-              return <TxCancel key={action} entry={row} />;
+              return <TxCancel account={account} key={action} entry={row} />;
             }
           })}
         </Space>
