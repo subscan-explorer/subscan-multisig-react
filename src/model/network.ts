@@ -14,7 +14,7 @@ interface Facade {
 
 type TokenRecord = { [key in Token]?: string };
 
-type Api = { subql: string; [key: string]: string };
+type Api = { subql: string; subscan: string; [key: string]: string };
 
 interface Donate {
   address: string;
@@ -43,6 +43,7 @@ export interface NetConfigV2 {
   explorerHostName?: string;
   themeColor?: string;
   headerBackground?: string;
+  subscanSupported?: boolean;
 }
 
 export type NetworkConfig<T = NetConfig> = Config<Network, T>;

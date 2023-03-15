@@ -1,15 +1,13 @@
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
 import { encodeAddress } from '@polkadot/util-crypto';
-import { useManualQuery } from 'graphql-hooks';
 import { difference, intersection } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { MultisigRecordsQueryRes } from '../components/ExtrinsicRecords';
 import { Entry } from '../model';
 import { convertToSS58 } from '../utils';
-import { MULTISIG_RECORD_QUERY } from '../config';
 import { useApi } from './api';
+import { useMultisigRecords } from './combineQuery';
 
 export function useMultisig(acc?: string) {
   const { networkConfig } = useApi();
@@ -21,20 +19,16 @@ export function useMultisig(acc?: string) {
   const [inProgress, setInProgress] = useState<Entry[]>([]);
   const [loadingInProgress, setLoadingInProgress] = useState(false);
 
-  const [fetchInProgress, { data: inProgressData }] = useManualQuery<MultisigRecordsQueryRes>(MULTISIG_RECORD_QUERY, {
-    variables: {
-      account,
-      status: 'default',
-      offset: 0,
-      limit: 100,
-    },
-    skipCache: true,
-  });
+  const fetchInprogressParams = {
+    account,
+    status: 'default',
+    offset: 0,
+    limit: 20,
+  };
+  const { fetchData: fetchInProgress, data: inProgressData } = useMultisigRecords(networkConfig, fetchInprogressParams);
 
   useEffect(() => {
-    if (networkConfig?.api?.subql) {
-      fetchInProgress();
-    }
+    fetchInProgress();
   }, [networkConfig, fetchInProgress]);
 
   const queryInProgress = useCallback(
@@ -66,24 +60,36 @@ export function useMultisig(acc?: string) {
       // eslint-disable-next-line complexity
       const calls: Entry[] | undefined = result.map((multisigEntry) => {
         const record = inProgressData?.multisigRecords.nodes?.filter((r) => r.callHash === multisigEntry.callHash);
-        if (!record) {
+        if (!record || record.length === 0) {
           return { ...multisigEntry, callDataJson: {}, meta: {}, hash: multisigEntry.callHash };
         }
-
         try {
           const asMultiExtrinsic = record[0]?.block?.extrinsics?.nodes?.filter((extrinsic) => extrinsic.multisigCall);
 
-          if (!asMultiExtrinsic || asMultiExtrinsic.length === 0) {
-            return { ...multisigEntry, callDataJson: {}, meta: {}, hash: multisigEntry.callHash };
+          if ((!asMultiExtrinsic || asMultiExtrinsic.length === 0) && !record[0]?.callData) {
+            return {
+              ...multisigEntry,
+              callDataJson: {},
+              meta: {},
+              hash: multisigEntry.callHash,
+              approveRecords: record[0].approveRecords,
+            };
           }
-
-          const callData = api.registry.createType('Call', asMultiExtrinsic[0].multisigCall);
+          const callData = api.registry.createType('Call', record[0]?.callData || asMultiExtrinsic[0].multisigCall);
           const { section, method } = api.registry.findMetaCall(callData.callIndex);
           const callDataJson = { ...callData.toJSON(), section, method };
           const hexCallData = callData.toHex();
           const meta = api?.tx[callDataJson?.section][callDataJson.method].meta.toJSON();
 
-          return { ...multisigEntry, callDataJson, callData, meta, hash: multisigEntry.callHash, hexCallData };
+          return {
+            ...multisigEntry,
+            callDataJson,
+            callData,
+            meta,
+            hash: multisigEntry.callHash,
+            hexCallData,
+            approveRecords: record[0].approveRecords,
+          };
         } catch (error) {
           return { ...multisigEntry, callDataJson: {}, meta: {}, hash: multisigEntry.callHash };
         }

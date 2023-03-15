@@ -57,7 +57,7 @@ export function TxApprove({
                 setTimeout(() => {
                   refreshConfirmedAccount();
                   // eslint-disable-next-line no-magic-numbers
-                }, 6000);
+                }, 10000);
               },
             };
 

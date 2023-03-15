@@ -1,10 +1,8 @@
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { Spin } from 'antd';
-import { useManualQuery } from 'graphql-hooks';
 import { createContext, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { MULTISIG_RECORD_COUNT_QUERY } from '../config';
-import { useApi, useMultisig } from '../hooks';
+import { useApi, useMultisig, useMultisigRecordCount } from '../hooks';
 import { Entry } from '../model';
 import { empty } from '../utils';
 
@@ -41,31 +39,17 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
   const value = useMultisig();
   const { account } = useParams<{ account: string }>();
 
-  const [fetchData, { data }] = useManualQuery<{
-    multisigRecords: { totalCount: number };
-  }>(MULTISIG_RECORD_COUNT_QUERY, {
-    variables: { account, status: 'confirmed' },
-    skipCache: true,
-  });
-  const refreshConfirmedAccount = useCallback(() => {
-    if (networkConfig?.api?.subql) {
-      fetchData({ variables: { account, status: 'confirmed' }, skipCache: true });
-    }
-  }, [account, fetchData, networkConfig]);
+  const { fetchData, data } = useMultisigRecordCount(networkConfig);
 
-  const [fetchCancelledData, { data: cancelledData }] = useManualQuery<{ multisigRecords: { totalCount: number } }>(
-    MULTISIG_RECORD_COUNT_QUERY,
-    {
-      variables: { account, status: 'cancelled' },
-      skipCache: true,
-    }
-  );
+  const refreshConfirmedAccount = useCallback(() => {
+    fetchData(account, 'confirmed');
+  }, [account, fetchData]);
+
+  const { fetchData: fetchCancelledData, data: cancelledData } = useMultisigRecordCount(networkConfig);
 
   const refreshCancelledAccount = useCallback(() => {
-    if (networkConfig?.api?.subql) {
-      fetchCancelledData({ variables: { account, status: 'cancelled' }, skipCache: true });
-    }
-  }, [account, fetchCancelledData, networkConfig]);
+    fetchCancelledData(account, 'cancelled');
+  }, [account, fetchCancelledData]);
 
   useEffect(() => {
     refreshConfirmedAccount();

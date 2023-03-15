@@ -1,13 +1,12 @@
+/* eslint-disable no-magic-numbers */
 import { ReloadOutlined } from '@ant-design/icons';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { Space, Spin, Tabs } from 'antd';
-import { useManualQuery } from 'graphql-hooks';
 import { isNumber } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { MULTISIG_RECORD_QUERY } from '../config';
-import { useApi } from '../hooks';
+import { useApi, useMultisigRecords } from '../hooks';
 import { useMultisigContext } from '../hooks/multisigContext';
 import { IExtrinsic, parseArgs } from '../utils';
 import { Entries } from './Entries';
@@ -23,6 +22,7 @@ interface MultisigRecord {
   createExtrinsicIdx: string;
   confirmExtrinsicIdx: string;
   cancelExtrinsicIdx: string;
+  callData?: string;
   approveRecords: {
     nodes: ApproveRecord[];
   };
@@ -102,6 +102,7 @@ function ConfirmedOrCancelled({
           id: createBlockHash,
           extrinsics: { nodes: createExNodes },
         },
+        callData,
       } = node;
 
       const target = isConfirmed
@@ -115,10 +116,14 @@ function ConfirmedOrCancelled({
       let callDataJson;
       let meta;
       try {
-        if (typeof argsHash === 'string') {
-          const callData = api.registry.createType('Call', argsHash);
-          const { section, method } = api.registry.findMetaCall(callData.callIndex);
-          callDataJson = { ...callData.toJSON(), section, method };
+        if (callData) {
+          const callDataType = api.registry.createType('Call', callData);
+          const { section, method } = api.registry.findMetaCall(callDataType.callIndex);
+          callDataJson = { ...callDataType.toJSON(), section, method };
+        } else if (typeof argsHash === 'string') {
+          const callDataType = api.registry.createType('Call', argsHash);
+          const { section, method } = api.registry.findMetaCall(callDataType.callIndex);
+          callDataJson = { ...callDataType.toJSON(), section, method };
         } else {
           callDataJson = argsHash;
         }
@@ -193,30 +198,31 @@ export function ExtrinsicRecords() {
   const [confirmedPage, setConfirmedPage] = useState(1);
   const [cancelledPage, setCancelledPage] = useState(1);
   const [first, setFirst] = useState(true);
+  const fetchConfirmedParams = {
+    account: multiAddress,
+    status: 'confirmed',
+    offset: confirmedPage - 1,
+    limit: 10,
+  };
 
-  const [fetchConfimed, { data: confirmedData, loading: loadingConfirmed }] = useManualQuery<MultisigRecordsQueryRes>(
-    MULTISIG_RECORD_QUERY,
-    {
-      variables: {
-        account: multiAddress,
-        status: 'confirmed',
-        offset: (confirmedPage - 1) * 10,
-        limit: 10,
-      },
-    }
-  );
+  const fetchCancelledParams = {
+    account: multiAddress,
+    status: 'cancelled',
+    offset: cancelledPage - 1,
+    limit: 10,
+  };
 
-  const [fetchCancelled, { data: cancelledData, loading: loadingCancelled }] = useManualQuery<MultisigRecordsQueryRes>(
-    MULTISIG_RECORD_QUERY,
-    {
-      variables: {
-        account: multiAddress,
-        status: 'cancelled',
-        offset: (cancelledPage - 1) * 10,
-        limit: 10,
-      },
-    }
-  );
+  const {
+    fetchData: fetchConfirmed,
+    data: confirmedData,
+    loading: loadingConfirmed,
+  } = useMultisigRecords(networkConfig, fetchConfirmedParams);
+
+  const {
+    fetchData: fetchCancelled,
+    data: cancelledData,
+    loading: loadingCancelled,
+  } = useMultisigRecords(networkConfig, fetchCancelledParams);
 
   // eslint-disable-next-line complexity
   useEffect(() => {
@@ -229,22 +235,16 @@ export function ExtrinsicRecords() {
   }, [loadingInProgress, confirmedAccount, first, inProgress]);
 
   useEffect(() => {
-    if (networkConfig?.api?.subql) {
-      fetchConfimed();
-      fetchCancelled();
-    }
-  }, [networkConfig, fetchCancelled, fetchConfimed]);
+    fetchConfirmed();
+    fetchCancelled();
+  }, [networkConfig, fetchCancelled, fetchConfirmed]);
 
   useEffect(() => {
-    if (networkConfig?.api?.subql) {
-      fetchConfimed();
-    }
-  }, [confirmedPage, fetchConfimed, networkConfig]);
+    fetchConfirmed();
+  }, [confirmedPage, fetchConfirmed, networkConfig]);
 
   useEffect(() => {
-    if (networkConfig?.api?.subql) {
-      fetchCancelled();
-    }
+    fetchCancelled();
   }, [cancelledPage, fetchCancelled, networkConfig]);
 
   // eslint-disable-next-line complexity
@@ -253,22 +253,16 @@ export function ExtrinsicRecords() {
     if (key === 'inProgress') {
       queryInProgress();
     } else if (key === 'confirmed') {
-      if (networkConfig?.api?.subql) {
-        fetchConfimed();
-      }
+      fetchConfirmed();
     } else if (key === 'cancelled') {
-      if (networkConfig?.api?.subql) {
-        fetchCancelled();
-      }
+      fetchCancelled();
     }
   };
 
   const refreshData = () => {
     queryInProgress();
-    if (networkConfig?.api?.subql) {
-      fetchConfimed();
-      fetchCancelled();
-    }
+    fetchConfirmed();
+    fetchCancelled();
   };
 
   return (
@@ -297,50 +291,46 @@ export function ExtrinsicRecords() {
             <Spin className="w-full mt-4" />
           )}
         </TabPane>
-        {networkConfig?.api?.subql && (
-          <>
-            <TabPane
-              tab={
-                <Space>
-                  <span>{t('multisig.Confirmed Extrinsic')}</span>
-                  <span>{confirmedAccount}</span>
-                </Space>
-              }
-              key="confirmed"
-            >
-              <ConfirmedOrCancelled
-                nodes={confirmedData?.multisigRecords?.nodes || []}
-                loading={loadingConfirmed}
-                account={multisigAccount}
-                multiAddress={multiAddress}
-                isConfirmed
-                totalCount={confirmedData?.multisigRecords?.totalCount || 0}
-                currentPage={confirmedPage}
-                onChangePage={setConfirmedPage}
-              />
-            </TabPane>
-            <TabPane
-              tab={
-                <Space>
-                  <span>{t('multisig.Cancelled Extrinsic')}</span>
-                  <span>{cancelledAccount}</span>
-                </Space>
-              }
-              key="cancelled"
-            >
-              <ConfirmedOrCancelled
-                nodes={cancelledData?.multisigRecords?.nodes || []}
-                loading={loadingCancelled}
-                account={multisigAccount}
-                multiAddress={multiAddress}
-                isConfirmed={false}
-                totalCount={cancelledData?.multisigRecords?.totalCount || 0}
-                currentPage={cancelledPage}
-                onChangePage={setCancelledPage}
-              />
-            </TabPane>
-          </>
-        )}
+        <TabPane
+          tab={
+            <Space>
+              <span>{t('multisig.Confirmed Extrinsic')}</span>
+              <span>{confirmedAccount}</span>
+            </Space>
+          }
+          key="confirmed"
+        >
+          <ConfirmedOrCancelled
+            nodes={confirmedData?.multisigRecords?.nodes || []}
+            loading={loadingConfirmed}
+            account={multisigAccount}
+            multiAddress={multiAddress}
+            isConfirmed
+            totalCount={confirmedData?.multisigRecords?.totalCount || 0}
+            currentPage={confirmedPage}
+            onChangePage={setConfirmedPage}
+          />
+        </TabPane>
+        <TabPane
+          tab={
+            <Space>
+              <span>{t('multisig.Cancelled Extrinsic')}</span>
+              <span>{cancelledAccount}</span>
+            </Space>
+          }
+          key="cancelled"
+        >
+          <ConfirmedOrCancelled
+            nodes={cancelledData?.multisigRecords?.nodes || []}
+            loading={loadingCancelled}
+            account={multisigAccount}
+            multiAddress={multiAddress}
+            isConfirmed={false}
+            totalCount={cancelledData?.multisigRecords?.totalCount || 0}
+            currentPage={cancelledPage}
+            onChangePage={setCancelledPage}
+          />
+        </TabPane>
       </Tabs>
     </div>
   );

@@ -2,22 +2,20 @@ import { encodeAddress } from '@polkadot/util-crypto';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { Card, message, Spin } from 'antd';
-import { useManualQuery } from 'graphql-hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { MULTISIG_ACCOUNT_DETAIL_QUERY } from 'src/config';
 import { ShareScope } from 'src/model';
 import { isCustomRpc, updateMultiAccountScope } from 'src/utils';
 import { useTranslation } from 'react-i18next';
 import { ExtrinsicRecords } from '../components/ExtrinsicRecords';
 import { WalletState } from '../components/WalletState';
-import { useApi } from '../hooks';
+import { useApi, useMultisigAccountDetail } from '../hooks';
 import { EntriesProvider } from '../providers/multisig-provider';
 
 export default function Extrinsic() {
   const history = useHistory();
   const { t } = useTranslation();
-  const { api, network, chain, rpc, networkStatus } = useApi();
+  const { api, network, chain, rpc, networkStatus, networkConfig } = useApi();
   const { account } = useParams<{ account: string }>();
   const [multisig, setMultisig] = useState<KeyringAddress | undefined>();
 
@@ -27,10 +25,7 @@ export default function Extrinsic() {
     };
   }, [rpc]);
 
-  const [fetchMultisigDetail, { data: multisigDetail }] = useManualQuery<{
-    multisigAccount: { id: string; threshold: number; members: string[] };
-  }>(MULTISIG_ACCOUNT_DETAIL_QUERY);
-
+  const { fetchData: fetchMultisigDetail, data: multisigDetail } = useMultisigAccountDetail(networkConfig);
   // eslint-disable-next-line complexity
   useEffect(() => {
     if (!chain || !chain.ss58Format || networkStatus !== 'success') {
@@ -45,12 +40,22 @@ export default function Extrinsic() {
         message.warn(t('multisig account not exist', { account: ss58Account }));
         history.push('/' + history.location.hash);
       } else {
-        fetchMultisigDetail({ variables: { account: ss58Account }, skipCache: true });
+        fetchMultisigDetail(ss58Account);
       }
     } else {
       setMultisig(keyring.getAccount(ss58Account));
     }
-  }, [isCustomNetwork, fetchMultisigDetail, history, t, chain, account, networkStatus, chain.ss58Format]);
+  }, [
+    isCustomNetwork,
+    fetchMultisigDetail,
+    history,
+    t,
+    chain,
+    account,
+    networkStatus,
+    chain.ss58Format,
+    networkConfig,
+  ]);
 
   // eslint-disable-next-line complexity
   useEffect(() => {
