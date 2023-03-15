@@ -3,7 +3,8 @@
   "displayName": "Kusama",
   "rpc": "wss://kusama.api.onfinality.io/public-ws",
   "api": {
-    "subql": "https://api.subquery.network/sq/itering/multisig-kusama"
+    "subql": "https://api.subquery.network/sq/itering/multisig-kusama",
+    "subscan": "https://kusama.webapi.subscan.io"
   },
   "logo": "/image/kusama-button-mobile.png",
   "explorerHostName": "kusama",
