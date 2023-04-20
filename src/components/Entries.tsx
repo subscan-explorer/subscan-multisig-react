@@ -2,12 +2,10 @@ import BaseIdentityIcon from '@polkadot/react-identicon';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
 import { Button, Collapse, Empty, Progress, Space, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { useManualQuery } from 'graphql-hooks';
 import { intersection, isEmpty } from 'lodash';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { APPROVE_RECORD_QUERY } from '../config';
-import { useApi, useIsInjected } from '../hooks';
+import { useApi, useDataSourceTools, useIsInjected } from '../hooks';
 import { AddressPair, Entry, Network, TxActionType, TxOperationComponentProps } from '../model';
 import { toShortString, formatDate } from '../utils';
 import { ArgObj, Args } from './Args';
@@ -18,10 +16,6 @@ import { TxPreviewModal } from './modals/TxPreviewModal';
 import { SubscanLink } from './SubscanLink';
 import { TxApprove } from './TxApprove';
 import { TxCancel } from './TxCancel';
-
-interface ApproveRecordsQueryRes {
-  approveRecords: { totalCount: number; nodes: ApproveRecord[] };
-}
 
 export interface EntriesProps {
   source: Entry[];
@@ -59,23 +53,10 @@ export const renderMemberStatus = (entry: Entry, pair: KeyringJson, _network: Ne
 function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: boolean }) {
   const { entry, isInProgress } = props;
   const { address } = props.pair;
-  const { approvals, when } = props.entry;
+  const { approvals } = props.entry;
   const approved = approvals.includes(address);
-
-  const [fetchApproveRecords, { data: inProgressApproveRecords }] = useManualQuery<ApproveRecordsQueryRes>(
-    APPROVE_RECORD_QUERY,
-    {
-      variables: {
-        multisigRecordId: `${entry.address}-${when.height}-${when.index}`,
-      },
-    }
-  );
-
-  useEffect(() => {
-    if (isInProgress) {
-      fetchApproveRecords();
-    }
-  }, [fetchApproveRecords, isInProgress]);
+  const { networkConfig } = useApi();
+  const { constants } = useDataSourceTools(networkConfig);
 
   if (!isInProgress && entry.approveRecords) {
     const approveRecords = entry.approveRecords as ApproveRecord[];
@@ -99,9 +80,9 @@ function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: bo
     };
 
     const approveTypeTrans =
-      matchedApproveRecord.approveType === 'initialize'
+      matchedApproveRecord.approveType === constants.approveType_initialize
         ? 'status.initialized'
-        : matchedApproveRecord.approveType === 'execute'
+        : matchedApproveRecord.approveType === constants.approveType_executed
         ? 'status.approvedAndExecuted'
         : 'status.approved';
 
@@ -113,7 +94,7 @@ function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: bo
             <SubscanLink extrinsic={approveTimepoint}>{matchedApproveRecord.approveTimepoint}</SubscanLink>)
           </div>
           <div className="text-xs scale-90 origin-left text-gray-500" style={{ marginTop: '2px' }}>
-            {formatDate(matchedApproveRecord.approveTimestamp)}
+            {formatDate(matchedApproveRecord.approveTimestamp, constants.timestampInSecond)}
           </div>
         </div>
 
@@ -126,7 +107,7 @@ function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: bo
                 <SubscanLink extrinsic={cancelTimepoint}>{matchedCancelRecord.cancelTimepoint}</SubscanLink>)
               </div>
               <div className="text-xs scale-90 origin-left text-gray-500" style={{ marginTop: '2px' }}>
-                {formatDate(matchedCancelRecord.cancelTimestamp)}
+                {formatDate(matchedCancelRecord.cancelTimestamp, constants.timestampInSecond)}
               </div>
             </div>
           </>
@@ -138,8 +119,7 @@ function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: bo
   if (!approved) {
     return <div>-</div>;
   }
-
-  const matched = inProgressApproveRecords?.approveRecords.nodes.find((item) => item.account === address);
+  const matched = (entry?.approveRecords?.nodes as ApproveRecord[]).find((item) => item.account === address);
 
   if (!matched) {
     return (
@@ -153,11 +133,10 @@ function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: bo
     height: matched.approveTimepoint.split('-')[0] || '',
     index: matched.approveTimepoint.split('-')[1] || '',
   };
-
   const approveTypeTrans =
-    matched.approveType === 'initialize'
+    matched.approveType === constants.approveType_initialize
       ? 'status.initialized'
-      : matched.approveType === 'execute'
+      : matched.approveType === constants.approveType_executed
       ? 'status.approvedAndExecuted'
       : 'status.approved';
 
@@ -169,7 +148,9 @@ function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: bo
           (<SubscanLink extrinsic={inProgressApproveTimepoint}>{matched.approveTimepoint}</SubscanLink>)
         </div>
       </div>
-      <div className="text-xs scale-90 origin-left text-gray-500">{formatDate(matched.approveTimestamp)}</div>
+      <div className="text-xs scale-90 origin-left text-gray-500">
+        {formatDate(matched.approveTimestamp, constants.timestampInSecond)}
+      </div>
     </div>
   );
 }
@@ -213,23 +194,12 @@ export function Entries({
         actions.push('cancel');
       }
 
-      const localAccountInMultisigPairList = intersection(
-        injectedAccounts,
-        pairs.map((pair) => pair.address)
-      );
-      const approvedLocalAccounts = intersection(localAccountInMultisigPairList, row.approvals);
+      const approvedLocalAccounts = intersection(injectedAccounts, row.approvals);
       // The number of approveed is sufficient, and any member can initiate an execution operation
-      if (
-        row.approvals &&
-        row.approvals.length >= (account.meta.threshold as number) &&
-        localAccountInMultisigPairList.length
-      ) {
+      if (row.approvals && row.approvals.length >= (account.meta.threshold as number) && injectedAccounts.length) {
         actions.push('execute');
       } else {
-        if (
-          approvedLocalAccounts.length !== localAccountInMultisigPairList.length &&
-          localAccountInMultisigPairList.length
-        ) {
+        if (approvedLocalAccounts.length !== injectedAccounts.length && injectedAccounts.length) {
           actions.push('approve');
         }
       }
@@ -383,7 +353,7 @@ export function Entries({
         loading={loading}
         dataSource={source}
         columns={columns}
-        rowKey={(record) => record.callHash ?? (record.blockHash as string)}
+        rowKey={(record) => record.extrinsicIdx ?? (record.callHash as string)}
         pagination={
           isConfirmed || isCancelled
             ? {
