@@ -1,8 +1,8 @@
 import { Config } from './common';
 
-export type Network = 'pangolin' | 'crab' | 'darwinia' | 'polkadot' | 'kusama';
+export type Network = 'polkadot' | 'kusama';
 
-export type Token = 'ring' | 'kton' | 'native';
+export type Token = 'native';
 
 // eslint-disable-next-line no-magic-numbers
 export type SS58Prefix = 0 | 2 | 18 | 42;
