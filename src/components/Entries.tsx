@@ -119,7 +119,7 @@ function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: bo
   if (!approved) {
     return <div>-</div>;
   }
-  const matched = (entry?.approveRecords?.nodes as ApproveRecord[]).find((item) => item.account === address);
+  const matched = (entry?.approveRecords?.nodes as ApproveRecord[])?.find((item) => item.account === address);
 
   if (!matched) {
     return (
