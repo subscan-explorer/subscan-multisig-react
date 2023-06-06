@@ -177,6 +177,10 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
                     refTime: 'Compact<u64>',
                     proofSize: 'Compact<u64>',
                   },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
                 },
               },
             ],
@@ -189,6 +193,10 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
                 types: {
                   WeightV1: 'u64',
                   WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
                     refTime: 'Compact<u64>',
                     proofSize: 'Compact<u64>',
                   },
