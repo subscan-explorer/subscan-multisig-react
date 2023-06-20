@@ -10,23 +10,12 @@ export interface WeightV2 extends Struct {
   readonly proofSize: Compact<u64>;
 }
 
-export type CompatibleWeight =
-  | BN
-  | {
-      refTime: BN;
-    };
-export interface WeightAll {
-  v1Weight: BN;
-  v2Weight: {
-    refTime: BN;
-  };
-  compatibleWeight: CompatibleWeight;
-}
+export type CompatibleWeight = BN | WeightV2;
 
 export function convertWeight(
   api: ApiPromise | null,
   orig: WeightV1 | WeightV2 | bigint | string | number | BN
-): WeightAll {
+): CompatibleWeight {
   let isWeightV2 = false;
   try {
     api?.createType('WeightV2', { refTime: 0 });
@@ -34,12 +23,7 @@ export function convertWeight(
   } catch (error) {
     isWeightV2 = false;
   }
-
   const refTime = (orig as WeightV2).proofSize ? (orig as WeightV2).refTime.toBn() : bnToBn(orig as BN);
 
-  return {
-    v1Weight: refTime,
-    v2Weight: { refTime },
-    compatibleWeight: isWeightV2 ? { refTime } : refTime,
-  };
+  return isWeightV2 ? (orig as WeightV2) : refTime;
 }
