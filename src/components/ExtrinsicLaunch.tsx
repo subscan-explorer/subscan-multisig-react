@@ -104,9 +104,9 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
       const args =
         // eslint-disable-next-line no-magic-numbers
         argsLength === 5
-          ? [...generalParams, ext.method.toHex(), weightAll.compatibleWeight]
+          ? [...generalParams, ext.method.toHex(), weightAll]
           : argsLength === ARG_LENGTH
-          ? [...generalParams, ext.method.toHex(), false, weightAll.compatibleWeight]
+          ? [...generalParams, ext.method.toHex(), false, weightAll]
           : [...generalParams, ext];
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore

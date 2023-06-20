@@ -21,12 +21,12 @@ export function useMultiApprove() {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const info = await api?.query.multisig.multisigs(multiRoot, data.callHash!);
       let callData = null;
-      let weight: CompatibleWeight = convertWeight(api, 0).compatibleWeight;
+      let weight: CompatibleWeight = convertWeight(api, 0);
 
       if (data.callData && api) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const payment = await api?.tx(data.callData as any).paymentInfo(ZERO_ACCOUNT);
-        weight = convertWeight(api, payment?.weight || 0).compatibleWeight;
+        weight = convertWeight(api, payment?.weight || 0);
         callData = api?.registry.createType('Call', data.callData);
       }
 
