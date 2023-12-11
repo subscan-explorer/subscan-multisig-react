@@ -1,7 +1,7 @@
 {
   "name": "kusama",
   "displayName": "Kusama",
-  "rpc": "wss://kusama.api.onfinality.io/public-ws",
+  "rpc": "wss://kusama-rpc.dwellir.com",
   "api": {
     "subql": "https://api.subquery.network/sq/itering/multisig-kusama",
     "subscan": "https://kusama.webapi.subscan.io"
