@@ -249,7 +249,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
       const chainState = await api.rpc.system.properties();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { tokenDecimals, tokenSymbol, ss58Format } = chainState?.toHuman() as any;
-      let finalSs58Format = ss58Format || api.consts.system?.ss58Prefix;
+      let finalSs58Format = ss58Format || api.consts.system?.ss58Prefix.toString();
       finalSs58Format = finalSs58Format.replaceAll(',', '');
       const chainInfo = tokenDecimals.reduce(
         (acc: Chain, decimal: string, index: number) => {
