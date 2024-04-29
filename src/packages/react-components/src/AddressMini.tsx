@@ -9,10 +9,11 @@ import type { KeyringItemType } from '@polkadot/ui-keyring/types';
 import React from 'react';
 import styled from 'styled-components';
 
+import BaseIdentityIcon from '@polkadot/react-identicon';
 import AccountName from './AccountName';
 import BalanceDisplay from './Balance';
 import BondedDisplay from './Bonded';
-import IdentityIcon from './IdentityIcon';
+// import IdentityIcon from './IdentityIcon';
 import LockedVote from './LockedVote';
 import { toShortAddress } from './util';
 
@@ -73,7 +74,7 @@ function AddressMini({
     >
       {label && <label className="ui--AddressMini-label">{label}</label>}
       <div className="ui--AddressMini-icon">
-        <IdentityIcon value={value as Uint8Array} />
+        <BaseIdentityIcon value={value as Uint8Array} size={24} />
         {iconInfo && <div className="ui--AddressMini-icon-info">{iconInfo}</div>}
       </div>
       <div className="ui--AddressMini-info">

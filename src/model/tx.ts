@@ -1,6 +1,6 @@
 import { AnyJson } from '@polkadot/types/types';
-import { Call } from '@polkadot/types/interfaces';
 import { PartialQueueTxExtrinsic } from '@polkadot/react-components/Status/types';
+import { KeyringAddress } from '@polkadot/ui-keyring/types';
 
 export interface When {
   height: number;
@@ -15,13 +15,14 @@ export interface Entry {
   callHash: string | null;
   blockHash?: string;
   extrinsicIdx?: string;
-  callData: Call | null;
+  // callData: Call | null;
+  callDataJson: any;
   meta: Record<string, AnyJson> | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
-export type TxActionType = 'pending' | 'approve' | 'cancel';
+export type TxActionType = 'pending' | 'approve' | 'cancel' | 'execute';
 
 interface TxOperation {
   type: TxActionType;
@@ -30,7 +31,10 @@ interface TxOperation {
 }
 
 export interface TxOperationComponentProps {
+  account: KeyringAddress;
   entry: Entry;
   txSpy?: (tx: PartialQueueTxExtrinsic | null) => void;
   onOperation?: (operation: TxOperation) => void;
+  beforeOperation?: (operation: TxOperation, cb: () => void) => void;
+  isExecute?: boolean;
 }

@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
-import { isNull, isNumber, isString, isUndefined } from 'lodash';
 import BN from 'bn.js';
+import fromExponential from 'from-exponential';
+import { isNull, isNumber, isString, isUndefined } from 'lodash';
 
 export function accuracyFormat(num: BigNumber.Value, accuracy: number | string) {
   if (accuracy) {
@@ -27,9 +28,9 @@ const toString = (value: string | BN | number): string => {
   if (BN.isBN(value)) {
     return value.toString();
   } else if (isString(value)) {
-    return value;
+    return Number(value).toString(10);
   } else if (isNumber(value)) {
-    return String(value);
+    return value.toString(10);
   } else if (isUndefined(value) || isNaN(value) || isNull(value)) {
     return '0';
   } else {
@@ -66,14 +67,14 @@ export function formatBalance(
     result = (Number(origin) / Math.pow(10, radix)).toString();
   } else {
     const position = origin.length - radix;
-    const prefix = origin.slice(0, position + 1);
+    const prefix = origin.slice(0, position);
     // eslint-disable-next-line no-magic-numbers
     const suffix = origin.substr(position, 3);
 
     result = `${prefix}.${suffix}`;
   }
 
-  return withThousandSplit ? prettyNumber(result, { noDecimal, decimal }) : result;
+  return withThousandSplit ? fromExponential(prettyNumber(result, { noDecimal, decimal })) : fromExponential(result);
 }
 
 export interface PrettyNumberOptions {
@@ -98,7 +99,7 @@ export function prettyNumber(
 
   prefix = prefix.replace(/\d{1,3}(?=(\d{3})+(\.\d*)?$)/g, '$&,');
 
-  return !noDecimal ? `${prefix}.${suffix}` : prefix;
+  return !noDecimal && Number(suffix) > 0 ? `${prefix}.${suffix}` : prefix;
 }
 
 const completeDecimal = (value: string, bits: number): string => {

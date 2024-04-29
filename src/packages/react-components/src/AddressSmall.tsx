@@ -6,8 +6,9 @@ import type { AccountId, Address } from '@polkadot/types/interfaces';
 import React from 'react';
 import styled from 'styled-components';
 
+import BaseIdentityIcon from '@polkadot/react-identicon';
 import AccountName from './AccountName';
-import IdentityIcon from './IdentityIcon';
+// import IdentityIcon from './IdentityIcon';
 
 interface Props {
   children?: React.ReactNode;
@@ -32,7 +33,7 @@ function AddressSmall({
 }: Props): React.ReactElement<Props> {
   return (
     <div className={`ui--AddressSmall ${className}`}>
-      <IdentityIcon value={value as Uint8Array} />
+      <BaseIdentityIcon value={value as Uint8Array} size={24} />
       <AccountName
         className={withSidebar ? 'withSidebar' : ''}
         defaultName={defaultName}

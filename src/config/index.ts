@@ -5,3 +5,4 @@ export * from './query';
 export * from './theme';
 export * from './types';
 export * from './validate-msg';
+export * from './chains';

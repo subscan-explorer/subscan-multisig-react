@@ -1,0 +1,11 @@
+{
+  "name": "interlay",
+  "displayName": "Interlay",
+  "rpc": "wss://api.interlay.io:443/parachain",
+  "api": {
+    "subql": ""
+  },
+  "logo": "/image/interlay.png",
+  "explorerHostName": "interlay",
+  "themeColor": "#075ABC"
+}

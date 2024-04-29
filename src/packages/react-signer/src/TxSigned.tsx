@@ -23,6 +23,7 @@ import styled from 'styled-components';
 import { Button, ErrorBoundary, Modal, Output, StatusContext, Toggle } from '../../react-components/src';
 import type { QueueTx, QueueTxMessageSetStatus } from '../../react-components/src/Status/types';
 import { useApi, useLedger, useToggle } from '../../react-hooks/src';
+import { convertWeight } from '../../../utils';
 import Address from './Address';
 import Qr from './Qr';
 import { AccountSigner, LedgerSigner, QrSigner } from './signers';
@@ -145,6 +146,7 @@ async function wrapTx(
     const multiModule = api.tx.multisig ? 'multisig' : 'utility';
     const info = await api.query[multiModule].multisigs<Option<Multisig>>(multiRoot, tx.method.hash);
     const { weight } = await tx.paymentInfo(multiRoot);
+    const weightAll = convertWeight(api, weight);
     const { threshold, who } = extractExternal(multiRoot);
     const others = who.filter((w) => w !== signAddress);
     let timepoint: Timepoint | null = null;
@@ -156,12 +158,12 @@ async function wrapTx(
     tx = isMultiCall
       ? api.tx[multiModule].asMulti.meta.args.length === 6
         ? // We are doing toHex here since we have a Vec<u8> input
-          api.tx[multiModule].asMulti(threshold, others, timepoint, tx.method.toHex(), false, weight)
+          api.tx[multiModule].asMulti(threshold, others, timepoint, tx.method.toHex(), false, weightAll)
         : // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           api.tx[multiModule].asMulti(threshold, others, timepoint, tx.method)
       : api.tx[multiModule].approveAsMulti.meta.args.length === 5
-      ? api.tx[multiModule].approveAsMulti(threshold, others, timepoint, tx.method.hash, weight)
+      ? api.tx[multiModule].approveAsMulti(threshold, others, timepoint, tx.method.hash, weightAll)
       : // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         api.tx[multiModule].approveAsMulti(threshold, others, timepoint, tx.method.hash);

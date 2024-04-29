@@ -4,8 +4,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import BaseIdentityIcon from '@polkadot/react-identicon';
 import AccountName from '../AccountName';
-import IdentityIcon from '../IdentityIcon';
 
 interface Props {
   address: string;
@@ -18,7 +18,7 @@ interface Props {
 function KeyPair({ address, className = '' }: Props): React.ReactElement<Props> {
   return (
     <div className={`ui--KeyPair ${className}`}>
-      <IdentityIcon className="icon" value={address} />
+      <BaseIdentityIcon className="icon" value={address} size={24} />
       <div className="name">
         <AccountName value={address} />
       </div>

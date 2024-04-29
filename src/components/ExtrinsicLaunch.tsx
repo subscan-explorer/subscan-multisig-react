@@ -16,7 +16,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApi, useIsInjected, useMultisig } from '../hooks';
 import { AddressPair } from '../model';
-import { extractExternal } from '../utils';
+import { convertWeight, extractExternal } from '../utils';
 
 const { Text } = Typography;
 
@@ -33,9 +33,11 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
   const [error, setError] = useState<string | null>(null);
   const [extrinsic, setExtrinsic] = useState<SubmittableExtrinsic<'promise'> | null>(null);
   const [hexCallData, setHexCallData] = useState('0x');
+  const [hexCallHash, setHexCallHash] = useState('0x');
   const [reserveAmount, setReserveAmount] = useState(0);
   const { multisigAccount } = useMultisig();
   const isExtensionAccount = useIsInjected();
+  const [isBusy, SetIsBusy] = useState<boolean>(true);
 
   const [depositBase, depositFactor] = useMemo(() => {
     return [Number(api?.consts.multisig.depositBase.toJSON()), Number(api?.consts.multisig.depositFactor.toJSON())];
@@ -62,10 +64,13 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
   const _onExtrinsicChange = useCallback(
     // eslint-disable-next-line complexity
     async (ext?: SubmittableExtrinsic<'promise'>) => {
+      SetIsBusy(true);
       if (!ext) {
+        SetIsBusy(false);
         return setExtrinsic(null);
       }
       if (!multisigAccount) {
+        SetIsBusy(false);
         return setExtrinsic(null);
       }
 
@@ -77,17 +82,39 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
       const timepoint = (info as any).isSome ? (info as any)?.unwrap().when : null;
       const { threshold, who } = extractExternal(multiRoot);
       const others: string[] = who.filter((item) => item !== accountId);
-      const { weight } = (await ext?.paymentInfo(multiRoot)) || { weight: 0 };
+      // queryInfo(extrinsic: Bytes, at?: BlockHash): RuntimeDispatchInfo:: createType(RuntimeDispatchInfo):: Struct: failed on weight: u64:: Assertion failed
+      // https://github.com/polkadot-js/api/issues/5258
+      const { weight } = (await ext
+        ?.paymentInfo(multiRoot)
+        .then((data) => data)
+        .catch((err) => {
+          console.info('ExtrinsicLaunch::paymentInfo err', err);
+          return { weight: 0 };
+        })) || { weight: 0 };
+      const weightAll = convertWeight(api, weight);
+
       const module = api?.tx.multisig;
       const argsLength = module?.asMulti.meta.args.length || 0;
       const generalParams = [threshold, others, timepoint];
+
+      // argsLength = 4 as_multi(threshold, other_signatories, maybe_timepoint, call)
+      // argsLength = 5 as_multi(threshold, other_signatories, maybe_timepoint, call, max_weight)
+      // argsLength = 6 as_multi(threshold, other_signatories, maybe_timepoint, call, store_call, max_weight)
+
       const args =
-        argsLength === ARG_LENGTH ? [...generalParams, ext.method.toHex(), true, weight] : [...generalParams, ext];
+        // eslint-disable-next-line no-magic-numbers
+        argsLength === 5
+          ? [...generalParams, ext.method.toHex(), weightAll]
+          : argsLength === ARG_LENGTH
+          ? [...generalParams, ext.method.toHex(), false, weightAll]
+          : [...generalParams, ext];
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const multiTx = module?.asMulti(...args);
 
       setHexCallData(ext.method.toHex());
+      setHexCallHash(ext.method.hash.toHex());
+      SetIsBusy(false);
 
       // Estimate reserve amount
       try {
@@ -99,6 +126,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
           );
         }
       } catch (err) {
+        console.info('ExtrinsicLaunch::setReserveAmount err', err);
         setReserveAmount(0);
       }
 
@@ -109,16 +137,16 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
 
   const _onExtrinsicError = useCallback((err?: Error | null) => setError(err ? err.message : null), []);
 
-  const [extrinsicHash] = useMemo((): [string] => {
-    if (!extrinsic) {
-      return ['0x'];
-    }
+  // const [extrinsicHash] = useMemo((): [string] => {
+  //   if (!extrinsic) {
+  //     return ['0x'];
+  //   }
 
-    const u8a = extrinsic.method.toU8a();
+  //   const u8a = extrinsic.method.toU8a();
 
-    // don't use the built-in hash, we only want to convert once
-    return [extrinsic.registry.hash(u8a).toHex()];
-  }, [extrinsic]);
+  //   // don't use the built-in hash, we only want to convert once
+  //   return [extrinsic.registry.hash(u8a).toHex()];
+  // }, [extrinsic]);
 
   const createMultiItem = useCallback(
     (option: Option): Option[] => {
@@ -175,7 +203,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
       />
       <Output isDisabled isTrimmed label="encoded call data" value={hexCallData} withCopy />
 
-      <Output isDisabled label="encoded call hash" value={extrinsicHash} withCopy />
+      <Output isDisabled label="encoded call hash" value={hexCallHash} withCopy />
 
       {error && !extrinsic && <MarkError content={error} />}
 
@@ -191,6 +219,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
             isUnsigned
             label={t<string>('Submit Unsigned')}
             withSpinner
+            isBusy={isBusy}
           />
           <TxButton
             accountId={accountId}
@@ -198,6 +227,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
             icon="sign-in-alt"
             label={t<string>('Submit Transaction')}
             onSuccess={onTxSuccess}
+            isBusy={isBusy}
           />
         </Button.Group>
       </div>

@@ -1,0 +1,12 @@
+{
+  "name": "kusama",
+  "displayName": "Kusama",
+  "rpc": "wss://kusama-rpc.dwellir.com",
+  "api": {
+    "subql": "https://api.subquery.network/sq/itering/multisig-kusama",
+    "subscan": "https://kusama.webapi.subscan.io"
+  },
+  "logo": "/image/kusama-button-mobile.png",
+  "explorerHostName": "kusama",
+  "themeColor": "#000000"
+}

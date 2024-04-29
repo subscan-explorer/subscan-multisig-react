@@ -16,6 +16,8 @@ const lightVars = {
 };
 const { alias, configPaths } = require('react-app-rewire-alias');
 
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+
 // just for dev purpose, use to compare vars in different theme.
 // fs.writeFileSync('./ant-theme-vars/dark.json', JSON.stringify(darkVars));
 // fs.writeFileSync('./ant-theme-vars/light.json', JSON.stringify(lightVars));
@@ -84,9 +86,35 @@ module.exports = {
   webpack: {
     plugins: {
       add: [themePlugin],
+      // add: [themePlugin, new BundleAnalyzerPlugin({ analyzerPort: 8919 })],
     },
+    // .
     // add mjs compatibility configuration
     configure: (webpackConfig) => {
+      webpackConfig.optimization.splitChunks = {
+        ...webpackConfig.optimization.splitChunks,
+        chunks: 'all',
+        minSize: 1000000,
+        maxSize: 5000000,
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            priority: -10,
+            name(module) {
+              // get the name. E.g. node_modules/packageName/not/this/part.js
+              // or node_modules/packageName
+              const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+              // npm package names are URL-safe, but some servers don't like @ symbols
+              return `npm.${packageName.replace('@', '')}`;
+            },
+          },
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
+        },
+      };
       webpackConfig.module.rules.push({
         test: /\.mjs$/,
         include: /node_modules/,

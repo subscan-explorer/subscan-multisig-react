@@ -1,8 +1,7 @@
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
-import BN from 'bn.js';
 import { useCallback } from 'react';
 import { Entry } from '../model';
-import { extractExternal } from '../utils';
+import { CompatibleWeight, convertWeight, extractExternal } from '../utils';
 import { useApi } from './api';
 import { useMultisig } from './multisig';
 
@@ -22,13 +21,12 @@ export function useMultiApprove() {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const info = await api?.query.multisig.multisigs(multiRoot, data.callHash!);
       let callData = null;
-      let weight: BN | undefined = new BN(0);
+      let weight: CompatibleWeight = convertWeight(api, 0);
 
-      if (data.callData) {
+      if (data.callData && api) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const payment = await api?.tx(data.callData as any).paymentInfo(ZERO_ACCOUNT);
-
-        weight = payment?.weight;
+        weight = convertWeight(api, payment?.weight || 0);
         callData = api?.registry.createType('Call', data.callData);
       }
 
@@ -51,8 +49,8 @@ export function useMultiApprove() {
       if (data.approvals.length + 1 >= (multisigAccount?.meta as any).threshold) {
         args =
           multiModule?.asMulti.meta.args.length === AS_MULTI_ARG_LENGTH
-            ? [...generalParams, callData?.toHex(), true, weight]
-            : [callData];
+            ? [...generalParams, callData?.toHex(), false, weight]
+            : [...generalParams, callData?.toHex(), weight];
         extFn = multiModule?.asMulti;
       } else {
         args =

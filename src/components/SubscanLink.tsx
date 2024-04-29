@@ -1,8 +1,11 @@
 import { Typography } from 'antd';
-import { CSSProperties, PropsWithChildren } from 'react';
+import { CSSProperties, PropsWithChildren, useMemo } from 'react';
+import { CopyOutlined } from '@ant-design/icons';
+import { getLinkColor, getThemeColor } from 'src/config';
+import { isCustomRpc } from '../utils';
 import { useApi } from '../hooks';
 
-const { Link } = Typography;
+const { Text } = Typography;
 
 export interface SubscanLinkProps extends PropsWithChildren<unknown> {
   address?: string;
@@ -13,19 +16,68 @@ export interface SubscanLinkProps extends PropsWithChildren<unknown> {
   copyable?: boolean;
 }
 
+// eslint-disable-next-line complexity
 export function SubscanLink({ address, extrinsic, children, copyable, block, ...other }: SubscanLinkProps) {
-  const { network } = useApi();
+  const { network, rpc, networkConfig } = useApi();
+
+  const [mainColor, linkColor] = useMemo(() => {
+    return [getThemeColor(network), getLinkColor(network)];
+  }, [network]);
+
+  const { isCustomNetwork } = useMemo(() => {
+    return {
+      isCustomNetwork: isCustomRpc(rpc),
+    };
+  }, [rpc]);
+
+  const openLink = (url: string) => {
+    if (!url) {
+      return;
+    }
+    window.open(url, '_blank');
+  };
 
   if (address) {
     return (
-      <Link
-        href={`https://${network}.subscan.io/account/${address}`}
-        target="_blank"
-        copyable={copyable}
+      <Text
+        copyable={
+          copyable && {
+            tooltips: false,
+            text: address,
+            icon: (
+              <CopyOutlined
+                className="rounded-full opacity-60 cursor-pointer p-1"
+                style={{
+                  color: mainColor,
+                  backgroundColor: mainColor + '40',
+                }}
+                onClick={(e) => e.preventDefault()}
+              />
+            ),
+          }
+        }
         className="w-full"
+        style={{
+          wordBreak: 'break-all',
+          color: !isCustomNetwork || networkConfig?.explorerHostName ? linkColor : '#302B3C',
+          height: '20px',
+          cursor: !isCustomNetwork || networkConfig?.explorerHostName ? 'pointer' : 'default',
+        }}
       >
-        {address}
-      </Link>
+        <span
+          onClick={() =>
+            openLink(
+              !isCustomNetwork
+                ? `https://${network}.subscan.io/account/${address}`
+                : networkConfig?.explorerHostName
+                ? `https://${networkConfig?.explorerHostName}.subscan.io/account/${address}`
+                : ''
+            )
+          }
+        >
+          {address}
+        </span>
+      </Text>
     );
   }
 
@@ -33,17 +85,49 @@ export function SubscanLink({ address, extrinsic, children, copyable, block, ...
     const { height, index } = extrinsic;
 
     return (
-      <Link href={`https://${network}.subscan.io/extrinsic/${height}-${index}`} target="_blank" {...other}>
+      <Text
+        {...other}
+        onClick={() => {
+          openLink(
+            !isCustomNetwork
+              ? `https://${network}.subscan.io/extrinsic/${height}-${index}`
+              : networkConfig?.explorerHostName
+              ? `https://${networkConfig?.explorerHostName}.subscan.io/extrinsic/${height}-${index}`
+              : ''
+          );
+        }}
+        style={{
+          color: !isCustomNetwork || networkConfig?.explorerHostName ? linkColor : '#302B3C',
+          height: '20px',
+          cursor: !isCustomNetwork || networkConfig?.explorerHostName ? 'pointer' : 'default',
+        }}
+      >
         {children}
-      </Link>
+      </Text>
     );
   }
 
   if (block) {
     return (
-      <Link href={`https://${network}.subscan.io/block/${block}`} target="_blank" {...other}>
+      <Text
+        {...other}
+        onClick={() => {
+          openLink(
+            !isCustomNetwork
+              ? `https://${network}.subscan.io/block/${block}`
+              : networkConfig?.explorerHostName
+              ? `https://${networkConfig?.explorerHostName}.subscan.io/block/${block}`
+              : ''
+          );
+        }}
+        style={{
+          color: !isCustomNetwork || networkConfig?.explorerHostName ? linkColor : '#302B3C',
+          height: '20px',
+          cursor: !isCustomNetwork || networkConfig?.explorerHostName ? 'pointer' : 'default',
+        }}
+      >
         {block}
-      </Link>
+      </Text>
     );
   }
 

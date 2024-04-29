@@ -8,15 +8,15 @@ const isDev = process.env.REACT_APP_HOST_TYPE === 'dev';
 const subqlDev = 'http://localhost:3000/';
 
 export const GqlProvider = ({ children }: React.PropsWithChildren<unknown>) => {
-  const { networkConfig, network } = useApi();
+  const { networkConfig } = useApi();
 
   const value = useMemo(() => {
     const client = new GraphQLClient({
-      url: isDev && network === 'pangolin' ? subqlDev : networkConfig.api.subql || subqlDev,
+      url: isDev ? subqlDev : networkConfig?.api?.subql || subqlDev,
     });
 
     return client;
-  }, [network, networkConfig.api.subql]);
+  }, [networkConfig]);
 
   return <ClientContext.Provider value={value}>{children}</ClientContext.Provider>;
 };

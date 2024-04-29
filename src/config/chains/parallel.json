@@ -1,0 +1,11 @@
+{
+  "name": "parallel",
+  "displayName": "Parallel",
+  "rpc": "wss://parallel-rpc.dwellir.com",
+  "api": {
+    "subql": ""
+  },
+  "logo": "/image/parallel.svg",
+  "explorerHostName": "parallel",
+  "themeColor": "#ef18ac"
+}

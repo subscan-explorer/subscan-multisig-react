@@ -13,6 +13,7 @@ This is a React-rewrite of previous Vue [implementation](https://github.com/iter
 
 - [Feature](#Feature)
 - [Tutorial](#Tutorial)
+- [Integration](#Integration)
 - [QuickStart](#QuickStart)
   - [Requirement](#Requirement)
   - [Installation](#Install)
@@ -151,6 +152,43 @@ Only the initiator has the authority to cancel the multi-sig extrinsic. Click "C
   <p align="center">
     <img src="./docs/12_cancel.png" style="width:800px";>
   </p>
+
+## Integration
+
+### Add your own network in supported network list
+
+#### 1.Write your network config file
+
+All networks are configured in `src/config/chains` folder, You can take `polkadot.json` as an exmaple:
+
+```
+{
+  "name": "polkadot",
+  "displayName": "Polkadot",
+  "rpc": "wss://rpc.polkadot.io",
+  // Optional (Delete this line in PR!)
+  "api": {
+    "subql": "https://api.subquery.network/sq/itering/multisig-polkadot"
+  },
+  "logo": "/image/polkadot-button-mobile.png",
+  // Optional (Delete this line in PR!)
+  "explorerHostName": "polkadot",
+  "themeColor": "#e6007a"
+}
+```
+
+#### 2.Make a PR to submit your network
+
+After completing the above json config file, you can place it under `src/config/chains`, and submit a PR targeting `master` branch, once it's approved, multisig APP will display your network in the list.
+
+  <p align="center">
+    <img src="./docs/13_select_network.png" style="width:800px";>
+  </p>
+
+#### 3.Deploy your own subquery endpoint (optional)
+
+In order to support advanced features such as transaction history, you need to deploy your own [subquery](https://doc.subquery.network/) endpoint, and add it to the json file above.
+You can fork from the [subscan multisig subquery repo](https://github.com/subscan-explorer/subscan-multisig-subql) and add support for your network.
 
 ## QuickStart
 

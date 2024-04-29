@@ -1,137 +1,116 @@
-import { Network, NetworkConfig } from '../model';
+// export const NETWORK_CONFIG: NetworkConfig = {
+//   polkadot: {
+//     facade: {
+//       logo: '/image/polkadot-button-mobile.png',
+//       logoWithText: '/image/polkadot-button.png',
+//     },
+//     fullName: 'Polkadot',
+//     ss58Prefix: 0,
+//     token: { native: 'DOT' },
+//     erc20: {
+//       ring: '',
+//       kton: '',
+//     },
+//     // rpc: 'wss://pub.elara.patract.io/polkadot',
+//     rpc: 'wss://rpc.polkadot.io',
+//     api: {
+//       // subql: 'https://api.subquery.network/sq/itering/multisig_polkadot',
+//       subql: 'https://api.subquery.network/sq/itering/multisig_polkadot__aXRlc',
+//     },
+//     donate: {
+//       address: '14RYaXRSqb9rPqMaAVp1UZW2czQ6dMNGMbvukwfifi6m8ZgZ',
+//     },
+//   },
+//   kusama: {
+//     facade: {
+//       logo: '/image/kusama-button-mobile.png',
+//       logoWithText: '/image/kusama-button.png',
+//     },
+//     fullName: 'Kusama',
+//     ss58Prefix: 2,
+//     token: { native: 'KSM' },
+//     erc20: {
+//       ring: '',
+//       kton: '',
+//     },
+//     rpc: 'wss://kusama.api.onfinality.io/public-ws',
 
-export const NETWORK_CONFIG: NetworkConfig = {
-  polkadot: {
-    facade: {
-      logo: '/image/polkadot-button-mobile.png',
-      logoWithText: '/image/polkadot-button.png',
-    },
-    fullName: 'Polkadot',
-    ss58Prefix: 0,
-    token: { native: 'DOT' },
-    erc20: {
-      ring: '',
-      kton: '',
-    },
-    // rpc: 'wss://pub.elara.patract.io/polkadot',
-    rpc: 'wss://rpc.polkadot.io',
-    api: {
-      // subql: 'https://api.subquery.network/sq/darwinia-network/polkadot',
-      subql: 'https://api.subquery.network/sq/itering/multisig-polkadot',
-    },
-    donate: {
-      address: '14RYaXRSqb9rPqMaAVp1UZW2czQ6dMNGMbvukwfifi6m8ZgZ',
-    },
-  },
-  kusama: {
-    facade: {
-      logo: '/image/kusama-button-mobile.png',
-      logoWithText: '/image/kusama-button.png',
-    },
-    fullName: 'Kusama',
-    ss58Prefix: 2,
-    token: { native: 'KSM' },
-    erc20: {
-      ring: '',
-      kton: '',
-    },
-    rpc: 'wss://kusama.api.onfinality.io/public-ws',
-
-    // rpc: 'wss://kusama.elara.patract.io',
-    // rpc: 'wss://kusama-rpc.polkadot.io',
-    api: {
-      // subql: 'https://api.subquery.network/sq/darwinia-network/kusama',
-      subql: 'https://api.subquery.network/sq/itering/multisig-ksm',
-    },
-    donate: {
-      address: 'Fzs6WWFcAuJhxAVyZa4EN2suxggjidJjV3AzJxKbRHjh2Jc',
-    },
-  },
-  acala: {
-    facade: {
-      logo: '/image/acala-button-mobile.svg',
-      logoWithText: '/image/acala-button.svg',
-    },
-    fullName: 'Acala',
-    ss58Prefix: 10,
-    token: { native: 'ACA' },
-    erc20: {
-      ring: '',
-      kton: '',
-    },
-    rpc: 'wss://acala-polkadot.api.onfinality.io/public-ws',
-    api: {
-      subql: '',
-    },
-    donate: {
-      address: '',
-    },
-  },
-  darwinia: {
-    // TODO
-    facade: {
-      logo: '/image/darwinia-button-mobile.png',
-      logoWithText: '/image/darwinia-logo.svg',
-    },
-    fullName: 'Darwinia Mainnet',
-    ss58Prefix: 18,
-    token: { native: 'RING' },
-    erc20: {
-      ring: '',
-      kton: '',
-    },
-    rpc: 'wss://rpc.darwinia.network',
-    api: {
-      // subql: 'https://api.subquery.network/sq/darwinia-network/darwinia',
-      subql: 'https://api.subquery.network/sq/itering/multisig-darwinia__aXRlc',
-    },
-    donate: {
-      address: '2rbREPAhkptwCtdvU5eSGnHgFiyPcehdkXuGqFF916oYCJ7s',
-    },
-  },
-  pangolin: {
-    facade: {
-      logo: '/image/pangolin-button-mobile.png',
-      logoWithText: '/image/pangolin-logo.svg',
-    },
-    fullName: 'Pangolin Testnet',
-    ss58Prefix: 42,
-    token: { native: 'PRING' },
-    erc20: {
-      ring: '0xfe098c5eeDec594271618922B2F3364F0f8b1785',
-      kton: '0x0eb47c5347B255e469101b9D71288b34DD5e2B95',
-    },
-    rpc: 'wss://pangolin-rpc.darwinia.network/',
-    api: {
-      // subql: 'https://api.subquery.network/sq/darwinia-network/pangolin',
-      subql: 'https://api.subquery.network/sq/itering/multisig-pangolin',
-    },
-    donate: {
-      address: '2rbREPAhkptwCtdvU5eSGnHgFiyPcehdkXuGqFF916oYCJ7s',
-    },
-  },
-  crab: {
-    facade: {
-      logo: '/image/crab-button-mobile.png',
-      logoWithText: '/image/crab-logo.svg',
-    },
-    fullName: 'Crab Mainnet',
-    ss58Prefix: 42,
-    token: { native: 'CRAB' },
-    erc20: {
-      ring: '0x588abe3F7EE935137102C5e2B8042788935f4CB0',
-      kton: '0xbfE9E136270cE46A2A6a8E8D54718BdAEBEbaA3D',
-    },
-    rpc: 'wss://crab-rpc.darwinia.network',
-    api: {
-      // subql: 'https://api.subquery.network/sq/darwinia-network/crab',
-      subql: 'https://api.subquery.network/sq/itering/multisig-crab__aXRlc',
-    },
-    donate: {
-      address: '5FVFSCANyotNxJM4Crm1LQfsmNQSw3p8H7CRbegN7d5Ex91y',
-    },
-  },
-};
+//     // rpc: 'wss://kusama.elara.patract.io',
+//     // rpc: 'wss://kusama-rpc.polkadot.io',
+//     api: {
+//       // subql: 'https://api.subquery.network/sq/itering/multisig_ksm',
+//       subql: 'https://api.subquery.network/sq/itering/multisig_ksm__aXRlc',
+//     },
+//     donate: {
+//       address: 'Fzs6WWFcAuJhxAVyZa4EN2suxggjidJjV3AzJxKbRHjh2Jc',
+//     },
+//   },
+//   darwinia: {
+//     // TODO
+//     facade: {
+//       logo: '/image/darwinia-button-mobile.png',
+//       logoWithText: '/image/darwinia-logo.svg',
+//     },
+//     fullName: 'Darwinia Mainnet',
+//     ss58Prefix: 18,
+//     token: { native: 'RING' },
+//     erc20: {
+//       ring: '',
+//       kton: '',
+//     },
+//     rpc: 'wss://rpc.darwinia.network',
+//     api: {
+//       // subql: 'https://api.subquery.network/sq/itering/multisig_darwinia',
+//       subql: 'https://api.subquery.network/sq/itering/multisig_darwinia__aXRlc',
+//     },
+//     donate: {
+//       address: '2rbREPAhkptwCtdvU5eSGnHgFiyPcehdkXuGqFF916oYCJ7s',
+//     },
+//   },
+//   pangolin: {
+//     isTest: true,
+//     facade: {
+//       logo: '/image/pangolin-button-mobile.png',
+//       logoWithText: '/image/pangolin-logo.svg',
+//     },
+//     fullName: 'Pangolin Testnet',
+//     ss58Prefix: 42,
+//     token: { native: 'PRING' },
+//     erc20: {
+//       ring: '0xfe098c5eeDec594271618922B2F3364F0f8b1785',
+//       kton: '0x0eb47c5347B255e469101b9D71288b34DD5e2B95',
+//     },
+//     rpc: 'wss://pangolin-rpc.darwinia.network/',
+//     api: {
+//       // subql: 'https://api.subquery.network/sq/itering/multisig_pangolin',
+//       subql: 'https://api.subquery.network/sq/itering/multisig_pangolin__aXRlc',
+//     },
+//     donate: {
+//       address: '2rbREPAhkptwCtdvU5eSGnHgFiyPcehdkXuGqFF916oYCJ7s',
+//     },
+//   },
+//   crab: {
+//     facade: {
+//       logo: '/image/crab-button-mobile.png',
+//       logoWithText: '/image/crab-logo.svg',
+//     },
+//     fullName: 'Crab Mainnet',
+//     ss58Prefix: 42,
+//     token: { native: 'CRAB' },
+//     erc20: {
+//       ring: '0x588abe3F7EE935137102C5e2B8042788935f4CB0',
+//       kton: '0xbfE9E136270cE46A2A6a8E8D54718BdAEBEbaA3D',
+//     },
+//     rpc: 'wss://crab-rpc.darwinia.network',
+//     api: {
+//       // subql: 'https://api.subquery.network/sq/itering/multisig_crab',
+//       subql: 'https://api.subquery.network/sq/itering/multisig_crab__aXRlc',
+//     },
+//     donate: {
+//       address: '5FVFSCANyotNxJM4Crm1LQfsmNQSw3p8H7CRbegN7d5Ex91y',
+//     },
+//   },
+// };
 
 export interface NetworkSimpleInfo {
   prefix: number;
@@ -404,7 +383,7 @@ const networkSimple: Record<string, NetworkSimpleInfo> = {
   },
 };
 
-export const NETWORKS = Object.keys(NETWORK_CONFIG) as Network[];
+// export const NETWORKS = Object.keys(NETWORK_CONFIG) as Network[];
 
 export const NETWORK_SIMPLE: Required<NetworkSimpleInfo>[] = Object.entries(networkSimple).map(([key, value]) => ({
   network: key,

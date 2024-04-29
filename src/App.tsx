@@ -3,21 +3,23 @@ import GlobalStyle from '@polkadot/react-components/styles';
 import { useApi as usePolkaApi } from '@polkadot/react-hooks';
 import { BlockAuthors, Events } from '@polkadot/react-query';
 import Signer from '@polkadot/react-signer';
-import { Alert, Button, Dropdown, Layout, Menu } from 'antd';
+import { Alert, Button, Layout } from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
-import React, { useMemo } from 'react';
+import React, { Suspense, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Route, Switch } from 'react-router-dom';
-import { HeadAccounts } from './components/HeadAccounts';
+import { Link, Route, Switch, useHistory } from 'react-router-dom';
+import subscanLogo from 'src/assets/images/subscan_logo.png';
 import { Footer } from './components/Footer';
+import { HeadAccounts } from './components/HeadAccounts';
 import { DownIcon } from './components/icons';
+import { SelectNetworkModal } from './components/modals/SelectNetworkModal';
 import Status from './components/Status';
-import { ThemeSwitch } from './components/ThemeSwitch';
-import { NETWORK_CONFIG } from './config';
+import { chains } from './config/chains';
 import { Path, routes } from './config/routes';
 import { useApi } from './hooks';
 import { Network } from './model';
 import { Connecting } from './pages/Connecting';
+import { getExplorerUrl, isCustomRpc } from './utils';
 
 const genHeaderLinkStyle = (classes: TemplateStringsArray, network: Network) => {
   return `text-white opacity-80 hover:opacity-100 leading-normal whitespace-nowrap cursor-pointer transition-all duration-200 mr-4 dark:text-${network}-main ${classes.join(
@@ -25,20 +27,39 @@ const genHeaderLinkStyle = (classes: TemplateStringsArray, network: Network) => 
   )}`;
 };
 
+// eslint-disable-next-line complexity
 function App() {
   const { t } = useTranslation();
-  const { networkStatus, network, networkConfig } = useApi();
+  const history = useHistory();
+  const { networkStatus, network, networkConfig, rpc } = useApi();
   const { systemChain, systemName, specName, isDevelopment, apiError } = usePolkaApi();
   const polkaLogo = useMemo(
     () => (networkStatus === 'success' ? '/image/polka-check.png' : '/image/polka-cross.png'),
     [networkStatus]
   );
-  const networks = useMemo(() => Object.entries(NETWORK_CONFIG).map(([key, value]) => ({ name: key, ...value })), []);
   const uiHighlight = useMemo(
     () => (isDevelopment ? undefined : getSystemColor(systemChain, systemName, specName)),
     [isDevelopment, specName, systemChain, systemName]
   );
   const headerLinkStyle = useMemo(() => genHeaderLinkStyle`${network}`, [network]);
+
+  const networkAlias = useMemo(() => {
+    return Object.keys(chains).indexOf(network) >= 0 ? network : 'custom';
+  }, [network]);
+
+  const { isCustomNetwork } = useMemo(() => {
+    return {
+      isCustomNetwork: isCustomRpc(rpc),
+    };
+  }, [rpc]);
+
+  const [selectNetworkModalVisible, setSelectNetworkModalVisible] = useState(false);
+
+  const openExplorer = () => {
+    if (networkConfig?.explorerHostName) {
+      window.open(getExplorerUrl(networkConfig.explorerHostName), '_blank');
+    }
+  };
 
   return (
     <>
@@ -49,9 +70,9 @@ function App() {
           style={{ marginTop: -1 }}
         >
           <span className="flex items-center justify-between">
-            <Link to={Path.root} className="flex items-center mr-4">
+            <Link to={Path.root + history.location.hash} className="flex items-center mr-4">
               <img src="/image/parallel-logo.png" style={{ width: '3rem' }} className="mr-4" />
-              <span className={`bg-white px-3 rounded-lg leading-6 whitespace-nowrap text-${network}-main`}>
+              <span className={`bg-white px-3 rounded-full leading-6 whitespace-nowrap text-${networkAlias}-main`}>
                 {t('multisig.index')}
               </span>
             </Link>
@@ -60,73 +81,52 @@ function App() {
           </span>
 
           <div className="flex items-center justify-between">
-            <span onClick={() => window.open(`https://${network}.subscan.io`, '_blank')} className={headerLinkStyle}>
-              {t('explorer')}
-            </span>
+            {(!isCustomNetwork || networkConfig?.explorerHostName) && (
+              <span onClick={openExplorer} className={headerLinkStyle}>
+                {t('explorer')}
+              </span>
+            )}
 
-            <HeadAccounts />
+            {networkStatus === 'success' && <HeadAccounts />}
 
-            <Dropdown
-              overlay={
-                <Menu>
-                  {networks
-                    .filter((v, _i) => v.fullName === 'Polkadot' || v.fullName === 'Kusama' || v.fullName === 'Acala')
-                    .map((item) => (
-                      <Menu.Item
-                        key={item.name}
-                        onClick={() => {
-                          if (item.name !== network) {
-                            location.hash = encodeURIComponent(`n=${item.name}`);
-                            location.reload();
-                          } else {
-                            location.replace(`/#${encodeURIComponent(`n=${item.name}`)}`);
-                          }
-                        }}
-                      >
-                        <div className="flex items-center gap-4">
-                          <img src={item.facade.logo} className="w-8 h-8" />
-                          <span>{item.fullName}</span>
-                        </div>
-                      </Menu.Item>
-                    ))}
-                </Menu>
-              }
-              placement="bottomCenter"
-              arrow
+            <Button
+              className="flex justify-between items-center px-2"
+              onClick={() => {
+                setSelectNetworkModalVisible(true);
+              }}
             >
-              <Button className="flex justify-between items-center px-2 ">
-                <img src={networkConfig.facade.logo} className="w-6 h-6 mr-0 md:mr-2 " />
-                {networkConfig.fullName}
-                <DownIcon />
-              </Button>
-            </Dropdown>
-
-            <ThemeSwitch network={network} />
+              <img src={networkConfig?.logo || subscanLogo} className="w-6 h-6 mr-0 md:mr-2 " />
+              {networkConfig?.displayName}
+              <DownIcon />
+            </Button>
           </div>
         </Header>
-
-        <Content className="lg:px-40 sm:py-8 py-1 px-4 my-24 sm:my-20">
-          {networkStatus === 'connecting' ? (
-            <Connecting />
-          ) : (
-            <BlockAuthors>
-              <Events>
-                <Signer>
-                  <Switch>
-                    {routes.map((item, index) => (
-                      <Route key={index} {...item}></Route>
-                    ))}
-                  </Switch>
-                </Signer>
-              </Events>
-            </BlockAuthors>
-          )}
-          <Status />
-        </Content>
+        <Suspense fallback={<div></div>}>
+          <Content className="lg:px-40 sm:py-8 py-1 px-4 mt-24 mb-6 md:mb-24 sm:my-20 relative">
+            {networkStatus === 'connecting' ? (
+              <Connecting />
+            ) : (
+              <BlockAuthors>
+                <Events>
+                  <Signer>
+                    <Switch>
+                      {routes.map((item, index) => (
+                        <Route key={index} {...item}></Route>
+                      ))}
+                    </Switch>
+                  </Signer>
+                </Events>
+              </BlockAuthors>
+            )}
+            <Status />
+          </Content>
+        </Suspense>
         <Footer networkConfig={networkConfig} />
       </Layout>
 
       {apiError && <Alert message={apiError} type="error" showIcon closable className="fixed top-24 right-20" />}
+
+      <SelectNetworkModal visible={selectNetworkModalVisible} onCancel={() => setSelectNetworkModalVisible(false)} />
     </>
   );
 }

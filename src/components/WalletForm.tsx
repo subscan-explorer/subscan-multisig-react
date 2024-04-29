@@ -1,10 +1,11 @@
-import { DownOutlined, MinusCircleOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { DeleteOutlined } from '@ant-design/icons';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { encodeAddress } from '@polkadot/util-crypto';
 import {
   AutoComplete,
   Button,
+  Checkbox,
   Col,
   Descriptions,
   Form,
@@ -17,19 +18,23 @@ import {
   Select,
   Tag,
   Tooltip,
-  Checkbox,
+  Upload,
 } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
 import { format } from 'date-fns';
+import { keys } from 'lodash';
 import { useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
-import { NETWORKS, validateMessages } from '../config';
+import iconDownFilled from 'src/assets/images/icon_down_filled.svg';
+import iconQuestion from 'src/assets/images/icon_question.svg';
+import { chains } from 'src/config/chains';
+import { validateMessages, getThemeColor } from '../config';
 import i18n from '../config/i18n';
 import { useApi, useContacts } from '../hooks';
-import { Network, ShareScope, WalletFormValue } from '../model';
+import { MultisigAccountConfig, Network, ShareScope, WalletFormValue } from '../model';
 import { InjectedAccountWithMeta } from '../model/account';
-import { convertToSS58, findMultiAccount, getMainColor, updateMultiAccountScope } from '../utils';
+import { convertToSS58, findMultiAccount, updateMultiAccountScope } from '../utils';
 
 interface LabelWithTipProps {
   name: string;
@@ -42,10 +47,10 @@ const THRESHOLD = 2;
 function LabelWithTip({ name, tipMessage }: LabelWithTipProps) {
   const { t } = useTranslation();
   return (
-    <div className="flex items-center gap-4">
-      <span>{t(name)}</span>
+    <div className="flex items-center gap-2">
+      <span className="text-black-800 font-bold">{t(name)}</span>
       <Tooltip placement="right" title={t(tipMessage)}>
-        <QuestionCircleOutlined color="primary" />
+        <img src={iconQuestion} alt="tooltip" className="opacity-50" />
       </Tooltip>
     </div>
   );
@@ -88,12 +93,20 @@ function confirmToAdd(accountExist: KeyringAddress, confirm: () => void) {
 
 export function WalletForm() {
   const { t } = useTranslation();
-  const { accounts, networkConfig, api, network } = useApi();
+  const { accounts, api, network, chain } = useApi();
   const { contacts } = useContacts();
   const [form] = useForm();
   const history = useHistory();
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
   const [shareScope, setShareScope] = useState<ShareScope>(ShareScope.all);
+  const mainColor = useMemo(() => {
+    return getThemeColor(network);
+  }, [network]);
+
+  const presetNetworks = useMemo(() => {
+    return keys(chains);
+  }, []);
+
   const options = useMemo<{ label: string; value: string }[]>(() => {
     const accountOptions = accounts?.map(({ address, meta }) => ({
       label: meta?.name ? `${meta?.name} - ${address}` : address,
@@ -113,6 +126,7 @@ export function WalletForm() {
 
     return composeOptions.filter(({ value }) => !selectedAccounts.includes(value)) || [];
   }, [accounts, contacts, selectedAccounts]);
+
   const updateSelectedAccounts = (namePath?: (string | number)[]) => {
     const selected: {
       name: string;
@@ -127,6 +141,53 @@ export function WalletForm() {
     }
 
     setSelectedAccounts(result);
+  };
+
+  const uploadProps = {
+    name: 'file',
+    headers: {
+      authorization: 'authorization-text',
+    },
+    onChange(info: any) {
+      if (info.file.status !== 'uploading') {
+        // console.log(info.file, info.fileList);
+      }
+      if (info.file.status === 'done') {
+        message.success(`${info.file.name} file uploaded successfully`);
+      } else if (info.file.status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+    customRequest(info: any) {
+      try {
+        const reader = new FileReader();
+
+        reader.onload = (e: any) => {
+          // eslint-disable-next-line no-console
+          // console.log(e.target.result);
+
+          const config = JSON.parse(e.target.result) as MultisigAccountConfig;
+          if (!config || !config.members || !config.threshold) {
+            message.error(t('account config error'));
+            return;
+          }
+          const encodeMembers = config.members.map((member) => {
+            return {
+              name: member.name,
+              address: encodeAddress(member.address, Number(chain.ss58Format)),
+            };
+          });
+          form.setFieldsValue({ threshold: config.threshold, name: config.name, members: encodeMembers });
+        };
+        reader.readAsText(info.file);
+      } catch (err: unknown) {
+        message.error(t('account config error'));
+        if (err instanceof Error) {
+          // eslint-disable-next-line no-console
+          console.log('err:', err);
+        }
+      }
+    },
   };
 
   return (
@@ -150,7 +211,7 @@ export function WalletForm() {
         const signatories = members.map(({ address }) => address);
         const addressPair = members.map(({ address, ...other }) => ({
           ...other,
-          address: encodeAddress(address, networkConfig.ss58Prefix),
+          address: encodeAddress(address, Number(chain.ss58Format)),
         }));
         // Add external address to contact list.
         const addExternalToContact = () => {
@@ -189,7 +250,7 @@ export function WalletForm() {
 
             updateMultiAccountScope(values, network);
             message.success(t('success'));
-            history.push('/');
+            history.push('/' + history.location.hash);
           } catch (error: unknown) {
             if (error instanceof Error) {
               message.error(t(error.message));
@@ -205,8 +266,18 @@ export function WalletForm() {
           exec();
         }
       }}
-      className="max-w-3xl mx-auto"
+      className="max-w-screen-xl mx-auto"
     >
+      <Form.Item>
+        <div className="w-full grid grid-cols-4 items-center gap-8">
+          <Upload {...uploadProps} showUploadList={false}>
+            <Button type="primary" size="middle" block className="flex justify-center items-center">
+              {t('import from config')}
+            </Button>
+          </Upload>
+        </div>
+      </Form.Item>
+
       <Form.Item
         name="name"
         label={<LabelWithTip name="name" tipMessage="wallet.tip.name" />}
@@ -236,9 +307,16 @@ export function WalletForm() {
           {shareScope === ShareScope.custom && (
             <Form.Item name="scope" rules={[{ required: true }]} initialValue={[network]} className="mb-0 flex-1">
               <Select mode="multiple" disabled={shareScope !== ShareScope.custom}>
-                {NETWORKS.map((net) => (
+                {presetNetworks.map((net) => (
                   <Select.Option value={net} key={net}>
-                    <Tag color={getMainColor(net as Network)}>{net}</Tag>
+                    <Tag
+                      color={getThemeColor(net as Network)}
+                      style={{
+                        borderRadius: '2px',
+                      }}
+                    >
+                      {net}
+                    </Tag>
                   </Select.Option>
                 ))}
               </Select>
@@ -249,7 +327,7 @@ export function WalletForm() {
 
       <LabelWithTip name="members" tipMessage="wallet.tip.members" />
 
-      <Row gutter={10} className="bg-gray-100 dark:bg-gray-500 mt-2 mb-6 p-4 rounded-lg">
+      <Row gutter={20} className="bg-gray-100 mt-2 mb-6 p-4">
         <Col span={2}>{t('id')}</Col>
         <Col span={5}>{t('name')}</Col>
         <Col span={17}>{t('address')}</Col>
@@ -259,7 +337,7 @@ export function WalletForm() {
         {(fields, { add, remove }) => (
           <>
             {fields.map((field, index) => (
-              <Row key={field.key} gutter={10} className="px-4">
+              <Row key={field.key} gutter={20} className="px-4">
                 <Col span={2} className="pl-2 pt-2">
                   {index + 1}
                 </Col>
@@ -267,24 +345,23 @@ export function WalletForm() {
                   <Form.Item
                     {...field}
                     name={[field.name, 'name']}
-                    fieldKey={[field.fieldKey, 'name']}
+                    fieldKey={[field.key, 'name']}
                     rules={[{ required: true, message: t('Member name is required') }]}
                   >
                     <Input size="large" placeholder={t('wallet.tip.member_name')} className="wallet-member" />
                   </Form.Item>
                 </Col>
-
-                <Col span={15}>
+                <Col span={16}>
                   <Form.Item
                     {...field}
                     name={[field.name, 'address']}
-                    fieldKey={[field.fieldKey, 'address']}
+                    fieldKey={[field.key, 'address']}
                     validateFirst
                     rules={[
                       { required: true, message: t('Account address is required') },
                       {
                         validator: (_, value) =>
-                          convertToSS58(value, networkConfig.ss58Prefix) ? Promise.resolve() : Promise.reject(),
+                          convertToSS58(value, Number(chain.ss58Format)) ? Promise.resolve() : Promise.reject(),
                         message: t('You must input a ss58 format address'),
                       },
                     ]}
@@ -315,7 +392,7 @@ export function WalletForm() {
                       }}
                     >
                       <Input
-                        suffix={<DownOutlined className="opacity-30" />}
+                        suffix={<img src={iconDownFilled} alt="down" />}
                         size="large"
                         placeholder={t('wallet.tip.member_address')}
                         className="wallet-member"
@@ -324,9 +401,13 @@ export function WalletForm() {
                   </Form.Item>
                 </Col>
 
-                <Col span={2}>
+                <Col span={1}>
                   <Form.Item>
-                    <MinusCircleOutlined
+                    <DeleteOutlined
+                      className="text-xl mt-2"
+                      style={{
+                        color: mainColor,
+                      }}
                       onClick={() => {
                         updateSelectedAccounts(['members', field.name, 'address']);
 
@@ -350,12 +431,11 @@ export function WalletForm() {
               <Col span={24}>
                 <Form.Item>
                   <Button
-                    type="dashed"
                     size="large"
                     onClick={() => add()}
                     block
-                    icon={<PlusOutlined />}
                     className="flex justify-center items-center w-full"
+                    style={{ color: mainColor }}
                   >
                     {t('add_members')}
                   </Button>
@@ -371,12 +451,17 @@ export function WalletForm() {
       </Form.Item>
 
       <Form.Item>
-        <div className="w-full grid grid-cols-2 items-center gap-8">
+        <div className="w-2/5 grid grid-cols-2 items-center gap-8">
           <Button type="primary" size="large" block htmlType="submit" className="flex justify-center items-center">
             {t('create')}
           </Button>
           <Link to="/" className="block">
-            <Button type="default" size="large" className="flex justify-center items-center w-full">
+            <Button
+              type="default"
+              size="large"
+              className="flex justify-center items-center w-full"
+              style={{ color: mainColor }}
+            >
               {t('cancel')}
             </Button>
           </Link>

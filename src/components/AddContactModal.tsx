@@ -12,7 +12,7 @@ interface AddContactModalProps {
 
 export const AddContactModal = (props: AddContactModalProps) => {
   const { t } = useTranslation();
-  const { networkConfig } = useApi();
+  const { chain } = useApi();
 
   const _addContact = (name: string, address: string) => {
     try {
@@ -32,7 +32,7 @@ export const AddContactModal = (props: AddContactModalProps) => {
   const onFinish = async (values: ContactFormValue) => {
     const { name, address } = values;
 
-    const convertAddress = convertToSS58(address, networkConfig.ss58Prefix);
+    const convertAddress = convertToSS58(address, Number(chain.ss58Format));
 
     if (!convertAddress) {
       message.error(t('contact.Invalid Address'));

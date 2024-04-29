@@ -1,8 +1,8 @@
 import { Button, Dropdown, Menu } from 'antd';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NETWORK_LIGHT_THEME } from '../config';
 import { Network } from '../model';
+import { chains } from '../config';
 import { EarthIcon } from './icons';
 
 export interface LanguageProps {
@@ -15,6 +15,7 @@ const lang: { name: string; short: string }[] = [
   { name: 'English', short: 'en' },
 ];
 
+// eslint-disable-next-line complexity
 export function Language({ network, className = '' }: LanguageProps) {
   const { t, i18n } = useTranslation();
   const [current, setCurrent] = useState(i18n.language.includes('-') ? i18n.language.split('-')[0] : i18n.language);
@@ -42,9 +43,14 @@ export function Language({ network, className = '' }: LanguageProps) {
       className={className}
     >
       <Button
-        className={`${textColor} flex items-center justify-around uppercase`}
+        className={`${textColor} flex items-center justify-around uppercase opacity-40`}
         icon={
-          <EarthIcon style={{ color: (network && NETWORK_LIGHT_THEME[network]['@project-main-bg']) || 'inherit' }} />
+          <EarthIcon
+            style={{
+              color:
+                (network && chains[network] && chains[network]?.themeColor && chains[network]?.themeColor) || 'inherit',
+            }}
+          />
         }
       >
         <span className={textColor}>{current}</span>

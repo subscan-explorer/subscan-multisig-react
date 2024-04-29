@@ -1,7 +1,8 @@
-import { useEffect, useState, FC } from 'react';
+import { useEffect, useState, FC, useContext } from 'react';
 import keyring from '@polkadot/ui-keyring';
 import { encodeAddress } from '@polkadot/util-crypto';
 
+import { ApiContext } from '@polkadot/react-api';
 import { useApi } from '../../hooks';
 import { findMultiAccount, updateMultiAccountScope } from '../../utils';
 import { Network, WalletFormValue } from '../../model';
@@ -15,7 +16,7 @@ function addMultiAccount(apiContext: ApiCtx, wallet: WalletFormValue): void {
   const signatories = members.map(({ address }) => address);
   const addressPair = members.map(({ address, ...other }) => ({
     ...other,
-    address: encodeAddress(address, networkConfig.ss58Prefix),
+    address: encodeAddress(address, networkConfig?.ss58Prefix),
   }));
 
   const account = findMultiAccount({
@@ -24,6 +25,8 @@ function addMultiAccount(apiContext: ApiCtx, wallet: WalletFormValue): void {
   });
 
   if (!account) {
+    // eslint-disable-next-line no-console
+    console.log(signatories, addressPair, name, api, keyring, wallet);
     keyring.addMultisig(signatories, threshold, {
       name,
       addressPair,
@@ -36,34 +39,35 @@ function addMultiAccount(apiContext: ApiCtx, wallet: WalletFormValue): void {
 
 // eslint-disable-next-line react/prop-types
 const AutoMultiAccounts: FC = ({ children }) => {
+  const { isApiReady } = useContext(ApiContext);
   const [isReady, setIsReady] = useState(false);
   // const { networkConfig, api, network } = useApi();
   const apiContext = useApi();
 
   useEffect(() => {
-    const { name, threshold, share, members, scope } = accounts;
-    addMultiAccount(apiContext, {
-      name,
-      threshold,
-      share,
-      members,
-      scope: scope as Network[],
-      rememberExternal: true,
-    });
+    if (isApiReady) {
+      const { name, threshold, share, members, scope } = accounts;
+      addMultiAccount(apiContext, {
+        name,
+        threshold,
+        share,
+        members,
+        scope: scope as Network[],
+        rememberExternal: true,
+      });
 
-    addMultiAccount(apiContext, {
-      name: acaAccounts.name,
-      threshold: acaAccounts.threshold,
-      share: acaAccounts.share,
-      members: acaAccounts.members,
-      scope: acaAccounts.scope as Network[],
-      rememberExternal: true,
-    });
+      addMultiAccount(apiContext, {
+        name: acaAccounts.name,
+        threshold: acaAccounts.threshold,
+        share: acaAccounts.share,
+        members: acaAccounts.members,
+        scope: acaAccounts.scope as Network[],
+        rememberExternal: true,
+      });
 
-    setIsReady(true);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      setIsReady(true);
+    }
+  }, [apiContext]);
 
   if (isReady) return <>{children}</>;
   return null;

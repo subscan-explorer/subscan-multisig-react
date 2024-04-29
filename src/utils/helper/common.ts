@@ -1,5 +1,5 @@
 import { partialRight } from 'lodash';
-import { NETWORK_LIGHT_THEME } from '../../config';
+import { chains } from 'src/config/chains';
 import { Network } from '../../model';
 
 export function swap<T, U>(value: T | U, value1: U, value2: T): T | U {
@@ -35,22 +35,18 @@ export function makeSure<T = () => void>(fn: T | null | undefined): T | typeof e
   return fn ?? empty;
 }
 
-export function getMainColor(network: Network) {
-  const color = NETWORK_LIGHT_THEME[network]['@project-main-bg'];
-
-  if (color.startsWith('#')) {
-    return color;
-  }
-
-  const res = color.match(/#[a-fA-F\d]{6}/);
-
-  return res ? res[0] : '#ccc';
-}
-
 export function toShortString(str: string, maxLength: number): string {
   if (str.length <= maxLength) {
     return str;
   }
   // eslint-disable-next-line no-magic-numbers
   return `${str.substring(0, maxLength / 2)}...${str.substring(str.length - maxLength / 2)}`;
+}
+
+export function isCustomRpc(rpc: string): boolean {
+  return (
+    Object.keys(chains).filter((key) => {
+      return chains[key as Network]?.rpc === rpc;
+    }).length === 0
+  );
 }
