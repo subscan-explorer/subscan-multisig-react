@@ -13,7 +13,9 @@
       "@polkadot/react-query": ["src/packages/react-query/src"],
       "@polkadot/react-query/*": ["src/packages/react-query/src/*"],
       "@polkadot/react-signer": ["src/packages/react-signer/src"],
-      "@polkadot/react-signer/*": ["src/packages/react-signer/src/*"]
+      "@polkadot/react-signer/*": ["src/packages/react-signer/src/*"],
+      "@polkadot/types": ["node_modules/@subscan/multisig-polkadot-types"],
+      "@polkadot/types/*": ["node_modules/@subscan/multisig-polkadot-types/*"]
     }
   }
 }
