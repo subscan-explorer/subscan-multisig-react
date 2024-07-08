@@ -207,7 +207,7 @@ function Transfer({
           ? api.tx.balances?.transferAll
           : isProtected
           ? api.tx.balances?.transferKeepAlive
-          : api.tx.balances?.transfer;
+          : api.tx.balances?.transferAllowDeath;
 
       if (!fn || !propSenderId) {
         setMultisigExtrinsic(null);
