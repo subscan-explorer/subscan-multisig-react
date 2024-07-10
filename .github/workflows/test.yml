@@ -1,11 +1,11 @@
-name: Test
+name: Test Multisig
 
 on:
   pull_request:
 
 jobs:
   deploy:
-    name: Test
+    name: Test Multisig
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -35,13 +35,13 @@ jobs:
           REACT_APP_MULTISIG_MEMBER_MNEMONICS: ${{ secrets.MULTISIG_MEMBER_MNEMONICS }}
         run: npx cypress run   
 
-      # - name: Slack Notification
-      #   uses: rtCamp/action-slack-notify@v2
-      #   env:
-      #     SLACK_CHANNEL: subscan-multisig-notification
-      #     SLACK_COLOR: ${{ job.status }}
-      #     SLACK_ICON: https://avatars.githubusercontent.com/u/14985020?s=48&v=4
-      #     SLACK_MESSAGE: '${{ steps.smart-vercel.outputs.PREVIEW_LINK }}'
-      #     SLACK_TITLE: Preview
-      #     SLACK_USERNAME: Vercel
-      #     SLACK_WEBHOOK: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: subscan-multisig-notification
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: https://avatars.githubusercontent.com/u/14985020?s=48&v=4
+          SLACK_MESSAGE: '${{ steps.smart-vercel.outputs.PREVIEW_LINK }}'
+          SLACK_TITLE: Preview
+          SLACK_USERNAME: Vercel
+          SLACK_WEBHOOK: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
