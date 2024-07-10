@@ -15,8 +15,10 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm install
-      
+
       - name: Run server
+        env:
+          REACT_APP_MULTISIG_MEMBER_MNEMONICS: ${{ secrets.MULTISIG_MEMBER_MNEMONICS }}
         run: npm run start &
       - name: wait server start
         run: |
@@ -30,10 +32,8 @@ jobs:
             sleep 1
           done
 
-      - name: run test   
-        env:
-          REACT_APP_MULTISIG_MEMBER_MNEMONICS: ${{ secrets.MULTISIG_MEMBER_MNEMONICS }}
-        run: npx cypress run   
+      - name: run test
+        run: npx cypress run
 
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
