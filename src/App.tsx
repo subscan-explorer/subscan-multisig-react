@@ -110,9 +110,9 @@ function App() {
                 <Events>
                   <Signer>
                     <Switch>
-                      {routes.map((item, index) => (
-                        <Route key={index} {...item}></Route>
-                      ))}
+                      {routes.map((item, index) => {
+                        if (!item.disable) return <Route key={index} {...item}></Route>;
+                      })}
                     </Switch>
                   </Signer>
                 </Events>
