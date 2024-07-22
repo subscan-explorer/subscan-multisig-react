@@ -9,5 +9,6 @@
     "staging": "https://multisig.subscan.io.l2me.com/"
   },
   "ignoreTestFiles": "*/examples/**",
-  "nodeVersion": "system"
+  "nodeVersion": "system",
+  "video": false
 }

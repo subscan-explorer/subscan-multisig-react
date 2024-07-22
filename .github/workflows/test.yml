@@ -1,0 +1,48 @@
+name: Test Multisig
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+
+jobs:
+  deploy:
+    name: Test Multisig
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run server
+        env:
+          REACT_APP_MULTISIG_MEMBER_MNEMONICS: ${{ secrets.MULTISIG_MEMBER_MNEMONICS }}
+        run: npm run start &
+      - name: wait server start
+        run: |
+          while true; do
+            curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3008
+            if [ $? -eq 0 ]; then
+              echo "server start"
+              break
+            fi
+            echo "server not start, waiting..."
+            sleep 1
+          done
+
+      - name: run test
+        run: npx cypress run
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        if: failure()
+        env:
+          SLACK_CHANNEL: subscan-multisig-notification
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: https://avatars.githubusercontent.com/u/14985020?s=48&v=4
+          SLACK_TITLE: Polkadot JS API Test Failure
+          SLACK_USERNAME: Test Job
+          SLACK_WEBHOOK: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
