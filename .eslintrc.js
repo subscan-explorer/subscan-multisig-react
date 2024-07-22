@@ -137,12 +137,6 @@ module.exports = {
     ],
     'no-eval': 'error',
     'no-invalid-this': 'error',
-    'no-magic-numbers': [
-      'error',
-      {
-        ignore: [0, 1, -1, 10],
-      },
-    ],
     'no-new-wrappers': 'error',
     'no-shadow': 'off',
     'no-throw-literal': 'error',
