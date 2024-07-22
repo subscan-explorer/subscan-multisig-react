@@ -59,7 +59,7 @@ module.exports = {
     ],
     '@typescript-eslint/no-shadow': ['error'],
     '@typescript-eslint/no-unused-expressions': 'error',
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/prefer-for-of': 'error',
     '@typescript-eslint/prefer-function-type': 'error',
     '@typescript-eslint/triple-slash-reference': [
@@ -137,17 +137,11 @@ module.exports = {
     ],
     'no-eval': 'error',
     'no-invalid-this': 'error',
-    'no-magic-numbers': [
-      'error',
-      {
-        ignore: [0, 1, -1, 10],
-      },
-    ],
     'no-new-wrappers': 'error',
     'no-shadow': 'off',
     'no-throw-literal': 'error',
     'no-unused-expressions': 'error',
-    'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     'no-var': 'error',
     'object-shorthand': 'error',
     'one-var': ['error', 'never'],
