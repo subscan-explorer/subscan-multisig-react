@@ -3,7 +3,6 @@
 
 import { SubmittableResult } from '@polkadot/api';
 import type { DeriveBalancesAll } from '@polkadot/api-derive/types';
-import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import { checkAddress } from '@polkadot/phishing';
 import {
   InputAddress,
@@ -13,11 +12,11 @@ import {
   Modal,
   PureInputAddress,
   Toggle,
-  TxButton,
 } from '@polkadot/react-components';
 import createHeader from '@polkadot/react-components/InputAddress/createHeader';
 import createItem from '@polkadot/react-components/InputAddress/createItem';
 import { Option } from '@polkadot/react-components/InputAddress/types';
+import TxButtonMultisig from '@polkadot/react-components/TxButtonMultisig';
 import { useApi, useCall } from '@polkadot/react-hooks';
 import { Available, BalanceFree } from '@polkadot/react-query';
 import type { AccountInfoWithProviders, AccountInfoWithRefCount } from '@polkadot/types/interfaces';
@@ -31,7 +30,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIsInjected, useMultisig } from 'src/hooks';
 import { AddressPair } from 'src/model';
-import { convertWeight, extractExternal } from 'src/utils';
+import { extractExternal } from 'src/utils';
 import styled from 'styled-components';
 
 const { Text } = Typography;
@@ -87,11 +86,9 @@ function Transfer({
   const accountInfo = useCall<AccountInfoWithProviders | AccountInfoWithRefCount>(api.query.system.account, [
     propSenderId || senderId,
   ]);
-  const [multisigExtrinsic, setMultisigExtrinsic] = useState<SubmittableExtrinsic<'promise'> | null>(null);
   const [accountId, setAccountId] = useState<string | null>(null);
   const isExtensionAccount = useIsInjected();
   const [reserveAmount, setReserveAmount] = useState(0);
-  const [isBusy, SetIsBusy] = useState<boolean>(true);
 
   const options = useMemo<KeyringSectionOption[]>(
     () =>
@@ -199,70 +196,13 @@ function Transfer({
     !isProtected && balances && balances.accountId?.eq(propSenderId || senderId) && maxTransfer && noReference;
 
   useEffect(() => {
-    // eslint-disable-next-line complexity
     (async () => {
-      SetIsBusy(true);
-      const fn =
-        canToggleAll && isAll && isFunction(api.tx.balances?.transferAll)
-          ? api.tx.balances?.transferAll
-          : isProtected
-          ? api.tx.balances?.transferKeepAlive
-          : api.tx.balances?.transferAllowDeath;
-
-      if (!fn || !propSenderId) {
-        setMultisigExtrinsic(null);
-        SetIsBusy(false);
-        return;
-      }
-
-      const params =
-        canToggleAll && isAll && isFunction(api.tx.balances?.transferAll)
-          ? [{ Id: recipientId }, amount]
-          : isProtected
-          ? [{ Id: recipientId }, amount]
-          : [{ Id: recipientId }, amount];
-
-      const ext = fn(...params);
-
-      // eslint-disable-next-line no-console
-      // console.log('amount', amount?.toString());
-
-      const ARG_LENGTH = 6;
-      const info = await api?.query.multisig.multisigs(propSenderId, ext?.method.hash);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const timepoint = (info as any).isSome ? (info as any)?.unwrap().when : null;
-      const { threshold, who } = extractExternal(propSenderId);
-      const others: string[] = who.filter((item) => item !== accountId);
-      const { weight } = (await ext?.paymentInfo(propSenderId)) || { weight: 0 };
-      const weightAll = convertWeight(api, weight);
-      const module = api?.tx.multisig;
-      const argsLength = module?.asMulti.meta.args.length || 0;
-      const generalParams = [threshold, others, timepoint];
-      const args =
-        // eslint-disable-next-line no-magic-numbers
-        argsLength === 5
-          ? [...generalParams, ext.method.toHex(), weightAll]
-          : argsLength === ARG_LENGTH
-          ? [...generalParams, ext.method.toHex(), false, weightAll]
-          : [...generalParams, ext];
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const multiTx = module?.asMulti(...args);
-
-      // eslint-disable-next-line no-console
-      // console.log('hexCallData', ext.method.toHex());
-
-      setMultisigExtrinsic(multiTx);
-      SetIsBusy(false);
-
+      const { threshold } = extractExternal(propSenderId);
       // Estimate reserve amount
+      // https://wiki.polkadot.network/docs/learn-guides-accounts-multisig#example-using-multisig-accounts
       try {
         if (chainDecimal) {
-          setReserveAmount(
-            // eslint-disable-next-line no-magic-numbers
-            (depositBase * 2 + depositFactor * threshold + (depositFactor * (ext.method.toHex().length + 31)) / 32) /
-              Math.pow(10, chainDecimal)
-          );
+          setReserveAmount((depositBase + depositFactor * threshold) / Math.pow(10, chainDecimal));
         }
       } catch (err) {
         setReserveAmount(0);
@@ -415,30 +355,28 @@ function Transfer({
         </Text>
 
         <Modal.Actions onCancel={onClose}>
-          <TxButton
-            // accountId={propSenderId || senderId}
+          <TxButtonMultisig
             accountId={accountId}
             icon="paper-plane"
             isDisabled={!hasAvailable || !(propRecipientId || recipientId) || !amount || !!recipientPhish}
-            isBusy={isBusy}
             label={t<string>('Make Transfer')}
             onStart={onClose}
-            extrinsic={multisigExtrinsic}
             onSuccess={onTxSuccess}
-            // params={
-            //   canToggleAll && isAll
-            //     ? isFunction(api.tx.balances?.transferAll)
-            //       ? [propRecipientId || recipientId, false]
-            //       : [propRecipientId || recipientId, maxTransfer]
-            //     : [propRecipientId || recipientId, amount]
-            // }
-            // tx={
-            //   canToggleAll && isAll && isFunction(api.tx.balances?.transferAll)
-            //     ? api.tx.balances?.transferAll
-            //     : isProtected
-            //     ? api.tx.balances?.transferKeepAlive
-            //     : api.tx.balances?.transfer
-            // }
+            multiRoot={propSenderId || senderId}
+            params={
+              canToggleAll && isAll
+                ? isFunction(api.tx.balances?.transferAll)
+                  ? [propRecipientId || recipientId, false]
+                  : [propRecipientId || recipientId, maxTransfer]
+                : [propRecipientId || recipientId, amount]
+            }
+            tx={
+              canToggleAll && isAll && isFunction(api.tx.balances?.transferAll)
+                ? api.tx.balances?.transferAll
+                : isProtected
+                ? api.tx.balances?.transferKeepAlive
+                : api.tx.balances?.transferAllowDeath
+            }
           />
         </Modal.Actions>
       </div>
