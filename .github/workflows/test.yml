@@ -3,7 +3,10 @@ name: Test Multisig
 on:
   schedule:
     - cron: '0 6 * * *'
-
+  push:
+    branches: ["main"]
+    paths:
+      - .github/workflows/test.yml
 jobs:
   deploy:
     name: Test Multisig
