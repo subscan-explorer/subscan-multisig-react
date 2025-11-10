@@ -1,0 +1,12 @@
+{
+  "name": "assethub-polkadot",
+  "displayName": "Assethub Polkadot",
+  "rpc": "wss://asset-hub-polkadot-rpc.n.dwellir.com",
+  "api": {
+    "subql": "",
+    "subscan": "https://assethub-polkadot.webapi.subscan.io"
+  },
+  "logo": "/image/assethub-polkadot-button-mobile.png",
+  "explorerHostName": "assethub-polkadot",
+  "themeColor": "#E90979"
+}

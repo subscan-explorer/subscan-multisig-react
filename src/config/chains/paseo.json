@@ -1,0 +1,12 @@
+{
+  "name": "paseo",
+  "displayName": "Paseo",
+  "rpc": "wss://paseo-rpc.n.dwellir.com",
+  "api": {
+    "subql": "",
+    "subscan": "https://paseo.webapi.subscan.io"
+  },
+  "logo": "/image/paseo-button-mobile.png",
+  "explorerHostName": "paseo",
+  "themeColor": "#38393F"
+}

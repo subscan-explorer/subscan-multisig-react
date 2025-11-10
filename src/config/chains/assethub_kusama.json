@@ -1,0 +1,12 @@
+{
+  "name": "assethub-kusama",
+  "displayName": "Assethub Kusama",
+  "rpc": "wss://asset-hub-kusama-rpc.n.dwellir.com",
+  "api": {
+    "subql": "",
+    "subscan": "https://assethub-kusama.webapi.subscan.io"
+  },
+  "logo": "/image/assethub-kusama-button-mobile.png",
+  "explorerHostName": "assethub-kusama",
+  "themeColor": "#000000"
+}

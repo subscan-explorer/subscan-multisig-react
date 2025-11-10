@@ -26,13 +26,31 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
     return getThemeColor(network);
   }, [network]);
 
-  const networks = useMemo(
-    () =>
-      _.values(chains).sort((chain1) => {
-        return chain1?.name === 'polkadot' ? -1 : chain1?.name === 'kusama' ? -1 : 0;
-      }),
-    []
-  );
+  const networks = useMemo(() => {
+    const priorityOrder = ['polkadot', 'assethub-polkadot', 'kusama', 'assethub-kusama', 'paseo', 'assethub-paseo'];
+
+    // eslint-disable-next-line complexity
+    const compareNetworks = (a: NetConfigV2 | undefined, b: NetConfigV2 | undefined): number => {
+      const aIndex = priorityOrder.indexOf(a?.name || '');
+      const bIndex = priorityOrder.indexOf(b?.name || '');
+
+      if (aIndex !== -1 && bIndex !== -1) {
+        return aIndex - bIndex;
+      }
+
+      if (aIndex !== -1) {
+        return -1;
+      }
+
+      if (bIndex !== -1) {
+        return 1;
+      }
+
+      return (a?.name || '').localeCompare(b?.name || '');
+    };
+
+    return _.values(chains).sort(compareNetworks);
+  }, []);
 
   const [customNetworks, setCustomNetworks] = useState<NetConfigV2[]>([]);
 
