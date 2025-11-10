@@ -37,7 +37,7 @@ This is a React-rewrite of previous Vue [implementation](https://github.com/iter
 
 This application will not save your account's private key. All extrinsics initiated will be signed through the polkadot.js extension. Make sure you have installed the polkadot.js extension and created an account in it.
 
-[Download link](https://chrome.google.com/webstore/detail/polkadot%7Bjs%7D-extension/mopnmbcafieddcagagdcbnhejhlodfdd)
+[Download link](https://chrome.google.com/webstore/detail/polkadot%7Bjs%7D-extension/mopnmbcafieddcagagdcbnhejhlodfdd).
 
 <p align="center">
   <img src="./docs/1_download.png" style="width:800px";>
