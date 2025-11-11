@@ -9,38 +9,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - uses: actions/checkout@v2
+      - name: Docker login
+        uses: docker/login-action@v1
         with:
-          repository: itering/actions
-          path: .github/actions
-          persist-credentials: false
-          ssh-key: '${{ secrets.ITERING_ACTIONS_DEPLOY_KEY }}'
+          username: ${{ secrets.QUAY_IO_BOT_USERNAME }}
+          password: ${{ secrets.QUAY_IO_BOT_PASSWORD }}
+          registry: quay.io
 
-      - uses: ./.github/actions/smart-vercel
-        name: Deploy to Vercel
-        id: smart-vercel
+      - uses: bhowell2/github-substring-action@1.0.2
+        id: sha
         with:
-          node_version: 14
-          vercel_token: ${{ secrets.VERCEL_TOKEN }}
-          vercel_group: itering
-          preview_output: true
-          script_install: npm i
-          script_build: npm run build
-          alias_domain: multisig-dev
+          value: ${{ github.event.pull_request.head.sha }}
+          length_from_start: 7
 
-      - uses: marocchino/sticky-pull-request-comment@v2
+      - uses: docker/build-push-action@v5
         with:
-          append: true
-          message: ${{ steps.smart-vercel.outputs.PREVIEW_OUTPUT }}
-
-      # - name: Slack Notification
-      #   uses: rtCamp/action-slack-notify@v2
-      #   env:
-      #     SLACK_CHANNEL: subscan-general
-      #     SLACK_COLOR: ${{ job.status }}
-      #     SLACK_ICON: https://avatars.githubusercontent.com/u/14985020?s=48&v=4
-      #     SLACK_MESSAGE: '${{ steps.smart-vercel.outputs.PREVIEW_LINK }}'
-      #     SLACK_TITLE: Preview
-      #     SLACK_USERNAME: Vercel
-      #     SLACK_WEBHOOK: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
+          context: .
+          file: Dockerfile
+          push: true
+          tags: quay.io/subscan-explorer/subscan-multisig:sha-${{
+            github.event.pull_request.number }}-${{ steps.sha.outputs.substring }}

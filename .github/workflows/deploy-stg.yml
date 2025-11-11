@@ -11,32 +11,21 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/checkout@v2
+      - name: Docker login
+        uses: docker/login-action@v1
         with:
-          repository: itering/actions
-          path: .github/actions
-          persist-credentials: false
-          ssh-key: '${{ secrets.ITERING_ACTIONS_DEPLOY_KEY }}'
+          username: ${{ secrets.QUAY_IO_BOT_USERNAME }}
+          password: ${{ secrets.QUAY_IO_BOT_PASSWORD }}
+          registry: quay.io
 
-      - uses: ./.github/actions/smart-vercel
-        name: Deploy to Vercel
-        id: smart-vercel
+      - uses: benjlevesque/short-sha@v3.0
+        id: short-sha
         with:
-          node_version: 14
-          vercel_token: ${{ secrets.VERCEL_TOKEN }}
-          vercel_group: itering
-          preview_output: true
-          script_install: npm i
-          script_build: npm run build
-          alias_domain: multisig-staging
+          length: 7
 
-      - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_CHANNEL: subscan-multisig-notification
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_ICON: https://avatars.githubusercontent.com/u/14985020?s=48&v=4
-          SLACK_MESSAGE: '${{ steps.smart-vercel.outputs.PREVIEW_LINK }}'
-          SLACK_TITLE: Preview
-          SLACK_USERNAME: Vercel
-          SLACK_WEBHOOK: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
+      - uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: quay.io/subscan-explorer/subscan-multisig:sha-${{ steps.short-sha.outputs.sha }}-${{ github.run_number }}
