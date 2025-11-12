@@ -36,7 +36,7 @@ const cacheNetwork = (network: Network, rpc: string): void => {
 };
 
 const initialState: StoreState = {
-  network: getInitialSetting<Network>('network', 'polkadot'),
+  network: getInitialSetting<Network>('network', 'assethub-polkadot'),
   rpc: getInitialSetting<string>('rpc', ''),
   accounts: null,
   networkStatus: 'pending',
@@ -135,7 +135,7 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
     }
 
     let selectedNetwork: NetConfigV2 | undefined = undefined;
-    let networkName: Network = 'polkadot';
+    let networkName: Network = 'assethub-polkadot';
     Object.keys(chains).forEach((key) => {
       if (chains[key]?.rpc === state.rpc) {
         selectedNetwork = chains[key];
@@ -146,12 +146,12 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
     if (!selectedNetwork) {
       if (storage.customNetwork && storage.customNetwork.rpc === state.rpc) {
         selectedNetwork = storage.customNetwork;
-        networkName = 'polkadot';
+        networkName = 'assethub-polkadot';
       }
     }
     if (!selectedNetwork) {
-      if (chains['polkadot']) {
-        changeUrlHash(chains['polkadot'].rpc);
+      if (chains['assethub-polkadot']) {
+        changeUrlHash(chains['assethub-polkadot'].rpc);
       }
       return;
     }

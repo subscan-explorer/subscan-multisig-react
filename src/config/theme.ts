@@ -32,7 +32,7 @@ export enum THEME {
 export function getThemeColor(network: string) {
   let networkTheme = chains[network];
   if (!networkTheme) {
-    networkTheme = chains['polkadot'];
+    networkTheme = chains['assethub-polkadot'];
   }
 
   return networkTheme?.themeColor;

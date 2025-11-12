@@ -27,7 +27,7 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
   }, [network]);
 
   const networks = useMemo(() => {
-    const priorityOrder = ['polkadot', 'assethub-polkadot', 'kusama', 'assethub-kusama', 'paseo', 'assethub-paseo'];
+    const priorityOrder = ['assethub-polkadot', 'assethub-kusama', 'assethub-paseo'];
 
     // eslint-disable-next-line complexity
     const compareNetworks = (a: NetConfigV2 | undefined, b: NetConfigV2 | undefined): number => {
