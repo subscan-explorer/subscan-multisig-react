@@ -1,6 +1,6 @@
 import { Config } from './common';
 
-export type Network = 'polkadot' | 'kusama';
+export type Network = 'assethub-polkadot' | 'assethub-kusama';
 
 export type Token = 'native';
 

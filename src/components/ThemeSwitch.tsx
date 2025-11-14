@@ -7,7 +7,7 @@ import { updateStorage } from '../utils/helper/storage';
 export const toggleTheme = (theme: THEME, network: Network) => {
   let networkName = network;
   if (Object.keys(chains).indexOf(networkName) < 0) {
-    networkName = 'polkadot';
+    networkName = 'assethub-polkadot';
   }
   if (document && document.documentElement) {
     document.documentElement.setAttribute('data-theme', theme);

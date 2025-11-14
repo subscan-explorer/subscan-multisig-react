@@ -1,0 +1,12 @@
+{
+  "name": "assethub-paseo",
+  "displayName": "Assethub Paseo",
+  "rpc": "wss://asset-hub-paseo-rpc.n.dwellir.com",
+  "api": {
+    "subql": "",
+    "subscan": "https://assethub-paseo.webapi.subscan.io"
+  },
+  "logo": "/image/assethub-paseo-button-mobile.png",
+  "explorerHostName": "assethub-paseo",
+  "themeColor": "#38393F"
+}
