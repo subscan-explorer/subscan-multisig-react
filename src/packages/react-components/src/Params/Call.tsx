@@ -21,7 +21,7 @@ function Call({
 
   const defaultValue = ((): SubmittableExtrinsicFunction<'promise'> => {
     try {
-      return api.tx.balances.transfer;
+      return api.tx.balances.transferAllowDeath;
     } catch (error) {
       return apiDefaultTx;
     }

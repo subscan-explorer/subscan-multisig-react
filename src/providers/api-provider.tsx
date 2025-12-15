@@ -204,6 +204,83 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
               },
             ],
           },
+          // rpc call - system (chain)
+          'Paseo Testnet': {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          'Polkadot Asset Hub': {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          'Kusama Asset Hub': {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          'Paseo Asset Hub': {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
         },
       },
       typesChain,

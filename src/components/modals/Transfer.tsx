@@ -155,10 +155,19 @@ function Transfer({
     const toId = propRecipientId || (recipientId as string);
 
     if (balances && balances.accountId?.eq(fromId) && fromId && toId && isFunction(api.rpc.payment?.queryInfo)) {
+      // Validate availableBalance is valid before attempting payment info
+      if (!balances.availableBalance || balances.availableBalance.isZero()) {
+        setMaxTransfer([null, true]);
+        return;
+      }
+
       setTimeout((): void => {
         try {
+          // Use a minimal transfer amount to estimate fees, not the full balance
+          const testAmount = api.consts.balances?.existentialDeposit as unknown as BN;
+
           api.tx.balances
-            ?.transfer(toId, balances.availableBalance)
+            ?.transferAllowDeath(toId, testAmount)
             .paymentInfo(fromId)
             .then(({ partialFee }): void => {
               // eslint-disable-next-line no-magic-numbers

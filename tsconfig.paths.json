@@ -2,6 +2,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@polkadot/api-derive": ["node_modules/@subscan/multisig-polkadot-api-derive"],
+      "@polkadot/api-derive/*": ["node_modules/@subscan/multisig-polkadot-api-derive/*"],
       "@polkadot/react-api": ["src/packages/react-api/src"],
       "@polkadot/react-api/*": ["src/packages/react-api/src/*"],
       "@polkadot/react-components": ["src/packages/react-components/src"],
