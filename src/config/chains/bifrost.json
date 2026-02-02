@@ -1,7 +1,7 @@
 {
   "name": "bifrost",
   "displayName": "Bifrost",
-  "rpc": "wss://bifrost-polkadot.ibp.network",
+  "rpc": "wss://hk.p.bifrost-rpc.liebi.com/ws",
   "api": {
     "subql": "",
     "subscan": "https://bifrost.webapi.subscan.io"

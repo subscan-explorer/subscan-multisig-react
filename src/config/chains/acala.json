@@ -1,7 +1,7 @@
 {
   "name": "acala",
   "displayName": "Acala",
-  "rpc": "wss://acala-rpc-1.aca-api.network",
+  "rpc": "wss://acala-rpc-0.aca-api.network",
   "api": {
     "subql": "",
     "subscan": "https://acala.webapi.subscan.io"

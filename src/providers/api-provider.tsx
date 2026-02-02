@@ -281,6 +281,329 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
               },
             ],
           },
+          'Kusama Coretime': {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          'Polkadot Coretime': {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          'Paseo Coretime': {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          'Kusama People': {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          'Polkadot People': {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          'Paseo People': {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          Acala: {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          'Acurast Mainnet': {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          Astar: {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          'Bifrost Polkadot': {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          Crust: {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          Hydration: {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          'Hyperbridge (Nexus)': {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          Interlay: {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          kintsugi: {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          Pendulum: {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
+          Xcavate: {
+            types: [
+              {
+                // eslint-disable-next-line no-magic-numbers
+                minmax: [0, undefined],
+                types: {
+                  WeightV1: 'u64',
+                  WeightV2: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                  Weight: {
+                    refTime: 'Compact<u64>',
+                    proofSize: 'Compact<u64>',
+                  },
+                },
+              },
+            ],
+          },
         },
       },
       typesChain,
