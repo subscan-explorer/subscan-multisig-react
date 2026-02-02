@@ -1,0 +1,12 @@
+{
+  "name": "astar",
+  "displayName": "Astar",
+  "rpc": "wss://astar-rpc.n.dwellir.com",
+  "api": {
+    "subql": "",
+    "subscan": "https://astar.webapi.subscan.io"
+  },
+  "logo": "/image/astar.png",
+  "explorerHostName": "astar",
+  "themeColor": "#694EA4"
+}

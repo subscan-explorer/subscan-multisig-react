@@ -1,0 +1,11 @@
+{
+  "name": "hyperbridge",
+  "displayName": "Hyperbridge (Nexus)",
+  "rpc": "wss://nexus.ibp.network",
+  "api": {
+    "subql": ""
+  },
+  "logo": "/image/hyperbridge.png",
+  "explorerHostName": "hyperbridge",
+  "themeColor": "#ED6FF1"
+}

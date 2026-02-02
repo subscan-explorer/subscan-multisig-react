@@ -1,0 +1,12 @@
+{
+  "name": "coretime-paseo",
+  "displayName": "Coretime Paseo",
+  "rpc": "wss://sys.ibp.network/coretime-paseo",
+  "api": {
+    "subql": "",
+    "subscan": "https://coretime-paseo.webapi.subscan.io"
+  },
+  "logo": "/image/coretime-paseo.png",
+  "explorerHostName": "coretime-paseo",
+  "themeColor": "#000000"
+}

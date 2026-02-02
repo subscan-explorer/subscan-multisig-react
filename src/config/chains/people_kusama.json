@@ -1,0 +1,12 @@
+{
+  "name": "people-kusama",
+  "displayName": "People Kusama",
+  "rpc": "wss://people-kusama-rpc.n.dwellir.com",
+  "api": {
+    "subql": "",
+    "subscan": "https://people-kusama.webapi.subscan.io"
+  },
+  "logo": "/image/people-kusama.png",
+  "explorerHostName": "people-kusama",
+  "themeColor": "#000000"
+}
