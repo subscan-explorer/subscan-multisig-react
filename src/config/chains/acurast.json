@@ -5,6 +5,7 @@
   "api": {
     "subql": ""
   },
+  "category": "mainnet",
   "logo": "/image/acurast.png",
   "explorerHostName": "acurast",
   "themeColor": "#000000"

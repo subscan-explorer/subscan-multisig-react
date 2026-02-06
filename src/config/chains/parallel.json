@@ -5,6 +5,7 @@
   "api": {
     "subql": ""
   },
+  "category": "polkadot",
   "logo": "/image/parallel.svg",
   "explorerHostName": "parallel",
   "themeColor": "#ef18ac"

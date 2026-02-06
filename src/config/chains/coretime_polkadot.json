@@ -6,6 +6,7 @@
     "subql": "",
     "subscan": "https://coretime-polkadot.webapi.subscan.io"
   },
+  "category": "polkadot",
   "logo": "/image/coretime-polkadot.png",
   "explorerHostName": "coretime-polkadot",
   "themeColor": "#0F0F0F"

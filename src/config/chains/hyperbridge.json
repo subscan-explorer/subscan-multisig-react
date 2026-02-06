@@ -5,6 +5,7 @@
   "api": {
     "subql": ""
   },
+  "category": "polkadot",
   "logo": "/image/hyperbridge.png",
   "explorerHostName": "hyperbridge",
   "themeColor": "#ED6FF1"

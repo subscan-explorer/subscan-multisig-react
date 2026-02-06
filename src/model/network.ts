@@ -38,6 +38,7 @@ export interface NetConfigV2 {
   displayName: string;
   rpc: string;
   isTestnet?: boolean;
+  category?: string;
   logo?: string;
   api?: Api;
   explorerHostName?: string;

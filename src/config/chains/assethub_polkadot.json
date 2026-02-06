@@ -6,7 +6,8 @@
     "subql": "",
     "subscan": "https://assethub-polkadot.webapi.subscan.io"
   },
-  "logo": "/image/assethub-polkadot-button-mobile.png",
+  "category": "polkadot",
+  "logo": "/image/assethub-polkadot.png",
   "explorerHostName": "assethub-polkadot",
   "themeColor": "#E90979"
 }

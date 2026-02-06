@@ -5,6 +5,7 @@
   "api": {
     "subql": ""
   },
+  "category": "kusama",
   "logo": "/image/kintsugi.png",
   "explorerHostName": "kintsugi",
   "themeColor": "#041333"

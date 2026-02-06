@@ -5,6 +5,7 @@
   "api": {
     "subql": ""
   },
+  "category": "polkadot",
   "logo": "/image/interlay.png",
   "explorerHostName": "interlay",
   "themeColor": "#075ABC"

@@ -6,6 +6,7 @@
     "subql": "",
     "subscan": "https://people-kusama.webapi.subscan.io"
   },
+  "category": "kusama",
   "logo": "/image/people-kusama.png",
   "explorerHostName": "people-kusama",
   "themeColor": "#000000"

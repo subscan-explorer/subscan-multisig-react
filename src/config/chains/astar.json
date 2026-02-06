@@ -6,6 +6,7 @@
     "subql": "",
     "subscan": "https://astar.webapi.subscan.io"
   },
+  "category": "polkadot",
   "logo": "/image/astar.png",
   "explorerHostName": "astar",
   "themeColor": "#694EA4"

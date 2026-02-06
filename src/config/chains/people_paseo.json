@@ -6,6 +6,7 @@
     "subql": "",
     "subscan": "https://people-paseo.webapi.subscan.io"
   },
+  "category": "paseo",
   "logo": "/image/people-paseo.png",
   "explorerHostName": "people-paseo",
   "themeColor": "#000000"

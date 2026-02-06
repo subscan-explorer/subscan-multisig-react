@@ -5,6 +5,7 @@
   "api": {
     "subql": ""
   },
+  "category": "polkadot",
   "logo": "/image/xcavate.png",
   "explorerHostName": "xcavate",
   "themeColor": "#FF0083"

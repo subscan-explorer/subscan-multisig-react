@@ -6,6 +6,7 @@
     "subql": "",
     "subscan": "https://coretime-paseo.webapi.subscan.io"
   },
+  "category": "paseo",
   "logo": "/image/coretime-paseo.png",
   "explorerHostName": "coretime-paseo",
   "themeColor": "#000000"

@@ -26,30 +26,57 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
     return getThemeColor(network);
   }, [network]);
 
-  const networks = useMemo(() => {
-    const priorityOrder = ['assethub-polkadot', 'assethub-kusama', 'assethub-paseo'];
+  const networksByCategory = useMemo(() => {
+    const categoryOrder = ['polkadot', 'kusama', 'mainnet', 'paseo', 'testnet'];
+    const specialNetworkPrefixes = ['assethub', 'coretime', 'people'];
 
-    // eslint-disable-next-line complexity
-    const compareNetworks = (a: NetConfigV2 | undefined, b: NetConfigV2 | undefined): number => {
-      const aIndex = priorityOrder.indexOf(a?.name || '');
-      const bIndex = priorityOrder.indexOf(b?.name || '');
-
-      if (aIndex !== -1 && bIndex !== -1) {
-        return aIndex - bIndex;
+    const getNetworkTypeOrder = (name: string): number => {
+      const lowerName = name.toLowerCase();
+      for (let i = 0; i < specialNetworkPrefixes.length; i++) {
+        if (lowerName.includes(specialNetworkPrefixes[i])) {
+          return i;
+        }
       }
-
-      if (aIndex !== -1) {
-        return -1;
-      }
-
-      if (bIndex !== -1) {
-        return 1;
-      }
-
-      return (a?.name || '').localeCompare(b?.name || '');
+      return specialNetworkPrefixes.length;
     };
 
-    return _.values(chains).sort(compareNetworks);
+    const getCategoryIndex = (config: NetConfigV2): number => {
+      const category = config.category || 'mainnet';
+      return categoryOrder.indexOf(category);
+    };
+
+    const compareByCategory = (a: NetConfigV2, b: NetConfigV2): number => {
+      return getCategoryIndex(a) - getCategoryIndex(b);
+    };
+
+    const compareByType = (a: NetConfigV2, b: NetConfigV2): number => {
+      return getNetworkTypeOrder(a.name) - getNetworkTypeOrder(b.name);
+    };
+
+    const compareNetworks = (a: NetConfigV2, b: NetConfigV2): number => {
+      const categoryComparison = compareByCategory(a, b);
+      if (categoryComparison !== 0) {
+        return categoryComparison;
+      }
+
+      const typeComparison = compareByType(a, b);
+      if (typeComparison !== 0) {
+        return typeComparison;
+      }
+
+      return a.name.localeCompare(b.name);
+    };
+
+    const sortedNetworks = _.values(chains)
+      .filter((item): item is NetConfigV2 => !!item)
+      .sort(compareNetworks);
+
+    const grouped = categoryOrder.reduce((acc, category) => {
+      acc[category] = sortedNetworks.filter((item) => (item.category || 'mainnet') === category);
+      return acc;
+    }, {} as Record<string, NetConfigV2[]>);
+
+    return grouped;
   }, []);
 
   const [customNetworks, setCustomNetworks] = useState<NetConfigV2[]>([]);
@@ -116,7 +143,7 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
       destroyOnClose
       onCancel={props.onCancel}
       closable={false}
-      width={620}
+      width={760}
       bodyStyle={{
         paddingLeft: '20px',
         paddingRight: '20px',
@@ -126,10 +153,10 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
       {addCustomNetworkVisible ? (
         <AddCustomNetwork onCancel={() => setAddCustomNetworkVisible(false)} editNetwork={editingNetwork} />
       ) : (
-        <div className="overflow-auto hide-scrollbar" style={{ maxHeight: '500px' }}>
+        <div className="overflow-auto hide-scrollbar" style={{ maxHeight: '1000px' }}>
           <div className="flex items-center justify-between">
             <div className="font-bold" style={{ color: mainColor, fontSize: '16px' }}>
-              {t('mainnet')}
+              {t('network')}
             </div>
 
             <CloseOutlined className="cursor-pointer ml-2" style={{ color: '#666666' }} onClick={props.onCancel} />
@@ -137,48 +164,47 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
 
           <div className="mt-2 bg-divider" style={{ height: '1px' }} />
 
-          <div className="flex flex-wrap py-3">
-            {networks
-              .filter((item) => !item?.isTestnet)
-              .filter((item) => !!item)
-              .map((item) => (
-                <div
-                  key={item?.name}
-                  className="bg-gray-200 w-36 h-10 cursor-pointer flex items-center mr-5 mb-3"
-                  onClick={() => selectPresetNetwork(item)}
-                >
-                  <img src={item?.logo || subscanLogo} className="w-5 h-5 mx-3" alt="logo" />
+          <div className="overflow-auto hide-scrollbar" style={{ maxHeight: '400px' }}>
+            {['polkadot', 'kusama', 'mainnet', 'paseo', 'testnet'].map((category) => {
+              const categoryNetworks = networksByCategory[category] || [];
+              if (categoryNetworks.length === 0) return null;
 
-                  <div className="font-bold text-black-800 leading-none" style={{ fontSize: '14px' }}>
-                    {item?.displayName || item?.name}
+              const getCategoryLabel = (cat: string) => {
+                const labels: Record<string, string> = {
+                  polkadot: 'Polkadot',
+                  kusama: 'Kusama',
+                  mainnet: 'Mainnet',
+                  paseo: 'Paseo',
+                  testnet: 'Testnet',
+                };
+                return labels[cat] || cat;
+              };
+
+              return (
+                <div key={category}>
+                  <div className="mt-4 font-bold" style={{ color: mainColor, fontSize: '16px' }}>
+                    {getCategoryLabel(category)}
+                  </div>
+                  <div className="mt-2 bg-divider" style={{ height: '1px' }} />
+
+                  <div className="flex flex-wrap py-3">
+                    {categoryNetworks.map((item) => (
+                      <div
+                        key={item.name}
+                        className="bg-gray-200 w-36 h-10 cursor-pointer flex items-center mr-5 mb-3"
+                        onClick={() => selectPresetNetwork(item)}
+                      >
+                        <img src={item.logo || subscanLogo} className="w-5 h-5 mx-3" alt="logo" />
+
+                        <div className="font-bold text-black-800 leading-none" style={{ fontSize: '14px' }}>
+                          {item.displayName || item.name}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
-          </div>
-
-          <div className="mt-1 font-bold" style={{ color: mainColor, fontSize: '16px' }}>
-            {t('testnet')}
-          </div>
-
-          <div className="mt-2 bg-divider" style={{ height: '1px' }} />
-
-          <div className="flex flex-wrap py-3">
-            {networks
-              .filter((item) => item?.isTestnet)
-              .filter((item) => !!item)
-              .map((item) => (
-                <div
-                  key={item?.name}
-                  className="bg-gray-200 w-36 h-10 cursor-pointer flex items-center mr-5 mb-3"
-                  onClick={() => selectPresetNetwork(item)}
-                >
-                  <img src={item?.logo || subscanLogo} className="w-5 h-5 mx-3" alt="logo" />
-
-                  <div className="font-bold text-black-800 leading-none" style={{ fontSize: '14px' }}>
-                    {item?.displayName || item?.name}
-                  </div>
-                </div>
-              ))}
+              );
+            })}
           </div>
 
           <div className="mt-1 font-bold" style={{ color: mainColor, fontSize: '16px' }}>

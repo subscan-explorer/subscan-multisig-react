@@ -6,7 +6,8 @@
     "subql": "",
     "subscan": "https://assethub-kusama.webapi.subscan.io"
   },
-  "logo": "/image/assethub-kusama-button-mobile.png",
+  "category": "kusama",
+  "logo": "/image/assethub-kusama.png",
   "explorerHostName": "assethub-kusama",
   "themeColor": "#000000"
 }
