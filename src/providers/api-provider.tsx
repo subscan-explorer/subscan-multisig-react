@@ -161,451 +161,60 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
 
     const url = selectedNetwork.rpc;
     const provider = new WsProvider(url);
-    const nApi = new ApiPromise({
-      provider,
-      // typesBundle,
-      typesBundle: {
-        chain: {
-          Polkadot: {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          Kusama: {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          // rpc call - system (chain)
-          'Paseo Testnet': {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          'Polkadot Asset Hub': {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          'Kusama Asset Hub': {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          'Paseo Asset Hub': {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          'Kusama Coretime': {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          'Polkadot Coretime': {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          'Paseo Coretime': {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          'Kusama People': {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          'Polkadot People': {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          'Paseo People': {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          Acala: {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          'Acurast Mainnet': {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          Astar: {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          'Bifrost Polkadot': {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          Crust: {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          Hydration: {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          'Hyperbridge (Nexus)': {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          Interlay: {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          kintsugi: {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          Pendulum: {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
-          },
-          Xcavate: {
-            types: [
-              {
-                // eslint-disable-next-line no-magic-numbers
-                minmax: [0, undefined],
-                types: {
-                  WeightV1: 'u64',
-                  WeightV2: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                  Weight: {
-                    refTime: 'Compact<u64>',
-                    proofSize: 'Compact<u64>',
-                  },
-                },
-              },
-            ],
+
+    const commonWeightTypes = {
+      types: [
+        {
+          // eslint-disable-next-line no-magic-numbers
+          minmax: [0, undefined],
+          types: {
+            WeightV1: 'u64',
+            WeightV2: {
+              refTime: 'Compact<u64>',
+              proofSize: 'Compact<u64>',
+            },
+            Weight: {
+              refTime: 'Compact<u64>',
+              proofSize: 'Compact<u64>',
+            },
           },
         },
-      },
+      ],
+    };
+
+    const chainNames = [
+      'Polkadot',
+      'Kusama',
+      'Paseo Testnet',
+      'Polkadot Asset Hub',
+      'Kusama Asset Hub',
+      'Paseo Asset Hub',
+      'Kusama Coretime',
+      'Polkadot Coretime',
+      'Paseo Coretime',
+      'Kusama People',
+      'Polkadot People',
+      'Paseo People',
+      'Acala',
+      'Acurast Mainnet',
+      'Astar',
+      'Bifrost Polkadot',
+      'Crust',
+      'Hydration',
+      'Hyperbridge (Nexus)',
+      'Interlay',
+      'kintsugi',
+      'Pendulum',
+      'Xcavate',
+    ];
+
+    const typesBundle = {
+      chain: chainNames.reduce((acc, name) => ({ ...acc, [name]: commonWeightTypes }), {}),
+    };
+
+    const nApi = new ApiPromise({
+      provider,
+      typesBundle,
       typesChain,
     });
 
