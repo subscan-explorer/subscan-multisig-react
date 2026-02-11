@@ -1,0 +1,12 @@
+{
+  "name": "xcavate",
+  "displayName": "Xcavate",
+  "rpc": "wss://xcavate.ibp.network",
+  "api": {
+    "subql": ""
+  },
+  "category": "polkadot",
+  "logo": "/image/xcavate.png",
+  "explorerHostName": "xcavate",
+  "themeColor": "#FF0083"
+}

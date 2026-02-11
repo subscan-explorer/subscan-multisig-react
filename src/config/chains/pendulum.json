@@ -1,0 +1,13 @@
+{
+  "name": "pendulum",
+  "displayName": "Pendulum",
+  "rpc": "wss://rpc-pendulum.prd.pendulumchain.tech",
+  "api": {
+    "subql": "",
+    "subscan": "https://pendulum.webapi.subscan.io"
+  },
+  "category": "polkadot",
+  "logo": "/image/pendulum.png",
+  "explorerHostName": "pendulum",
+  "themeColor": "#32253E"
+}

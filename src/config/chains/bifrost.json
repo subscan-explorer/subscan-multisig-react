@@ -1,0 +1,13 @@
+{
+  "name": "bifrost",
+  "displayName": "Bifrost",
+  "rpc": "wss://hk.p.bifrost-rpc.liebi.com/ws",
+  "api": {
+    "subql": "",
+    "subscan": "https://bifrost.webapi.subscan.io"
+  },
+  "category": "polkadot",
+  "logo": "/image/bifrost.png",
+  "explorerHostName": "bifrost",
+  "themeColor": "#5a25f0"
+}

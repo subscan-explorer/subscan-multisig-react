@@ -6,7 +6,8 @@
     "subql": "",
     "subscan": "https://assethub-paseo.webapi.subscan.io"
   },
-  "logo": "/image/assethub-paseo-button-mobile.png",
+  "category": "paseo",
+  "logo": "/image/assethub-paseo.png",
   "explorerHostName": "assethub-paseo",
   "themeColor": "#38393F"
 }

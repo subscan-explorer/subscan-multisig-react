@@ -5,6 +5,7 @@
   "api": {
     "subql": ""
   },
+  "category": "kusama",
   "logo": "/image/parallel.svg",
   "explorerHostName": "parallel-heiko",
   "themeColor": "#42d5de"

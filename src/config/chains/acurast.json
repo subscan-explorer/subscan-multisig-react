@@ -1,0 +1,12 @@
+{
+  "name": "acurast",
+  "displayName": "Acurast Mainnet",
+  "rpc": "wss://public-rpc.mainnet.acurast.com/",
+  "api": {
+    "subql": ""
+  },
+  "category": "mainnet",
+  "logo": "/image/acurast.png",
+  "explorerHostName": "acurast",
+  "themeColor": "#000000"
+}

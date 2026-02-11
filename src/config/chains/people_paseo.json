@@ -1,0 +1,13 @@
+{
+  "name": "people-paseo",
+  "displayName": "People Paseo",
+  "rpc": "wss://sys.ibp.network/people-paseo",
+  "api": {
+    "subql": "",
+    "subscan": "https://people-paseo.webapi.subscan.io"
+  },
+  "category": "paseo",
+  "logo": "/image/people-paseo.png",
+  "explorerHostName": "people-paseo",
+  "themeColor": "#000000"
+}

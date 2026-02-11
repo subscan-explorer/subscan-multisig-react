@@ -1,0 +1,13 @@
+{
+  "name": "coretime-polkadot",
+  "displayName": "Coretime Polkadot",
+  "rpc": "wss://coretime-polkadot-rpc.n.dwellir.com",
+  "api": {
+    "subql": "",
+    "subscan": "https://coretime-polkadot.webapi.subscan.io"
+  },
+  "category": "polkadot",
+  "logo": "/image/coretime-polkadot.png",
+  "explorerHostName": "coretime-polkadot",
+  "themeColor": "#0F0F0F"
+}

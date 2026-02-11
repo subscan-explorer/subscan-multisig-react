@@ -1,0 +1,13 @@
+{
+  "name": "hydration",
+  "displayName": "Hydration",
+  "rpc": "wss://hydration-rpc.n.dwellir.com",
+  "api": {
+    "subql": "",
+    "subscan": "https://hydration.webapi.subscan.io"
+  },
+  "category": "polkadot",
+  "logo": "/image/hydration.png",
+  "explorerHostName": "hydration",
+  "themeColor": "#E53E76"
+}

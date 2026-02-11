@@ -1,0 +1,13 @@
+{
+  "name": "coretime-kusama",
+  "displayName": "Coretime Kusama",
+  "rpc": "wss://coretime-kusama-rpc.n.dwellir.com",
+  "api": {
+    "subql": "",
+    "subscan": "https://coretime-kusama.webapi.subscan.io"
+  },
+  "category": "kusama",
+  "logo": "/image/coretime-kusama.png",
+  "explorerHostName": "coretime-kusama",
+  "themeColor": "#000000"
+}
