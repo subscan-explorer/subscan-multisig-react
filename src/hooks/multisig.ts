@@ -25,11 +25,11 @@ export function useMultisig(acc?: string) {
     offset: 0,
     limit: 20,
   };
-  const { fetchData: fetchInProgress, data: inProgressData } = useMultisigRecords(networkConfig, fetchInprogressParams);
-
-  useEffect(() => {
-    fetchInProgress();
-  }, [networkConfig, fetchInProgress]);
+  const {
+    fetchData: fetchInProgress,
+    data: inProgressData,
+    loading: loadingInProgressData,
+  } = useMultisigRecords(networkConfig, fetchInprogressParams);
 
   const queryInProgress = useCallback(
     // eslint-disable-next-line complexity

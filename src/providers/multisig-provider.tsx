@@ -37,7 +37,12 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
   const [isPageLocked, setIsPageLock] = useState<boolean>(false);
   const { networkConfig } = useApi();
   const value = useMultisig();
+  const { fetchInProgress } = value;
   const { account } = useParams<{ account: string }>();
+
+  useEffect(() => {
+    fetchInProgress();
+  }, [fetchInProgress]);
 
   const { fetchData, data } = useMultisigRecordCount(networkConfig);
 

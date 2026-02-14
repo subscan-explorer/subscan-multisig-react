@@ -235,16 +235,11 @@ export function ExtrinsicRecords() {
   }, [loadingInProgress, confirmedAccount, first, inProgress]);
 
   useEffect(() => {
-    fetchConfirmed();
-    fetchCancelled();
-  }, [networkConfig, fetchCancelled, fetchConfirmed]);
-
-  useEffect(() => {
-    fetchConfirmed();
+    // fetchConfirmed();
   }, [confirmedPage, fetchConfirmed, networkConfig]);
 
   useEffect(() => {
-    fetchCancelled();
+    // fetchCancelled();
   }, [cancelledPage, fetchCancelled, networkConfig]);
 
   // eslint-disable-next-line complexity

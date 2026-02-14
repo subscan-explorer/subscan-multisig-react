@@ -1,6 +1,6 @@
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
-import { Button, Collapse, Empty, Progress, Space, Table, Typography } from 'antd';
+import { Button, Collapse, Empty, Progress, Space, Spin, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { intersection, isEmpty } from 'lodash';
 import { useCallback, useRef, useState } from 'react';
@@ -258,10 +258,12 @@ export function Entries({
         return !(isConfirmed || isCancelled) ? (
           <>
             <Typography.Text copyable={!isEmpty(data) && { text: data }}>
-              {!isEmpty(data)
-                ? // ? `${data.substring(0, CALL_DATA_LENGTH)}${data.length > CALL_DATA_LENGTH ? '...' : ''}`
-                  toShortString(data, CALL_DATA_LENGTH)
-                : '-'}
+              {!isEmpty(data) ? (
+                // ? `${data.substring(0, CALL_DATA_LENGTH)}${data.length > CALL_DATA_LENGTH ? '...' : ''}`
+                toShortString(data, CALL_DATA_LENGTH)
+              ) : (
+                <Spin spinning={true} />
+              )}
             </Typography.Text>
           </>
         ) : (

@@ -25,9 +25,10 @@ interface Props {
   className?: string;
   onTxSuccess?: (res: SubmittableResult) => void;
   onTxFail?: (res: SubmittableResult | null) => void;
+  onTxUpdate?: (res: SubmittableResult) => void;
 }
 
-export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactElement<Props> {
+export function ExtrinsicLaunch({ className, onTxSuccess, onTxFail, onTxUpdate }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { api } = useApi();
   const [accountId, setAccountId] = useState<string | null>(null);
@@ -181,6 +182,7 @@ export function ExtrinsicLaunch({ className, onTxSuccess }: Props): React.ReactE
               icon="sign-in-alt"
               label={t<string>('Submit Transaction')}
               onSuccess={onTxSuccess}
+              onUpdate={onTxUpdate}
               isBusy={isBusy}
               multiRoot={multisigAccount?.address}
             />
