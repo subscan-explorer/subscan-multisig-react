@@ -230,17 +230,23 @@ export function ExtrinsicRecords() {
       setFirst(false);
       if (inProgress.length === 0 && confirmedAccount > 0) {
         setTabKey('confirmed');
+        fetchConfirmed();
       }
     }
-  }, [loadingInProgress, confirmedAccount, first, inProgress]);
+  }, [loadingInProgress, confirmedAccount, first, inProgress, fetchConfirmed]);
+
+  // Re-fetch list when page changes, only if already on that tab
+  useEffect(() => {
+    if (tabKey === 'confirmed') {
+      fetchConfirmed();
+    }
+  }, [confirmedPage]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    // fetchConfirmed();
-  }, [confirmedPage, fetchConfirmed, networkConfig]);
-
-  useEffect(() => {
-    // fetchCancelled();
-  }, [cancelledPage, fetchCancelled, networkConfig]);
+    if (tabKey === 'cancelled') {
+      fetchCancelled();
+    }
+  }, [cancelledPage]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // eslint-disable-next-line complexity
   const handleChangeTab = (key: string) => {

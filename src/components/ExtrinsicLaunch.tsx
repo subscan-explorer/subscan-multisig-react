@@ -28,7 +28,7 @@ interface Props {
   onTxUpdate?: (res: SubmittableResult) => void;
 }
 
-export function ExtrinsicLaunch({ className, onTxSuccess, onTxFail, onTxUpdate }: Props): React.ReactElement<Props> {
+export function ExtrinsicLaunch({ className, onTxSuccess, onTxUpdate }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { api } = useApi();
   const [accountId, setAccountId] = useState<string | null>(null);
