@@ -323,6 +323,12 @@ export function WalletState(props: WalletStateProps) {
             setIsExtrinsicDisplay(false);
             queryInProgress();
           }}
+          onTxUpdate={(status) => {
+            if (status.isInBlock) {
+              setIsExtrinsicDisplay(false);
+              queryInProgress();
+            }
+          }}
         />
       </Modal>
 

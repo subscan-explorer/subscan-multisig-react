@@ -27,10 +27,6 @@ export function useMultisig(acc?: string) {
   };
   const { fetchData: fetchInProgress, data: inProgressData } = useMultisigRecords(networkConfig, fetchInprogressParams);
 
-  useEffect(() => {
-    fetchInProgress();
-  }, [networkConfig, fetchInProgress]);
-
   const queryInProgress = useCallback(
     // eslint-disable-next-line complexity
     async (silent = false) => {

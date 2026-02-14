@@ -15,7 +15,7 @@ import {
 } from './subscan';
 
 export interface MultisigAccountDetailResult {
-  multisigAccount: { id: string; threshold: number; members: string[] };
+  multisigAccount: { id: string; threshold: number; members: string[] } | null;
 }
 
 export interface MultisigRecordCountResult {
@@ -26,31 +26,43 @@ export function useMultisigAccountDetail(network: NetConfigV2 | undefined) {
   const subquery = useSubqueryMultisigAccountDetail(network);
   const subscan = useSubscanMultisigAccountDetail(network);
 
-  const fetcher = network?.api?.subscan ? subscan : subquery;
+  const useSubscan = !!network?.api?.subscan;
+  const fetchFn = useSubscan ? subscan.fetchData : subquery.fetchData;
+  const data = useSubscan ? subscan.data : subquery.data;
+  const loading = useSubscan ? subscan.loading : subquery.loading;
 
-  const fetchData = useCallback((account: string) => {
-    if (!account) {
-      return;
-    }
-    fetcher.fetchData(account);
-  }, []);
+  const fetchData = useCallback(
+    (account: string) => {
+      if (!account) {
+        return;
+      }
+      fetchFn(account);
+    },
+    [fetchFn]
+  );
 
-  return { fetchData, data: fetcher.data, loading: fetcher.loading };
+  return { fetchData, data, loading };
 }
 
 export function useMultisigRecordCount(network: NetConfigV2 | undefined) {
   const subquery = usSubqueryMultisigRecordCount(network);
   const subscan = usSubscanMultisigRecordCount(network);
 
-  const fetcher = network?.api?.subscan ? subscan : subquery;
+  const useSubscan = !!network?.api?.subscan;
+  const fetchFn = useSubscan ? subscan.fetchData : subquery.fetchData;
+  const data = useSubscan ? subscan.data : subquery.data;
+  const loading = useSubscan ? subscan.loading : subquery.loading;
 
-  const fetchData = useCallback((account: string, status: string) => {
-    if (!account) {
-      return;
-    }
-    fetcher.fetchData(account, status);
-  }, []);
-  return { fetchData, data: fetcher.data, loading: fetcher.loading };
+  const fetchData = useCallback(
+    (account: string, status: string) => {
+      if (!account) {
+        return;
+      }
+      fetchFn(account, status);
+    },
+    [fetchFn]
+  );
+  return { fetchData, data, loading };
 }
 
 export function useMultisigRecords(
@@ -70,16 +82,19 @@ export function useMultisigRecords(
   const subquery = useSubqueryMultisigRecords(network);
   const subscan = useSubscanMultisigRecords(network);
 
-  const fetcher = network?.api?.subscan ? subscan : subquery;
+  const useSubscan = !!network?.api?.subscan;
+  const fetchFn = useSubscan ? subscan.fetchData : subquery.fetchData;
+  const data = useSubscan ? subscan.data : subquery.data;
+  const loading = useSubscan ? subscan.loading : subquery.loading;
 
   // eslint-disable-next-line no-magic-numbers
   const fetchData = useCallback(() => {
     if (!account) {
       return;
     }
-    fetcher.fetchData(account, status, offset, limit);
-  }, [account, offset, status]);
-  return { fetchData, data: fetcher.data, loading: fetcher.loading };
+    fetchFn(account, status, offset, limit);
+  }, [account, offset, status, limit, fetchFn]);
+  return { fetchData, data, loading };
 }
 
 export function useDataSourceTools(network: NetConfigV2 | undefined) {
