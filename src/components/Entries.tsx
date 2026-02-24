@@ -54,7 +54,7 @@ function MemberStatus(props: { entry: Entry; pair: KeyringJson; isInProgress: bo
   const { entry, isInProgress } = props;
   const { address } = props.pair;
   const { approvals } = props.entry;
-  const approved = approvals.includes(address);
+  const approved = approvals?.includes(address) ?? false;
   const { networkConfig } = useApi();
   const { constants } = useDataSourceTools(networkConfig);
 
