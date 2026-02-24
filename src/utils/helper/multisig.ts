@@ -2,10 +2,10 @@ import { ApiPromise } from '@polkadot/api';
 import { Call } from '@polkadot/types/interfaces';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
-import { u8aToHex } from '@polkadot/util';
 import { createKeyMulti } from '@polkadot/util-crypto';
 import store from 'store';
 import { Network, ShareScope, WalletFormValue } from '../../model';
+import { u8aToHexFixed as u8aToHex } from './u8aToHex';
 
 interface MultiInfo {
   isMultisig: boolean;

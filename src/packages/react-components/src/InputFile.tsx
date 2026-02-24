@@ -8,7 +8,8 @@ import React, { createRef, useCallback, useState } from 'react';
 import Dropzone, { DropzoneRef } from 'react-dropzone';
 import styled from 'styled-components';
 
-import { formatNumber, hexToU8a, isHex, u8aToString } from '@polkadot/util';
+import { formatNumber, isHex, u8aToString } from '@polkadot/util';
+import { hexToU8aFixed as hexToU8a } from 'src/utils/helper/hexToU8a';
 
 import Labelled from './Labelled';
 import { useTranslation } from './translate';

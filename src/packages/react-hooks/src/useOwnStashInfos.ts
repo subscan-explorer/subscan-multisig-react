@@ -6,7 +6,8 @@
 import type { DeriveStakingAccount } from '@polkadot/api-derive/types';
 import type { AccountId, ValidatorPrefs } from '@polkadot/types/interfaces';
 import type { Codec, ITuple } from '@polkadot/types/types';
-import { u8aConcat, u8aToHex } from '@polkadot/util';
+import { u8aConcat } from '@polkadot/util';
+import { u8aToHexFixed as u8aToHex } from 'src/utils/helper/u8aToHex';
 import { useEffect, useMemo, useState } from 'react';
 import type { StakerState } from './types';
 import { useAccounts } from './useAccounts';

@@ -7,7 +7,8 @@ import type { Codec } from '@polkadot/types/types';
 import React from 'react';
 
 import { Option, Raw } from '@polkadot/types';
-import { isFunction, isNull, isUndefined, u8aToHex } from '@polkadot/util';
+import { isFunction, isNull, isUndefined } from '@polkadot/util';
+import { u8aToHexFixed as u8aToHex } from 'src/utils/helper/u8aToHex';
 
 interface DivProps {
   className?: string;

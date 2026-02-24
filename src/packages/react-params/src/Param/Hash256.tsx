@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { useCallback, useState } from 'react';
-import { u8aToHex } from '@polkadot/util';
+import { u8aToHexFixed as u8aToHex } from 'src/utils/helper/u8aToHex';
 import type { Props } from '../types';
 
 import { Toggle } from '../../../react-components/src';
