@@ -2,7 +2,7 @@ import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { Spin } from 'antd';
 import { createContext, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useApi, useMultisig, useMultisigRecordCount } from '../hooks';
+import { useApi, useMultisig, useMultisigResourceCount } from '../hooks';
 import { Entry } from '../model';
 import { empty } from '../utils';
 
@@ -44,30 +44,27 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
     fetchInProgress();
   }, [fetchInProgress]);
 
-  const { fetchData, data } = useMultisigRecordCount(networkConfig);
+  const { fetchData: fetchCounts, data: countsData } = useMultisigResourceCount(networkConfig);
 
   const refreshConfirmedAccount = useCallback(() => {
-    fetchData(account, 'confirmed');
-  }, [account, fetchData]);
-
-  const { fetchData: fetchCancelledData, data: cancelledData } = useMultisigRecordCount(networkConfig);
+    fetchCounts(account);
+  }, [account, fetchCounts]);
 
   const refreshCancelledAccount = useCallback(() => {
-    fetchCancelledData(account, 'cancelled');
-  }, [account, fetchCancelledData]);
+    fetchCounts(account);
+  }, [account, fetchCounts]);
 
   useEffect(() => {
-    refreshConfirmedAccount();
-    refreshCancelledAccount();
-  }, [refreshConfirmedAccount, refreshCancelledAccount]);
+    fetchCounts(account);
+  }, [account, fetchCounts]);
 
   return (
     <MultisigContext.Provider
       value={{
         ...value,
         setIsPageLock,
-        confirmedAccount: data ? data?.multisigRecords.totalCount : undefined,
-        cancelledAccount: cancelledData ? cancelledData.multisigRecords.totalCount : undefined,
+        confirmedAccount: countsData?.confirmedCount,
+        cancelledAccount: countsData?.cancelledCount,
         refreshConfirmedAccount,
         refreshCancelledAccount,
       }}

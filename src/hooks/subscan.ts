@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 import { MultisigRecordsQueryRes } from 'src/components/ExtrinsicRecords';
 import { NetConfigV2 } from 'src/model';
 import axiosRequest from './AxiosRequest';
-import { MultisigAccountDetailResult, MultisigRecordCountResult } from './combineQuery';
+import { MultisigAccountDetailResult, MultisigCountsResult, MultisigRecordCountResult } from './combineQuery';
 
 function subscanRecordsStatusConverter(status: string) {
   switch (status) {
@@ -193,6 +193,49 @@ export const useMultisigRecords = (network: NetConfigV2 | undefined) => {
     [network]
   );
   return { fetchData, data: userInfo, loading };
+};
+
+export const useResourceCount = (network: NetConfigV2 | undefined) => {
+  const [counts, setCounts] = useState<MultisigCountsResult>({
+    approvalCount: undefined,
+    confirmedCount: undefined,
+    cancelledCount: undefined,
+  });
+  const [loading, setLoading] = useState(false);
+
+  const fetchData = useCallback(
+    async (account: string) => {
+      if (!network || !account) return;
+      setLoading(true);
+      try {
+        const { data } = await axiosRequest.post<{
+          list: { resource: string; count: number }[];
+        }>(`${network.api?.subscan}/api/scan/resource_count`, {
+          resource: ['Multisig'],
+          extra: {
+            Multisig: {
+              status: ['Approval', 'Executed', 'Cancelled'],
+            },
+          },
+          account,
+        });
+        const list = data.data.list || [];
+        const find = (name: string) => list.find((item) => item.resource === name)?.count;
+        setCounts({
+          approvalCount: find('MultisigApproval'),
+          confirmedCount: find('MultisigExecuted'),
+          cancelledCount: find('MultisigCancelled'),
+        });
+      } catch (error) {
+        // keep previous counts on error
+      } finally {
+        setLoading(false);
+      }
+    },
+    [network]
+  );
+
+  return { fetchData, data: counts, loading };
 };
 
 export const constants = {

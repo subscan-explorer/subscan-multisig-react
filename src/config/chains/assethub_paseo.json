@@ -4,7 +4,7 @@
   "rpc": "wss://asset-hub-paseo-rpc.n.dwellir.com",
   "api": {
     "subql": "",
-    "subscan": "https://assethub-paseo.webapi.subscan.io"
+    "subscan": "https://assethub-paseo.api.subscan.io"
   },
   "category": "paseo",
   "logo": "/image/assethub-paseo.png",

@@ -4,7 +4,7 @@
   "rpc": "wss://coretime-kusama-rpc.n.dwellir.com",
   "api": {
     "subql": "",
-    "subscan": "https://coretime-kusama.webapi.subscan.io"
+    "subscan": "https://coretime-kusama.api.subscan.io"
   },
   "category": "kusama",
   "logo": "/image/coretime-kusama.png",

@@ -4,7 +4,7 @@
   "rpc": "wss://hk.p.bifrost-rpc.liebi.com/ws",
   "api": {
     "subql": "",
-    "subscan": "https://bifrost.webapi.subscan.io"
+    "subscan": "https://bifrost.api.subscan.io"
   },
   "category": "polkadot",
   "logo": "/image/bifrost.png",

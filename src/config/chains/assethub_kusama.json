@@ -4,7 +4,7 @@
   "rpc": "wss://asset-hub-kusama-rpc.n.dwellir.com",
   "api": {
     "subql": "",
-    "subscan": "https://assethub-kusama.webapi.subscan.io"
+    "subscan": "https://assethub-kusama.api.subscan.io"
   },
   "category": "kusama",
   "logo": "/image/assethub-kusama.png",

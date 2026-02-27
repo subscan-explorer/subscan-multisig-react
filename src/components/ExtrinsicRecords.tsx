@@ -3,7 +3,7 @@ import { ReloadOutlined } from '@ant-design/icons';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { Space, Spin, Tabs } from 'antd';
 import { isNumber } from 'lodash';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useApi, useMultisigRecords } from '../hooks';
@@ -248,16 +248,23 @@ export function ExtrinsicRecords() {
     }
   }, [cancelledPage]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const fetchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // eslint-disable-next-line complexity
   const handleChangeTab = (key: string) => {
     setTabKey(key);
-    if (key === 'inProgress') {
-      queryInProgress();
-    } else if (key === 'confirmed') {
-      fetchConfirmed();
-    } else if (key === 'cancelled') {
-      fetchCancelled();
+    if (fetchTimerRef.current) {
+      clearTimeout(fetchTimerRef.current);
     }
+    fetchTimerRef.current = setTimeout(() => {
+      if (key === 'inProgress') {
+        queryInProgress();
+      } else if (key === 'confirmed') {
+        fetchConfirmed();
+      } else if (key === 'cancelled') {
+        fetchCancelled();
+      }
+    }, 300);
   };
 
   const refreshData = () => {

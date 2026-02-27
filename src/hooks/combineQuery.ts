@@ -11,6 +11,7 @@ import {
   useMultisigAccountDetail as useSubscanMultisigAccountDetail,
   useMultisigRecordCount as usSubscanMultisigRecordCount,
   useMultisigRecords as useSubscanMultisigRecords,
+  useResourceCount as useSubscanResourceCount,
   constants as subscanConstants,
 } from './subscan';
 
@@ -20,6 +21,12 @@ export interface MultisigAccountDetailResult {
 
 export interface MultisigRecordCountResult {
   multisigRecords: { totalCount: number };
+}
+
+export interface MultisigCountsResult {
+  approvalCount: number | undefined;
+  confirmedCount: number | undefined;
+  cancelledCount: number | undefined;
 }
 
 export function useMultisigAccountDetail(network: NetConfigV2 | undefined) {
@@ -95,6 +102,42 @@ export function useMultisigRecords(
     fetchFn(account, status, offset, limit);
   }, [account, offset, status, limit, fetchFn]);
   return { fetchData, data, loading };
+}
+
+// Fetch counts for all three statuses in a single request (subscan) or two fallback calls (subquery).
+export function useMultisigResourceCount(network: NetConfigV2 | undefined) {
+  const subscan = useSubscanResourceCount(network);
+  const confirmedSubquery = usSubqueryMultisigRecordCount(network);
+  const cancelledSubquery = usSubqueryMultisigRecordCount(network);
+
+  const useSubscan = !!network?.api?.subscan;
+
+  const fetchData = useCallback(
+    (account: string) => {
+      if (!account) return;
+      if (useSubscan) {
+        subscan.fetchData(account);
+      } else {
+        confirmedSubquery.fetchData(account, 'confirmed');
+        cancelledSubquery.fetchData(account, 'cancelled');
+      }
+    },
+    [useSubscan, subscan.fetchData, confirmedSubquery.fetchData, cancelledSubquery.fetchData]
+  );
+
+  if (useSubscan) {
+    return { fetchData, data: subscan.data, loading: subscan.loading };
+  }
+
+  return {
+    fetchData,
+    data: {
+      approvalCount: undefined,
+      confirmedCount: confirmedSubquery.data?.multisigRecords.totalCount,
+      cancelledCount: cancelledSubquery.data?.multisigRecords.totalCount,
+    } as MultisigCountsResult,
+    loading: confirmedSubquery.loading || cancelledSubquery.loading,
+  };
 }
 
 export function useDataSourceTools(network: NetConfigV2 | undefined) {
