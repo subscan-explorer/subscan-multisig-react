@@ -15,6 +15,7 @@ export class Request {
     this.instance = axios.create(Object.assign(this.baseConfig, config));
 
     this.instance.interceptors.request.use(
+      // eslint-disable-next-line complexity
       (inConfig) => {
         const token = localStorage.getItem('token') as string;
         const organizationId = localStorage.getItem('organization:id') as string;
@@ -25,6 +26,15 @@ export class Request {
 
         if (organizationId) {
           inConfig.headers!['OPEN-PLATFORM-ORGANIZATION'] = organizationId;
+        }
+
+        try {
+          const storage = JSON.parse(localStorage.getItem('multisig') || '{}');
+          if (storage.subscanApiKey) {
+            inConfig.headers!['X-API-Key'] = storage.subscanApiKey;
+          }
+        } catch {
+          // ignore storage parse errors
         }
 
         return inConfig;

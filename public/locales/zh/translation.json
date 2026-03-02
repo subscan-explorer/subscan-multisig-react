@@ -210,5 +210,15 @@
   "unfavorite": "取消收藏",
   "share link": "分享链接",
   "Mulitsig Transaction Details": "多签交易详情",
-  "Please be sure to double-check the mulitsig transaction progress and parameters carefully before approving.": "在批准前，请务必仔细检查多签交易进度和参数。"
+  "Please be sure to double-check the mulitsig transaction progress and parameters carefully before approving.": "在批准前，请务必仔细检查多签交易进度和参数。",
+  "api_key": {
+    "title": "Subscan API Key",
+    "button": "API Key",
+    "description": "Key 保存在本地浏览器中。",
+    "label": "API Key",
+    "placeholder": "请输入 Subscan API Key",
+    "current_set": "当前已设置 API Key",
+    "saved": "API Key 已保存",
+    "deleted": "API Key 已删除"
+  }
 }

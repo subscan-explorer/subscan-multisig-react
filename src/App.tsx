@@ -12,6 +12,7 @@ import subscanLogo from 'src/assets/images/subscan_logo.png';
 import { Footer } from './components/Footer';
 import { HeadAccounts } from './components/HeadAccounts';
 import { DownIcon } from './components/icons';
+import { ApiKeyModal } from './components/modals/ApiKeyModal';
 import { SelectNetworkModal } from './components/modals/SelectNetworkModal';
 import Status from './components/Status';
 import { chains } from './config/chains';
@@ -54,6 +55,7 @@ function App() {
   }, [rpc]);
 
   const [selectNetworkModalVisible, setSelectNetworkModalVisible] = useState(false);
+  const [apiKeyModalVisible, setApiKeyModalVisible] = useState(false);
 
   const openExplorer = () => {
     if (networkConfig?.explorerHostName) {
@@ -88,6 +90,14 @@ function App() {
             )}
 
             {networkStatus === 'success' && <HeadAccounts />}
+
+            <Button
+              className="flex justify-between items-center px-2 mr-2"
+              title={t('api_key.title')}
+              onClick={() => setApiKeyModalVisible(true)}
+            >
+              {t('api_key.button')}
+            </Button>
 
             <Button
               className="flex justify-between items-center px-2"
@@ -127,6 +137,7 @@ function App() {
       {apiError && <Alert message={apiError} type="error" showIcon closable className="fixed top-24 right-20" />}
 
       <SelectNetworkModal visible={selectNetworkModalVisible} onCancel={() => setSelectNetworkModalVisible(false)} />
+      <ApiKeyModal visible={apiKeyModalVisible} onCancel={() => setApiKeyModalVisible(false)} />
     </>
   );
 }

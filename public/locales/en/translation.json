@@ -212,5 +212,15 @@
   "Unfavorite": "Unfavorite",
   "share link": "Share Link",
   "Mulitsig Transaction Details": "Mulitsig Transaction Details",
-  "Please be sure to double-check the mulitsig transaction progress and parameters carefully before approving.": "Please be sure to double-check the mulitsig transaction progress and parameters carefully before approving."
+  "Please be sure to double-check the mulitsig transaction progress and parameters carefully before approving.": "Please be sure to double-check the mulitsig transaction progress and parameters carefully before approving.",
+  "api_key": {
+    "title": "Subscan API Key",
+    "button": "API Key",
+    "description": "The key is stored locally in your browser.",
+    "label": "API Key",
+    "placeholder": "Enter your Subscan API key",
+    "current_set": "API key is currently set",
+    "saved": "API key saved",
+    "deleted": "API key deleted"
+  }
 }
