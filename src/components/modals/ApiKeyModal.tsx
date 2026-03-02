@@ -60,7 +60,6 @@ export const ApiKeyModal = ({ visible, onCancel }: ApiKeyModalProps) => {
       message.success(t('api_key.saved'));
       onCancel();
     } catch (err: any) {
-      const status = err?.response?.status;
       setValidationError(t('api_key.invalid_key_or_network'));
     } finally {
       setValidating(false);
