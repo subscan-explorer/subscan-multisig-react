@@ -267,6 +267,14 @@ export function ExtrinsicRecords() {
     }, 300);
   };
 
+  useEffect(() => {
+    return () => {
+      if (fetchTimerRef.current) {
+        clearTimeout(fetchTimerRef.current);
+        fetchTimerRef.current = null;
+      }
+    };
+  }, []);
   const refreshData = () => {
     queryInProgress();
     fetchConfirmed();
