@@ -212,13 +212,18 @@
   "Mulitsig Transaction Details": "多签交易详情",
   "Please be sure to double-check the mulitsig transaction progress and parameters carefully before approving.": "在批准前，请务必仔细检查多签交易进度和参数。",
   "api_key": {
-    "title": "Subscan API Key",
-    "button": "API Key",
-    "description": "Key 保存在本地浏览器中。",
+    "title": "配置 API Key",
+    "button": "高级设置",
+    "desc_storage": "API Key 仅保存在本地浏览器中（不上传 Subscan 服务器）。",
+    "desc_security": "请勿在公共设备上保存，并妥善保管以防泄露。",
+    "desc_features": "配置后可启用：历史记录、自动获取 Call Data 等功能。",
+    "desc_get_key": "获取 API Key：",
     "label": "API Key",
     "placeholder": "请输入 Subscan API Key",
     "current_set": "当前已设置 API Key",
     "saved": "API Key 已保存",
-    "deleted": "API Key 已删除"
+    "deleted": "API Key 已删除",
+    "invalid_key": "API Key 无效，请检查后重试。",
+    "invalid_key_or_network": "API Key 无效或网络不受支持，请检查后重试。"
   }
 }
