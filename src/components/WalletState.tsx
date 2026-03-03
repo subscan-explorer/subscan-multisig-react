@@ -32,8 +32,7 @@ export function WalletState(props: WalletStateProps) {
   const history = useHistory();
   const { network, api, networkConfig } = useApi();
   const { multisigAccount, changeMultisigAccount } = props;
-  const { inProgress, queryInProgress, confirmedAccount, refreshConfirmedAccount, fetchInProgress } =
-    useMultisigContext();
+  const { inProgress, queryInProgress, confirmedAccount, refreshCounts, fetchInProgress } = useMultisigContext();
   const [isAccountsDisplay, setIsAccountsDisplay] = useState<boolean>(false);
   const [isExtrinsicDisplay, setIsExtrinsicDisplay] = useState(false);
   const [isTransferDisplay, setIsTransferDisplay] = useState(false);
@@ -132,7 +131,7 @@ export function WalletState(props: WalletStateProps) {
 
     const id = setInterval(() => {
       tick();
-      refreshConfirmedAccount();
+      refreshCounts();
     }, LONG_DURATION);
 
     return () => clearInterval(id);

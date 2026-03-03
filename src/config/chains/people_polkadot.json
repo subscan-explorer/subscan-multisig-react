@@ -4,7 +4,7 @@
   "rpc": "wss://people-polkadot-rpc.n.dwellir.com",
   "api": {
     "subql": "",
-    "subscan": "https://people-polkadot.webapi.subscan.io"
+    "subscan": "https://people-polkadot.api.subscan.io"
   },
   "category": "polkadot",
   "logo": "/image/people-polkadot.png",

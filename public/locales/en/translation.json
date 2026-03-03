@@ -212,5 +212,20 @@
   "Unfavorite": "Unfavorite",
   "share link": "Share Link",
   "Mulitsig Transaction Details": "Mulitsig Transaction Details",
-  "Please be sure to double-check the mulitsig transaction progress and parameters carefully before approving.": "Please be sure to double-check the mulitsig transaction progress and parameters carefully before approving."
+  "Please be sure to double-check the mulitsig transaction progress and parameters carefully before approving.": "Please be sure to double-check the mulitsig transaction progress and parameters carefully before approving.",
+  "api_key": {
+    "title": "Set up API key",
+    "button": "Advanced settings",
+    "desc_storage": "Your API key is stored only in this browser (not uploaded to Subscan servers).",
+    "desc_security": "Don't save it on public/shared devices. Keep it secure.",
+    "desc_features": "After setup, you can enable features like History and auto-fetching Call Data.",
+    "desc_get_key": "Get an API key:",
+    "label": "API Key",
+    "placeholder": "Enter your Subscan API key",
+    "current_set": "API key is currently set",
+    "saved": "API key saved",
+    "deleted": "API key deleted",
+    "invalid_key": "Invalid API key. Please check and try again.",
+    "invalid_key_or_network": "Invalid API key or unsupported network. Please check and try again."
+  }
 }

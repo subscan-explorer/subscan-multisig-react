@@ -4,7 +4,7 @@
   "rpc": "wss://sys.ibp.network/coretime-paseo",
   "api": {
     "subql": "",
-    "subscan": "https://coretime-paseo.webapi.subscan.io"
+    "subscan": "https://coretime-paseo.api.subscan.io"
   },
   "category": "paseo",
   "logo": "/image/coretime-paseo.png",

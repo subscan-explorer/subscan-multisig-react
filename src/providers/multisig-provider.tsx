@@ -2,7 +2,7 @@ import { KeyringAddress } from '@polkadot/ui-keyring/types';
 import { Spin } from 'antd';
 import { createContext, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useApi, useMultisig, useMultisigRecordCount } from '../hooks';
+import { useApi, useMultisig, useMultisigResourceCount } from '../hooks';
 import { Entry } from '../model';
 import { empty } from '../utils';
 
@@ -13,8 +13,7 @@ export const MultisigContext = createContext<{
   cancelledAccount: number | undefined;
   setMultisigAccount: React.Dispatch<React.SetStateAction<KeyringAddress | null>> | null;
   queryInProgress: (silent?: boolean) => Promise<void>;
-  refreshConfirmedAccount: () => void;
-  refreshCancelledAccount: () => void;
+  refreshCounts: () => void;
   setIsPageLock: (lock: boolean) => void;
   loadingInProgress: boolean;
   fetchInProgress: any;
@@ -26,8 +25,7 @@ export const MultisigContext = createContext<{
   cancelledAccount: 0,
   queryInProgress: () => Promise.resolve(),
   setIsPageLock: empty,
-  refreshConfirmedAccount: empty,
-  refreshCancelledAccount: empty,
+  refreshCounts: empty,
   loadingInProgress: false,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   fetchInProgress: () => {},
@@ -44,32 +42,24 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
     fetchInProgress();
   }, [fetchInProgress]);
 
-  const { fetchData, data } = useMultisigRecordCount(networkConfig);
+  const { fetchData: fetchCounts, data: countsData } = useMultisigResourceCount(networkConfig);
 
-  const refreshConfirmedAccount = useCallback(() => {
-    fetchData(account, 'confirmed');
-  }, [account, fetchData]);
-
-  const { fetchData: fetchCancelledData, data: cancelledData } = useMultisigRecordCount(networkConfig);
-
-  const refreshCancelledAccount = useCallback(() => {
-    fetchCancelledData(account, 'cancelled');
-  }, [account, fetchCancelledData]);
+  const refreshCounts = useCallback(() => {
+    fetchCounts(account);
+  }, [account, fetchCounts]);
 
   useEffect(() => {
-    refreshConfirmedAccount();
-    refreshCancelledAccount();
-  }, [refreshConfirmedAccount, refreshCancelledAccount]);
+    fetchCounts(account);
+  }, [account, fetchCounts]);
 
   return (
     <MultisigContext.Provider
       value={{
         ...value,
         setIsPageLock,
-        confirmedAccount: data ? data?.multisigRecords.totalCount : undefined,
-        cancelledAccount: cancelledData ? cancelledData.multisigRecords.totalCount : undefined,
-        refreshConfirmedAccount,
-        refreshCancelledAccount,
+        confirmedAccount: countsData?.confirmedCount,
+        cancelledAccount: countsData?.cancelledCount,
+        refreshCounts,
       }}
     >
       <Spin size="large" spinning={isPageLocked} style={{ zIndex: 1001 }}>

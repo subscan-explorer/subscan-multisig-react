@@ -25,7 +25,7 @@ export function TxApprove({
   const [getApproveTx] = useMultiApprove();
   const { queueExtrinsic } = useContext(StatusContext);
   const [getUnapprovedInjectedList] = useUnapprovedAccounts();
-  const { setIsPageLock, queryInProgress, refreshConfirmedAccount } = useMultisigContext();
+  const { setIsPageLock, queryInProgress, refreshCounts } = useMultisigContext();
   const unapprovedAddresses = getUnapprovedInjectedList(entry);
   const memberPairs = (account.meta?.addressPair ?? []) as AddressPair[];
   const injectedMemberAccounts: string[] = memberPairs
@@ -55,7 +55,7 @@ export function TxApprove({
                 makeSure(txSpy)(null);
                 queryInProgress();
                 setTimeout(() => {
-                  refreshConfirmedAccount();
+                  refreshCounts();
                   // eslint-disable-next-line no-magic-numbers
                 }, 10000);
               },
@@ -73,16 +73,7 @@ export function TxApprove({
         }
       );
     },
-    [
-      availableAccounts,
-      getApproveTx,
-      onOperation,
-      queryInProgress,
-      queueExtrinsic,
-      refreshConfirmedAccount,
-      setIsPageLock,
-      txSpy,
-    ]
+    [availableAccounts, getApproveTx, onOperation, queryInProgress, queueExtrinsic, refreshCounts, setIsPageLock, txSpy]
   );
 
   if (!entry.callHash || !entry.callData) {

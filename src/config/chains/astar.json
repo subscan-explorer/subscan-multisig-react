@@ -4,7 +4,7 @@
   "rpc": "wss://astar-rpc.n.dwellir.com",
   "api": {
     "subql": "",
-    "subscan": "https://astar.webapi.subscan.io"
+    "subscan": "https://astar.api.subscan.io"
   },
   "category": "polkadot",
   "logo": "/image/astar.png",

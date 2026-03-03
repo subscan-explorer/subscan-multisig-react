@@ -7,4 +7,5 @@ export interface StorageInfo {
   customNetwork?: NetConfigV2;
   addedCustomNetworks?: NetConfigV2[];
   selectedRpc?: string;
+  subscanApiKey?: string;
 }

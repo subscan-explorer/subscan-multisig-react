@@ -4,7 +4,7 @@
   "rpc": "wss://sys.ibp.network/people-paseo",
   "api": {
     "subql": "",
-    "subscan": "https://people-paseo.webapi.subscan.io"
+    "subscan": "https://people-paseo.api.subscan.io"
   },
   "category": "paseo",
   "logo": "/image/people-paseo.png",

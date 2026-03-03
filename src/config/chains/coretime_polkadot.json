@@ -4,7 +4,7 @@
   "rpc": "wss://coretime-polkadot-rpc.n.dwellir.com",
   "api": {
     "subql": "",
-    "subscan": "https://coretime-polkadot.webapi.subscan.io"
+    "subscan": "https://coretime-polkadot.api.subscan.io"
   },
   "category": "polkadot",
   "logo": "/image/coretime-polkadot.png",
