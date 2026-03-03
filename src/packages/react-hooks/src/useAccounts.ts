@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 
 import { keyring } from '@polkadot/ui-keyring';
-import { u8aToHex } from '@polkadot/util';
+import { u8aToHexFixed as u8aToHex } from 'src/utils/helper/u8aToHex';
 import { decodeAddress } from '@polkadot/util-crypto';
 
 import { useIsMountedRef } from './useIsMountedRef';
