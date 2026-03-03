@@ -13,8 +13,7 @@ export const MultisigContext = createContext<{
   cancelledAccount: number | undefined;
   setMultisigAccount: React.Dispatch<React.SetStateAction<KeyringAddress | null>> | null;
   queryInProgress: (silent?: boolean) => Promise<void>;
-  refreshConfirmedAccount: () => void;
-  refreshCancelledAccount: () => void;
+  refreshCounts: () => void;
   setIsPageLock: (lock: boolean) => void;
   loadingInProgress: boolean;
   fetchInProgress: any;
@@ -26,8 +25,7 @@ export const MultisigContext = createContext<{
   cancelledAccount: 0,
   queryInProgress: () => Promise.resolve(),
   setIsPageLock: empty,
-  refreshConfirmedAccount: empty,
-  refreshCancelledAccount: empty,
+  refreshCounts: empty,
   loadingInProgress: false,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   fetchInProgress: () => {},
@@ -46,11 +44,7 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
 
   const { fetchData: fetchCounts, data: countsData } = useMultisigResourceCount(networkConfig);
 
-  const refreshConfirmedAccount = useCallback(() => {
-    fetchCounts(account);
-  }, [account, fetchCounts]);
-
-  const refreshCancelledAccount = useCallback(() => {
+  const refreshCounts = useCallback(() => {
     fetchCounts(account);
   }, [account, fetchCounts]);
 
@@ -65,8 +59,7 @@ export const EntriesProvider = ({ children }: React.PropsWithChildren<unknown>) 
         setIsPageLock,
         confirmedAccount: countsData?.confirmedCount,
         cancelledAccount: countsData?.cancelledCount,
-        refreshConfirmedAccount,
-        refreshCancelledAccount,
+        refreshCounts,
       }}
     >
       <Spin size="large" spinning={isPageLocked} style={{ zIndex: 1001 }}>
