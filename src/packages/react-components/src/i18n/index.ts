@@ -34,7 +34,8 @@ i18next
     interpolation: {
       escapeValue: false,
     },
-    keySeparator: false,
+    keySeparator: '.',
+    defaultNS: 'translation',
     load: 'languageOnly',
     ns: [
       'apps',

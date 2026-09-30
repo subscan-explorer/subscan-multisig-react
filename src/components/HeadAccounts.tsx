@@ -45,11 +45,15 @@ export const HeadAccounts = () => {
 
   return (
     <div>
-      <span className={`${headerLinkStyle} inline md:hidden`} onClick={() => setDrawerVisible(true)}>
+      <button
+        type="button"
+        className={`${headerLinkStyle} inline-flex md:hidden`}
+        onClick={() => setDrawerVisible(true)}
+      >
         {t('accounts')}
 
-        <DownOutlined style={{ marginTop: '4px' }} />
-      </span>
+        <DownOutlined />
+      </button>
 
       <Drawer
         className="block md:hidden account-drawer"
@@ -151,11 +155,11 @@ export const HeadAccounts = () => {
         }
         placement="bottom"
       >
-        <span className={`${headerLinkStyle} hidden md:block`}>
+        <button type="button" className={`${headerLinkStyle} hidden md:inline-flex`}>
           {t('accounts')}
 
-          <DownOutlined style={{ marginTop: '4px' }} />
-        </span>
+          <DownOutlined />
+        </button>
       </Popover>
       <AddContactModal visible={addContactModalVisible} handleVisibleChange={setAddContactModalVisible} />
     </div>
