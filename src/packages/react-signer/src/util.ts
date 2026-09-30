@@ -100,19 +100,27 @@ export function handleTxResults(
     const status = result.status.type.toLowerCase() as QueueTxStatus;
 
     const failure = transactionFailure(result);
+    const included = result.status.isFinalized || result.status.isInBlock;
+    const succeeded = result.events.some(
+      ({ event }) => event.section === 'system' && event.method === 'ExtrinsicSuccess'
+    );
+    const verificationError =
+      result.internalError || (included && !failure && !succeeded)
+        ? new Error('Unable to verify transaction events. Check the explorer before retrying.')
+        : undefined;
     queueSetTxStatus(
       id,
-      failure ? 'error' : status,
+      failure || verificationError ? 'error' : status,
       result,
-      failure ? new Error(dispatchErrorMessage(failure)) : undefined
+      failure ? new Error(dispatchErrorMessage(failure)) : verificationError
     );
     txUpdateCb(result);
 
-    if (!outcomeReported && (result.status.isFinalized || result.status.isInBlock)) {
-      if (failure) {
+    if (!outcomeReported && (included || verificationError)) {
+      if (failure || verificationError) {
         outcomeReported = true;
         txFailedCb(result);
-      } else if (result.events.some(({ event }) => event.section === 'system' && event.method === 'ExtrinsicSuccess')) {
+      } else if (succeeded) {
         outcomeReported = true;
         txSuccessCb(result);
       }
@@ -121,7 +129,7 @@ export function handleTxResults(
       txFailedCb(result);
     }
 
-    if (result.isCompleted) {
+    if (result.isCompleted || verificationError) {
       unsubscribe();
     }
   };

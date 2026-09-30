@@ -10,7 +10,6 @@ import { ApiPromise } from '@polkadot/api';
 import type { SignerOptions } from '@polkadot/api/submittable/types';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
 import type { Injected } from '@polkadot/extension-inject/types';
-import type { KeyringPair } from '@polkadot/keyring/types';
 import type { Option } from '@polkadot/types';
 import type { Multisig, Timepoint } from '@polkadot/types/interfaces';
 import type { Ledger } from '@polkadot/hw-ledger';
@@ -31,10 +30,11 @@ import Qr from './Qr';
 import { AccountSigner, LedgerSigner, QrSigner } from './signers';
 import SignFields from './SignFields';
 import Tip from './Tip';
+import { signAsync, signAndSend } from './submitSigned';
 import Transaction from './Transaction';
 import { useTranslation } from './translate';
 import type { AddressFlags, AddressProxy, QrState } from './types';
-import { cacheUnlock, extractExternal, handleTxResults } from './util';
+import { cacheUnlock, extractExternal } from './util';
 
 interface Props {
   className?: string;
@@ -73,74 +73,6 @@ function unlockAccount({ isUnlockCached, signAddress, signPassword }: AddressPro
     console.error(error);
 
     return (error as Error).message;
-  }
-
-  return null;
-}
-
-async function signAndSend(
-  queueSetTxStatus: QueueTxMessageSetStatus,
-  currentItem: QueueTx,
-  tx: SubmittableExtrinsic<'promise'>,
-  pairOrAddress: KeyringPair | string,
-  options: Partial<SignerOptions>,
-  isCancelled: () => boolean
-): Promise<void> {
-  currentItem.txStartCb && currentItem.txStartCb();
-
-  try {
-    await tx.signAsync(pairOrAddress, options);
-
-    if (isCancelled()) {
-      queueSetTxStatus(currentItem.id, 'cancelled');
-
-      return;
-    }
-
-    console.info('sending', tx.toHex());
-
-    queueSetTxStatus(currentItem.id, 'sending');
-
-    const unsubscribe = await tx.send(
-      handleTxResults('signAndSend', queueSetTxStatus, currentItem, (): void => {
-        unsubscribe();
-      })
-    );
-  } catch (error: unknown) {
-    if (isCancelled()) {
-      queueSetTxStatus(currentItem.id, 'cancelled');
-
-      return;
-    }
-
-    if (error instanceof Error) {
-      console.error('signAndSend: error:', error);
-      queueSetTxStatus(currentItem.id, 'error', {}, error);
-    }
-    currentItem.txFailedCb && currentItem.txFailedCb(null);
-  }
-}
-
-async function signAsync(
-  queueSetTxStatus: QueueTxMessageSetStatus,
-  { id, txFailedCb = NOOP, txStartCb = NOOP }: QueueTx,
-  tx: SubmittableExtrinsic<'promise'>,
-  pairOrAddress: KeyringPair | string,
-  options: Partial<SignerOptions>
-): Promise<string | null> {
-  txStartCb();
-
-  try {
-    await tx.signAsync(pairOrAddress, options);
-
-    return tx.toJSON();
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error('signAsync: error:', error);
-      queueSetTxStatus(id, 'error', undefined, error);
-    }
-
-    txFailedCb(null);
   }
 
   return null;
