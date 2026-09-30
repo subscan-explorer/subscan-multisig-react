@@ -1,41 +1,35 @@
-@import '~antd/lib/style/themes/default.less';
+@import 'antd/lib/style/themes/default.less';
 
-// override global variables
-@border-radius-base: 10px;
-@shadow-2: 0 0 24px 0 rgba(191, 194, 234, 0.41);
-
-// project variables
-@project-main-bg: linear-gradient(-45deg, #fe3876 0%, #7c30dd 71%, #3a30dd 100%);
-@project-primary: #5745de;
-@project-accent: #ec3783;
-
-// color reset
-@primary-color: @project-primary;
-@select-item-selected-option-color: @primary-color;
-@processing-color: @primary-color;
-@select-item-selected-bg: @background-color-base;
-@secondary-color: @primary-color;
-@skeleton-color: @primary-color;
-@btn-primary-bg: @primary-color;
-
-// tabs
-@tabs-highlight-color: @primary-color;
-@tabs-active-color: @primary-color;
-@tabs-hover-color: @primary-color;
-@tabs-ink-bar-color: @primary-color;
-
-// btn
-@btn-primary-bg: @project-main-bg;
-@btn-default-border: 2px solid transparent;
-@btn-default-bg: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(to right, #5745de, #ec3783) border-box;
-
-// card
-@card-shadow: 0 0 24px 0 rgba(191, 194, 234, 0.41);
-@card-radius: @border-radius-base * 2;
-
-// modal
-@modal-footer-padding-vertical: 24px;
-@modal-footer-padding-horizontal: 24px;
+// Subscan explorer owners: globals.css, Box/Boundary and Button/Button.
+@font-family: 'Eina01', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+@font-size-base: 14px;
+@text-color: #35343d;
+@text-color-secondary: fade(#35343d, 50%);
+@heading-color: #35343d;
+@body-background: #fbfbfd;
+@layout-body-background: #fbfbfd;
+@layout-header-background: #ffffff;
+@border-color-base: fade(#35343d, 10%);
+@border-color-split: #f6f6fb;
+@border-radius-base: 8px;
+@primary-color: #ff0083;
+@link-color: #0085ff;
+@project-main-bg: @primary-color;
+@project-primary: @primary-color;
+@project-accent: @primary-color;
+@shadow-2: 0 2px 10px rgba(0, 0, 0, 0.05);
+@card-shadow: @shadow-2;
+@card-radius: 20px;
+@card-padding-base: 20px;
+@btn-border-radius-base: 24px;
+@btn-default-bg: #ffffff;
+@btn-default-border: fade(#35343d, 10%);
+@input-height-base: 36px;
+@table-header-bg: #fbfbfd;
+@table-header-color: fade(#35343d, 50%);
+@table-row-hover-bg: #fbfbfb;
+@modal-footer-padding-vertical: 20px;
+@modal-footer-padding-horizontal: 20px;
 
 :root {
   --PC: @primary-color;

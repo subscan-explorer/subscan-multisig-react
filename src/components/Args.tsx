@@ -4,13 +4,12 @@ import { ChainProperties } from '@polkadot/types/interfaces';
 import { encodeAddress } from '@polkadot/util-crypto';
 import { Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { isAscii, isHex, u8aToString } from '@polkadot/util';
+import { hexToU8a, isAscii, isHex, u8aToString } from '@polkadot/util';
 import { isArray, isObject, isString, toString } from 'lodash';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApi } from '../hooks';
 import { Chain } from '../providers/api-provider';
-import { hexToU8aFixed } from '../utils/helper/hexToU8a';
 import {
   formatBalance,
   isAddressType,
@@ -103,6 +102,8 @@ export function Args({ args, className, section, method }: ArgsProps) {
       className: 'value-column',
       // eslint-disable-next-line complexity
       render(value, record) {
+        if (value === null || value === undefined) return '-';
+        if (typeof value === 'boolean') return String(value);
         const { type, name } = record;
         const isAddr = type ? isAddressType(type) : isSS58Address(value);
 
@@ -144,7 +145,7 @@ export function Args({ args, className, section, method }: ArgsProps) {
 
         if (isString(value) && isHex(value)) {
           try {
-            const bytes = hexToU8aFixed(value);
+            const bytes = hexToU8a(value);
             if (bytes.length > 0 && isAscii(bytes)) {
               return <div style={{ wordBreak: 'break-all' }}>{u8aToString(bytes)}</div>;
             }

@@ -4,7 +4,7 @@ import { useApi } from '../hooks';
 
 export const GqlContext = createContext<GraphQLClient | null>(null);
 
-const isDev = process.env.REACT_APP_HOST_TYPE === 'dev';
+const isDev = import.meta.env.VITE_HOST_TYPE === 'dev';
 const subqlDev = 'http://localhost:3000/';
 
 export const GqlProvider = ({ children }: React.PropsWithChildren<unknown>) => {

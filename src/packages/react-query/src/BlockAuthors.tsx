@@ -60,9 +60,11 @@ function BlockAuthorsBase({ children }: Props): React.ReactElement<Props> {
         // subscribe to all validators
         api.query.session &&
           api.query.session
-            .validators((validatorIds: any): void => {
-              setValidators(validatorIds.map((validatorId: any) => validatorId.toString()));
-            })
+            .validators(
+              (validatorIds: import('@polkadot/types').Vec<import('@polkadot/types/interfaces').AccountId>): void => {
+                setValidators(validatorIds.map((validatorId) => validatorId.toString()));
+              }
+            )
             .catch(console.error);
 
         // subscribe to new headers

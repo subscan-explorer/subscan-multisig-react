@@ -33,7 +33,6 @@ function ChartDoughnut({ className = '', size = 100, values }: DoughnutProps): R
   return (
     <Base className={className}>
       <Doughnut
-        type=""
         data={{
           datasets: [
             {

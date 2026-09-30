@@ -113,7 +113,7 @@ function ChartHorizBar({
   return (
     <div className={className}>
       <HorizontalBar
-        type=""
+        type="bar"
         data={chartData}
         height={null as unknown as number}
         options={chartOptions}

@@ -7,7 +7,9 @@ import type { DropdownOptions } from '../../util/types';
 export default function createOptions(api: ApiPromise): DropdownOptions {
   return Object.keys(api.rpc)
     .sort()
-    .filter((section) => Object.keys((api.rpc as Record<string, Record<string, unknown>>)[section]).length !== 0)
+    .filter(
+      (section) => Object.keys((api.rpc as unknown as Record<string, Record<string, unknown>>)[section]).length !== 0
+    )
     .map((name): { text: string; value: string } => ({
       text: name,
       value: name,

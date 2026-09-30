@@ -187,19 +187,19 @@ export const SelectNetworkModal = (props: SelectNetworkModalProps) => {
                   </div>
                   <div className="mt-2 bg-divider" style={{ height: '1px' }} />
 
-                  <div className="flex flex-wrap py-3">
+                  <div className="network-options">
                     {categoryNetworks.map((item) => (
-                      <div
+                      <button
+                        type="button"
                         key={item.name}
-                        className="bg-gray-200 w-36 h-10 cursor-pointer flex items-center mr-5 mb-3"
+                        aria-pressed={network === item.name}
+                        className="network-option"
                         onClick={() => selectPresetNetwork(item)}
                       >
                         <img src={item.logo || subscanLogo} className="w-5 h-5 mx-3" alt="logo" />
 
-                        <div className="font-bold text-black-800 leading-none" style={{ fontSize: '14px' }}>
-                          {item.displayName || item.name}
-                        </div>
-                      </div>
+                        <div className="network-option-label">{item.displayName || item.name}</div>
+                      </button>
                     ))}
                   </div>
                 </div>

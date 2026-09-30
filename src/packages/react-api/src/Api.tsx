@@ -8,8 +8,6 @@
 import { deriveMapCache, setDeriveCache } from '@polkadot/api-derive/util';
 import { ApiPromise } from '@polkadot/api/promise';
 import { ethereumChains } from '@polkadot/apps-config';
-import { web3Accounts } from '@polkadot/extension-dapp';
-import type { InjectedExtension } from '@polkadot/extension-inject/types';
 import type { ChainProperties, ChainType } from '@polkadot/types/interfaces';
 import { keyring } from '@polkadot/ui-keyring';
 import type { KeyringStore } from '@polkadot/ui-keyring/types';
@@ -78,41 +76,17 @@ function getDevTypes(): Record<string, Record<string, string>> {
   return types;
 }
 
-async function getInjectedAccounts(injectedPromise: Promise<InjectedExtension[]>): Promise<InjectedAccountExt[]> {
-  try {
-    await injectedPromise;
-
-    const accounts = await web3Accounts();
-
-    return accounts.map(
-      ({ address, meta }, whenCreated): InjectedAccountExt => ({
-        address,
-        meta: {
-          ...meta,
-          name: `${meta.name || 'unknown'} (${meta.source === 'polkadot-js' ? 'extension' : meta.source})`,
-          whenCreated,
-        },
-      })
-    );
-  } catch (error) {
-    console.error('web3Accounts', error);
-
-    return [];
-  }
-}
-
-async function retrieve(api: ApiPromise, injectedPromise: Promise<InjectedExtension[]>): Promise<ChainData> {
-  const [chainProperties, systemChain, systemChainType, systemName, systemVersion, injectedAccounts] =
-    await Promise.all([
-      api.rpc.system.properties(),
-      api.rpc.system.chain(),
-      api.rpc.system.chainType
-        ? api.rpc.system.chainType()
-        : Promise.resolve(registry.createType('ChainType', 'Live') as ChainType),
-      api.rpc.system.name(),
-      api.rpc.system.version(),
-      getInjectedAccounts(injectedPromise),
-    ]);
+async function retrieve(api: ApiPromise): Promise<ChainData> {
+  const [chainProperties, systemChain, systemChainType, systemName, systemVersion] = await Promise.all([
+    api.rpc.system.properties(),
+    api.rpc.system.chain(),
+    api.rpc.system.chainType
+      ? api.rpc.system.chainType()
+      : Promise.resolve(registry.createType('ChainType', 'Live') as ChainType),
+    api.rpc.system.name(),
+    api.rpc.system.version(),
+  ]);
+  const injectedAccounts: InjectedAccountExt[] = [];
 
   return {
     injectedAccounts,
@@ -131,15 +105,11 @@ async function retrieve(api: ApiPromise, injectedPromise: Promise<InjectedExtens
 // eslint-disable-next-line complexity
 async function loadOnReady(
   api: ApiPromise,
-  injectedPromise: Promise<InjectedExtension[]>,
   store: KeyringStore | undefined,
   types: Record<string, Record<string, string>>
 ): Promise<ApiState> {
   registry.register(types);
-  const { injectedAccounts, properties, systemChain, systemChainType, systemName, systemVersion } = await retrieve(
-    api,
-    injectedPromise
-  );
+  const { injectedAccounts, properties, systemChain, systemChainType, systemName, systemVersion } = await retrieve(api);
   const ss58Format = settings.prefix === -1 ? properties.ss58Format.unwrapOr(DEFAULT_SS58).toNumber() : settings.prefix;
   const tokenSymbol = properties.tokenSymbol.unwrapOr([formatBalance.getDefaults().unit, ...DEFAULT_AUX]);
   const tokenDecimals = properties.tokenDecimals.unwrapOr([DEFAULT_DECIMALS]);
@@ -202,7 +172,7 @@ function Api({ children, store }: Props): React.ReactElement<Props> | null {
     isApiReady: false,
   } as unknown as ApiState);
   const [apiError, setApiError] = useState<null | string>(null);
-  const { api: iApi, networkConfig, extensions, networkStatus, setNetworkStatus } = useApi();
+  const { api: iApi, networkConfig, networkStatus, setNetworkStatus } = useApi();
 
   const url = networkConfig ? networkConfig.rpc : '';
 
@@ -212,12 +182,12 @@ function Api({ children, store }: Props): React.ReactElement<Props> | null {
       api: iApi as ApiPromise,
       apiError,
       apiUrl: url,
-      extensions,
+      extensions: undefined,
       isApiConnected: networkStatus === 'success',
       isApiInitialized: !!iApi,
-      isWaitingInjected: !extensions,
+      isWaitingInjected: false,
     }),
-    [state, iApi, apiError, url, extensions, networkStatus]
+    [state, iApi, apiError, url, networkStatus]
   );
 
   useEffect((): void => {
@@ -235,7 +205,7 @@ function Api({ children, store }: Props): React.ReactElement<Props> | null {
     iApi.on('disconnected', () => setNetworkStatus('disconnected'));
     iApi.on('error', (error: Error) => setApiError(error.message));
 
-    loadOnReady(iApi, Promise.resolve(extensions || []), store, types)
+    loadOnReady(iApi, store, types)
       .then((data) => {
         setState(data);
         setNetworkStatus('success');
@@ -245,7 +215,7 @@ function Api({ children, store }: Props): React.ReactElement<Props> | null {
 
         setApiError((error as Error).message);
       });
-  }, [extensions, iApi, queuePayload, queueSetTxStatus, setNetworkStatus, store]);
+  }, [iApi, queuePayload, queueSetTxStatus, setNetworkStatus, store]);
 
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
 }

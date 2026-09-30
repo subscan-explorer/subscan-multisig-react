@@ -6,9 +6,16 @@ import type { TypeDef } from '@polkadot/types/types';
 
 import React, { useCallback, useState } from 'react';
 
-import { compactAddLength, isAscii, isHex, stringToU8a, u8aToString, u8aToU8a } from '@polkadot/util';
-import { u8aToHexFixed as u8aToHex } from 'src/utils/helper/u8aToHex';
-import { hexToU8aFixed as hexToU8a } from 'src/utils/helper/hexToU8a';
+import {
+  compactAddLength,
+  hexToU8a,
+  isAscii,
+  isHex,
+  stringToU8a,
+  u8aToHex,
+  u8aToString,
+  u8aToU8a,
+} from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { CopyButton, Input } from '../../../react-components/src';
 import type { RawParam, RawParamOnChange, RawParamOnEnter, RawParamOnEscape, Size } from '../types';

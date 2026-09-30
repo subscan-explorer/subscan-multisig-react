@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 type Result<T> = {
   code: number;
@@ -39,7 +39,7 @@ export class Request {
 
         return inConfig;
       },
-      (err: any) => {
+      (err: AxiosError) => {
         // error alert
         return Promise.reject(err);
       }
@@ -49,19 +49,19 @@ export class Request {
       (res: AxiosResponse) => {
         return res;
       },
-      (err: any) => {
+      (err: AxiosError) => {
         let message = '';
-        switch (err.response.status) {
+        switch (err.response?.status) {
           // eslint-disable-next-line no-magic-numbers
           case 401:
             message = 'request auth error (401)';
             break;
           default:
-            message = `request error (${err.response.status})!`;
+            message = `request error (${err.response?.status})!`;
         }
         console.info('axios error:', message);
         /// global error alert
-        return Promise.reject(err.response);
+        return Promise.reject(err);
       }
     );
   }
@@ -70,19 +70,23 @@ export class Request {
     return this.instance.request(config);
   }
 
-  public get<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<Result<T>>> {
+  public get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<Result<T>>> {
     return this.instance.get(url, config);
   }
 
-  public post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<Result<T>>> {
+  public post<T = unknown>(
+    url: string,
+    data?: unknown,
+    config?: AxiosRequestConfig
+  ): Promise<AxiosResponse<Result<T>>> {
     return this.instance.post(url, data, config);
   }
 
-  public put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<Result<T>>> {
+  public put<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<AxiosResponse<Result<T>>> {
     return this.instance.put(url, data, config);
   }
 
-  public delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<Result<T>>> {
+  public delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<Result<T>>> {
     return this.instance.delete(url, config);
   }
 }

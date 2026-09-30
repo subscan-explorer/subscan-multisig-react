@@ -243,7 +243,11 @@ export function useAccountInfo(value: string | null, isContract = false): UseAcc
         const account = keyring.getPair(value);
 
         // eslint-disable-next-line
-        account && keyring.saveAccountMeta(account, { ...account.meta, genesisHash });
+        account &&
+          keyring.saveAccountMeta(account, {
+            ...account.meta,
+            genesisHash: genesisHash ? api.registry.createType('Hash', genesisHash).toHex() : null,
+          });
 
         setGenesisHash(genesisHash);
       }

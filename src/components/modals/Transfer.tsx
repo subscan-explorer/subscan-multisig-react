@@ -17,7 +17,7 @@ import createHeader from '@polkadot/react-components/InputAddress/createHeader';
 import createItem from '@polkadot/react-components/InputAddress/createItem';
 import { Option } from '@polkadot/react-components/InputAddress/types';
 import TxButtonMultisig from '@polkadot/react-components/TxButtonMultisig';
-import { useApi, useCall } from '@polkadot/react-hooks';
+import { useCall } from '@polkadot/react-hooks';
 import { Available, BalanceFree } from '@polkadot/react-query';
 import type { AccountInfoWithProviders, AccountInfoWithRefCount } from '@polkadot/types/interfaces';
 import { keyring } from '@polkadot/ui-keyring';
@@ -32,6 +32,7 @@ import { useIsInjected, useMultisig } from 'src/hooks';
 import { AddressPair } from 'src/model';
 import { extractExternal } from 'src/utils';
 import styled from 'styled-components';
+import { useApi } from '../../packages/react-hooks/src/useApi';
 
 const { Text } = Typography;
 

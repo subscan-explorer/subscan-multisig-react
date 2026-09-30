@@ -32,7 +32,7 @@ async function submitRpc(
   values: any[]
 ): Promise<QueueTxResult> {
   try {
-    const rpc = api.rpc as Record<string, Record<string, (...params: unknown[]) => Promise<unknown>>>;
+    const rpc = api.rpc as unknown as Record<string, Record<string, (...params: unknown[]) => Promise<unknown>>>;
 
     assert(isFunction(rpc[section] && rpc[section][method]), `api.rpc.${section}.${method} does not exist`);
 
@@ -76,7 +76,9 @@ function extractCurrent(txqueue: QueueTx[]): ItemState {
   if (currentItem) {
     if (currentItem.status === 'queued' && !(currentItem.extrinsic || currentItem.payload)) {
       isRpc = true;
-    } else if (currentItem.status !== 'signing') {
+    } else {
+      // Keep the dialog up while status is `signing`. The extension window is
+      // not guaranteed to open, and hiding this view left only a corner spinner.
       isVisible = true;
     }
   }

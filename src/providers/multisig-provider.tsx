@@ -16,7 +16,8 @@ export const MultisigContext = createContext<{
   refreshCounts: () => void;
   setIsPageLock: (lock: boolean) => void;
   loadingInProgress: boolean;
-  fetchInProgress: any;
+  inProgressError: boolean;
+  fetchInProgress: ReturnType<typeof useMultisig>['fetchInProgress'];
 }>({
   inProgress: [],
   multisigAccount: null,
@@ -27,6 +28,7 @@ export const MultisigContext = createContext<{
   setIsPageLock: empty,
   refreshCounts: empty,
   loadingInProgress: false,
+  inProgressError: false,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   fetchInProgress: () => {},
 });

@@ -39,13 +39,12 @@ export default class ApiSigner implements Signer {
   }
 
   public update(id: number, result: Hash | SubmittableResult): void {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    if (result instanceof this.#registry.createClass('Hash')) {
-      // if (result instanceof ClassOf(this.#registry, 'Hash')) {
-      this.#queueSetTxStatus(id, 'sent', result.toHex());
+    const status = (result as SubmittableResult).status;
+
+    if (status) {
+      this.#queueSetTxStatus(id, status.type.toLowerCase() as QueueTxStatus);
     } else {
-      this.#queueSetTxStatus(id, (result as SubmittableResult).status.type.toLowerCase() as QueueTxStatus, status);
+      this.#queueSetTxStatus(id, 'sent', (result as Hash).toHex());
     }
   }
 }

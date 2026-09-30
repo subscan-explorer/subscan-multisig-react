@@ -1,3 +1,4 @@
+import type { UploadProps } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
@@ -34,6 +35,7 @@ import i18n from '../config/i18n';
 import { useApi, useContacts } from '../hooks';
 import { MultisigAccountConfig, Network, ShareScope, WalletFormValue } from '../model';
 import { InjectedAccountWithMeta } from '../model/account';
+import { validateMultisigConfig } from '../utils/helper/multisigValidation';
 import { convertToSS58, findMultiAccount, updateMultiAccountScope } from '../utils';
 
 interface LabelWithTipProps {
@@ -143,12 +145,12 @@ export function WalletForm() {
     setSelectedAccounts(result);
   };
 
-  const uploadProps = {
+  const uploadProps: UploadProps = {
     name: 'file',
     headers: {
       authorization: 'authorization-text',
     },
-    onChange(info: any) {
+    onChange(info) {
       if (info.file.status !== 'uploading') {
         // console.log(info.file, info.fileList);
       }
@@ -158,27 +160,32 @@ export function WalletForm() {
         message.error(`${info.file.name} file upload failed.`);
       }
     },
-    customRequest(info: any) {
+    customRequest(info) {
       try {
         const reader = new FileReader();
 
-        reader.onload = (e: any) => {
+        reader.onload = () => {
           // eslint-disable-next-line no-console
           // console.log(e.target.result);
 
-          const config = JSON.parse(e.target.result) as MultisigAccountConfig;
-          if (!config || !config.members || !config.threshold) {
-            message.error(t('account config error'));
-            return;
-          }
-          const encodeMembers = config.members.map((member) => {
-            return {
+          try {
+            const config: unknown = JSON.parse(String(reader.result));
+            validateMultisigConfig(
+              config,
+              api?.consts.multisig?.maxSignatories ? Number(api.consts.multisig.maxSignatories.toString()) : undefined
+            );
+            const encodeMembers = config.members.map((member) => ({
               name: member.name,
               address: encodeAddress(member.address, Number(chain.ss58Format)),
-            };
-          });
-          form.setFieldsValue({ threshold: config.threshold, name: config.name, members: encodeMembers });
+            }));
+            form.setFieldsValue({ threshold: config.threshold, name: config.name, members: encodeMembers });
+            setSelectedAccounts(encodeMembers.map((member) => member.address));
+          } catch (error) {
+            message.error(t(error instanceof Error ? error.message : 'account config error'));
+          }
         };
+        reader.onerror = () => message.error(t('account config error'));
+        if (!(info.file instanceof Blob)) throw new Error('account config error');
         reader.readAsText(info.file);
       } catch (err: unknown) {
         message.error(t('account config error'));
@@ -207,6 +214,15 @@ export function WalletForm() {
         rememberExternal: true,
       }}
       onFinish={async (values: WalletFormValue) => {
+        try {
+          validateMultisigConfig(
+            values,
+            api?.consts.multisig?.maxSignatories ? Number(api.consts.multisig.maxSignatories.toString()) : undefined
+          );
+        } catch (error) {
+          message.error(t(error instanceof Error ? error.message : 'account config error'));
+          return;
+        }
         const { members, name, threshold, rememberExternal } = values;
         const signatories = members.map(({ address }) => address);
         const addressPair = members.map(({ address, ...other }) => ({
@@ -269,9 +285,9 @@ export function WalletForm() {
       className="max-w-screen-xl mx-auto"
     >
       <Form.Item>
-        <div className="w-full grid grid-cols-4 items-center gap-8">
+        <div className="flex items-center">
           <Upload {...uploadProps} showUploadList={false}>
-            <Button type="primary" size="middle" block className="flex justify-center items-center">
+            <Button type="default" size="middle" block className="flex justify-center items-center">
               {t('import from config')}
             </Button>
           </Upload>
@@ -289,7 +305,16 @@ export function WalletForm() {
       <Form.Item
         name="threshold"
         label={<LabelWithTip name="threshold" tipMessage="wallet.tip.threshold" />}
-        rules={[{ required: true }]}
+        dependencies={['members']}
+        rules={[
+          { required: true },
+          {
+            validator: (_, value) =>
+              Number.isInteger(value) && value >= 2 && value <= (form.getFieldValue('members') || []).length
+                ? Promise.resolve()
+                : Promise.reject(new Error(t('Threshold must be an integer between 2 and the number of members'))),
+          },
+        ]}
       >
         <InputNumber size="large" min={THRESHOLD} className="w-full" />
       </Form.Item>
@@ -327,21 +352,27 @@ export function WalletForm() {
 
       <LabelWithTip name="members" tipMessage="wallet.tip.members" />
 
-      <Row gutter={20} className="bg-gray-100 mt-2 mb-6 p-4">
-        <Col span={2}>{t('id')}</Col>
-        <Col span={5}>{t('name')}</Col>
-        <Col span={17}>{t('address')}</Col>
+      <Row gutter={[12, 8]} className="member-column-headings bg-gray-100 mt-2 mb-6 p-4">
+        <Col xs={4} md={2}>
+          {t('id')}
+        </Col>
+        <Col xs={8} md={5}>
+          {t('name')}
+        </Col>
+        <Col xs={12} md={17}>
+          {t('address')}
+        </Col>
       </Row>
 
       <Form.List name="members">
         {(fields, { add, remove }) => (
           <>
             {fields.map((field, index) => (
-              <Row key={field.key} gutter={20} className="px-4">
-                <Col span={2} className="pl-2 pt-2">
+              <Row key={field.key} gutter={[12, 8]} className="member-form-row px-4">
+                <Col xs={4} md={2} className="pl-2 pt-2">
                   {index + 1}
                 </Col>
-                <Col span={5}>
+                <Col xs={20} md={5}>
                   <Form.Item
                     {...field}
                     name={[field.name, 'name']}
@@ -351,7 +382,7 @@ export function WalletForm() {
                     <Input size="large" placeholder={t('wallet.tip.member_name')} className="wallet-member" />
                   </Form.Item>
                 </Col>
-                <Col span={16}>
+                <Col xs={20} md={16}>
                   <Form.Item
                     {...field}
                     name={[field.name, 'address']}
@@ -401,7 +432,7 @@ export function WalletForm() {
                   </Form.Item>
                 </Col>
 
-                <Col span={1}>
+                <Col xs={4} md={1}>
                   <Form.Item>
                     <DeleteOutlined
                       className="text-xl mt-2"
@@ -418,7 +449,7 @@ export function WalletForm() {
 
                           members[index] = { name: '', address: '' };
                           form.setFieldsValue({ members: [...members] });
-                          message.warn(`You must set at least ${THRESHOLD} members.`);
+                          message.warn(t('You must set at least {{count}} members.', { count: THRESHOLD }));
                         }
                       }}
                     />
@@ -451,7 +482,7 @@ export function WalletForm() {
       </Form.Item>
 
       <Form.Item>
-        <div className="w-2/5 grid grid-cols-2 items-center gap-8">
+        <div className="wallet-form-actions">
           <Button type="primary" size="large" block htmlType="submit" className="flex justify-center items-center">
             {t('create')}
           </Button>

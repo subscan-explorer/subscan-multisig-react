@@ -9,17 +9,19 @@
 import { ApiPromise } from '@polkadot/api';
 import type { SignerOptions } from '@polkadot/api/submittable/types';
 import type { SubmittableExtrinsic } from '@polkadot/api/types';
-import { web3FromSource } from '@polkadot/extension-dapp';
+import type { Injected } from '@polkadot/extension-inject/types';
 import type { KeyringPair } from '@polkadot/keyring/types';
 import type { Option } from '@polkadot/types';
 import type { Multisig, Timepoint } from '@polkadot/types/interfaces';
-import type { Ledger } from '@polkadot/ui-keyring';
+import type { Ledger } from '@polkadot/hw-ledger';
 import { keyring } from '@polkadot/ui-keyring';
 import { assert, BN_ZERO } from '@polkadot/util';
 import { addressEq } from '@polkadot/util-crypto';
 import type { HexString } from '@polkadot/util/types';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { useApi as useAppApi } from 'src/hooks';
+import { provideChainSignedExtensions } from 'src/wallets/chainMetadata';
 import { Button, ErrorBoundary, Modal, Output, StatusContext, Toggle } from '../../react-components/src';
 import type { QueueTx, QueueTxMessageSetStatus } from '../../react-components/src/Status/types';
 import { useApi, useLedger, useToggle } from '../../react-hooks/src';
@@ -81,12 +83,19 @@ async function signAndSend(
   currentItem: QueueTx,
   tx: SubmittableExtrinsic<'promise'>,
   pairOrAddress: KeyringPair | string,
-  options: Partial<SignerOptions>
+  options: Partial<SignerOptions>,
+  isCancelled: () => boolean
 ): Promise<void> {
   currentItem.txStartCb && currentItem.txStartCb();
 
   try {
     await tx.signAsync(pairOrAddress, options);
+
+    if (isCancelled()) {
+      queueSetTxStatus(currentItem.id, 'cancelled');
+
+      return;
+    }
 
     console.info('sending', tx.toHex());
 
@@ -98,6 +107,12 @@ async function signAndSend(
       })
     );
   } catch (error: unknown) {
+    if (isCancelled()) {
+      queueSetTxStatus(currentItem.id, 'cancelled');
+
+      return;
+    }
+
     if (error instanceof Error) {
       console.error('signAndSend: error:', error);
       queueSetTxStatus(currentItem.id, 'error', {}, error);
@@ -155,18 +170,21 @@ async function wrapTx(
       timepoint = info.unwrap().when;
     }
 
-    tx = isMultiCall
-      ? api.tx[multiModule].asMulti.meta.args.length === 6
-        ? // We are doing toHex here since we have a Vec<u8> input
-          api.tx[multiModule].asMulti(threshold, others, timepoint, tx.method.toHex(), false, weightAll)
-        : // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          api.tx[multiModule].asMulti(threshold, others, timepoint, tx.method)
-      : api.tx[multiModule].approveAsMulti.meta.args.length === 5
-      ? api.tx[multiModule].approveAsMulti(threshold, others, timepoint, tx.method.hash, weightAll)
-      : // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        api.tx[multiModule].approveAsMulti(threshold, others, timepoint, tx.method.hash);
+    const multisigCall = isMultiCall ? api.tx[multiModule].asMulti : api.tx[multiModule].approveAsMulti;
+    const argNames = multisigCall.meta.args.map((arg) => arg.name.toString());
+    const passesWeight = argNames.some((name) => name === 'max_weight' || name === 'maxWeight');
+    const passesStoreCall = argNames.some((name) => name === 'store_call' || name === 'storeCall');
+    const callArg = multisigCall.meta.args.find((arg) => arg.name.toString() === 'call');
+    const callValue = callArg && callArg.type.toString() === 'Call' ? tx.method : tx.method.toHex();
+    const baseArgs = isMultiCall
+      ? [threshold, others, timepoint, callValue]
+      : [threshold, others, timepoint, tx.method.hash];
+
+    tx = passesStoreCall
+      ? multisigCall(threshold, others, timepoint, tx.method.toHex(), false, weightAll)
+      : passesWeight
+      ? multisigCall(...baseArgs, weightAll)
+      : multisigCall(...baseArgs);
   }
 
   return tx;
@@ -177,7 +195,8 @@ async function extractParams(
   address: string,
   options: Partial<SignerOptions>,
   getLedger: () => Ledger,
-  setQrState: (state: QrState) => void
+  setQrState: (state: QrState) => void,
+  signers: Partial<Record<string, Injected>>
 ): Promise<['qr' | 'signing', string, Partial<SignerOptions>]> {
   const pair = keyring.getPair(address);
   const {
@@ -201,11 +220,16 @@ async function extractParams(
   } else if (isExternal && !isProxied) {
     return ['qr', address, { ...options, signer: new QrSigner(api.registry, setQrState) }];
   } else if (isInjected) {
-    const injected = await web3FromSource(source as string);
+    const injected = signers[source as string];
 
     assert(injected, `Unable to find a signer for ${address}`);
 
-    return ['signing', address, { ...options, signer: injected.signer }];
+    await provideChainSignedExtensions(api, injected, source as string);
+
+    // Ask the extension to return the signed extrinsic. Asset Hub includes
+    // CheckMetadataHash; without this flag a wallet that returns
+    // `signedTransaction` is rejected after the user approves.
+    return ['signing', address, { ...options, signer: injected.signer, withSignedTransaction: true }];
   }
 
   assert(addressEq(address, pair.address), `Unable to retrieve keypair for ${address}`);
@@ -224,6 +248,7 @@ function tryExtract(address: string | null): AddressFlags {
 function TxSigned({ className, currentItem, requestAddress }: Props): React.ReactElement<Props> | null {
   const { t } = useTranslation();
   const { api } = useApi();
+  const { extensions } = useAppApi();
   const { getLedger } = useLedger();
   const { queueSetTxStatus } = useContext(StatusContext);
   const [flags, setFlags] = useState(() => tryExtract(requestAddress));
@@ -249,6 +274,16 @@ function TxSigned({ className, currentItem, requestAddress }: Props): React.Reac
   const [signedTx, setSignedTx] = useState<string | null>(null);
   const [{ innerHash, innerTx }, setCallInfo] = useState<InnerTx>(EMPTY_INNER);
   const [tip, setTip] = useState(BN_ZERO);
+  const signGate = useRef<{ cancelled: boolean } | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect((): (() => void) => {
+    mountedRef.current = true;
+
+    return (): void => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   useEffect((): void => {
     setFlags(tryExtract(senderInfo.signAddress));
@@ -286,6 +321,10 @@ function TxSigned({ className, currentItem, requestAddress }: Props): React.Reac
 
   const _onCancel = useCallback((): void => {
     const { id, signerCb = NOOP, txFailedCb = NOOP } = currentItem;
+
+    if (signGate.current) {
+      signGate.current.cancelled = true;
+    }
 
     queueSetTxStatus(id, 'cancelled');
     signerCb(id, null);
@@ -344,15 +383,22 @@ function TxSigned({ className, currentItem, requestAddress }: Props): React.Reac
       if (senderInfo.signAddress) {
         const [tx, [status, pairOrAddress, options]] = await Promise.all([
           wrapTx(api, currentItem, senderInfo),
-          extractParams(api, senderInfo.signAddress, { nonce: -1, tip }, getLedger, setQrState),
+          extractParams(api, senderInfo.signAddress, { nonce: -1, tip }, getLedger, setQrState, extensions),
         ]);
 
         queueSetTxStatus(currentItem.id, status);
 
-        await signAndSend(queueSetTxStatus, currentItem, tx, pairOrAddress, options);
+        await signAndSend(
+          queueSetTxStatus,
+          currentItem,
+          tx,
+          pairOrAddress,
+          options,
+          () => !!signGate.current?.cancelled
+        );
       }
     },
-    [api, getLedger, tip]
+    [api, extensions, getLedger, tip]
   );
 
   const _onSign = useCallback(
@@ -364,42 +410,70 @@ function TxSigned({ className, currentItem, requestAddress }: Props): React.Reac
       if (senderInfo.signAddress) {
         const [tx, [, pairOrAddress, options]] = await Promise.all([
           wrapTx(api, currentItem, senderInfo),
-          extractParams(api, senderInfo.signAddress, { ...signedOptions, tip }, getLedger, setQrState),
+          extractParams(api, senderInfo.signAddress, { ...signedOptions, tip }, getLedger, setQrState, extensions),
         ]);
 
         setSignedTx(await signAsync(queueSetTxStatus, currentItem, tx, pairOrAddress, options));
       }
     },
-    [api, getLedger, signedOptions, tip]
+    [api, extensions, getLedger, signedOptions, tip]
   );
 
   const _doStart = useCallback((): void => {
+    const gate = { cancelled: false };
+
+    signGate.current = gate;
     setBusy(true);
 
-    setTimeout((): void => {
-      const errorHandler = (error: Error): void => {
-        console.error(error);
+    const errorHandler = (error: Error): void => {
+      console.error(error);
 
+      if (mountedRef.current && !gate.cancelled) {
         setBusy(false);
         setError(error);
-      };
+      }
+    };
 
-      _unlock()
-        .then((isUnlocked): void => {
-          if (isUnlocked) {
-            isSubmit
-              ? currentItem.payload
-                ? _onSendPayload(queueSetTxStatus, currentItem, senderInfo)
-                : _onSend(queueSetTxStatus, currentItem, senderInfo).catch(errorHandler)
-              : _onSign(queueSetTxStatus, currentItem, senderInfo).catch(errorHandler);
-          } else {
+    // Run on the click turn. A setTimeout(0) drops transient user activation,
+    // and some wallets then never open a signature window.
+    _unlock()
+      .then((isUnlocked): void => {
+        if (gate.cancelled) {
+          return;
+        }
+
+        if (!isUnlocked) {
+          if (mountedRef.current) {
             setBusy(false);
           }
-        })
-        .catch((error): void => {
-          errorHandler(error as Error);
-        });
-    }, 0);
+
+          return;
+        }
+
+        const done = (): void => {
+          if (mountedRef.current) {
+            setBusy(false);
+          }
+        };
+
+        if (!isSubmit) {
+          _onSign(queueSetTxStatus, currentItem, senderInfo).then(done).catch(errorHandler);
+
+          return;
+        }
+
+        if (currentItem.payload) {
+          _onSendPayload(queueSetTxStatus, currentItem, senderInfo);
+          done();
+
+          return;
+        }
+
+        _onSend(queueSetTxStatus, currentItem, senderInfo).then(done).catch(errorHandler);
+      })
+      .catch((error): void => {
+        errorHandler(error as Error);
+      });
   }, [_onSend, _onSendPayload, _onSign, _unlock, currentItem, isSubmit, queueSetTxStatus, senderInfo]);
 
   return (
@@ -416,6 +490,13 @@ function TxSigned({ className, currentItem, requestAddress }: Props): React.Reac
             />
           ) : (
             <>
+              {isBusy && !flags.isHardware && !flags.isUnlockable && (
+                <div>
+                  {t<string>(
+                    'Confirm the signature in your wallet. If no window opens, open the wallet extension and approve the pending request.'
+                  )}
+                </div>
+              )}
               <Transaction accountId={senderInfo.signAddress} currentItem={currentItem} onError={toggleRenderError} />
               <Address
                 currentItem={currentItem}

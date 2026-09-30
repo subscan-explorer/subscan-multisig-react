@@ -4,9 +4,8 @@
 
 // import type { DecodedEvent } from '@polkadot/api-contract/types';
 import { Params } from '@polkadot/react-params';
-import type { Bytes } from '@polkadot/types';
 import { getTypeDef } from '@polkadot/types';
-import type { Event } from '@polkadot/types/interfaces';
+import type { Event, EventRecord } from '@polkadot/types/interfaces';
 import type { Codec } from '@polkadot/types/types';
 import React, { useMemo } from 'react';
 import { useTranslation } from './translate';
@@ -17,6 +16,7 @@ export interface Props {
   children?: React.ReactNode;
   className?: string;
   value: Event;
+  record?: EventRecord;
 }
 
 interface Value {
@@ -30,7 +30,7 @@ interface AbiEvent {
   values: Value[];
 }
 
-function EventDisplay({ children, className = '', value }: Props): React.ReactElement<Props> {
+function EventDisplay({ children, className = '', value, record }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const params = value.typeDef.map(({ type }) => ({ type: getTypeDef(type) }));
   const values = value.data.map((value) => ({ isValid: true, value }));
@@ -39,15 +39,20 @@ function EventDisplay({ children, className = '', value }: Props): React.ReactEl
   const abiEvent = useMemo((): AbiEvent | null => {
     // for contracts, we decode the actual event
     // eslint-disable-next-line no-magic-numbers
-    if (value.section === 'contracts' && value.method === 'ContractExecution' && value.data.length === 2) {
+    if (
+      record &&
+      value.section === 'contracts' &&
+      ['ContractExecution', 'ContractEmitted'].includes(value.method) &&
+      value.data.length === 2
+    ) {
       // see if we have info for this contract
-      const [accountId, encoded] = value.data;
+      const [accountId] = value.data;
 
       try {
         const abi = getContractAbi(accountId.toString());
 
         if (abi) {
-          const decoded = abi.decodeEvent(encoded as Bytes);
+          const decoded = abi.decodeEvent(record);
 
           return {
             ...decoded,
@@ -62,7 +67,7 @@ function EventDisplay({ children, className = '', value }: Props): React.ReactEl
     }
 
     return null;
-  }, [value]);
+  }, [value, record]);
 
   return (
     <div className={`ui--Event ${className}`}>

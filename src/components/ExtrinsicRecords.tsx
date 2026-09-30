@@ -1,7 +1,7 @@
 /* eslint-disable no-magic-numbers */
 import { ReloadOutlined } from '@ant-design/icons';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
-import { Space, Spin, Tabs } from 'antd';
+import { Alert, Button, Space, Spin, Tabs } from 'antd';
 import { isNumber } from 'lodash';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -192,8 +192,15 @@ export function ExtrinsicRecords() {
   const { networkConfig } = useApi();
   const { t } = useTranslation();
   const { account: multiAddress } = useParams<{ account: string }>();
-  const { multisigAccount, inProgress, confirmedAccount, cancelledAccount, queryInProgress, loadingInProgress } =
-    useMultisigContext();
+  const {
+    multisigAccount,
+    inProgress,
+    confirmedAccount,
+    cancelledAccount,
+    queryInProgress,
+    loadingInProgress,
+    inProgressError,
+  } = useMultisigContext();
   const [tabKey, setTabKey] = useState('inProgress');
   const [confirmedPage, setConfirmedPage] = useState(1);
   const [cancelledPage, setCancelledPage] = useState(1);
@@ -226,14 +233,14 @@ export function ExtrinsicRecords() {
 
   // eslint-disable-next-line complexity
   useEffect(() => {
-    if (!loadingInProgress && confirmedAccount !== undefined && first) {
+    if (!inProgressError && !loadingInProgress && confirmedAccount !== undefined && first) {
       setFirst(false);
       if (inProgress.length === 0 && confirmedAccount > 0) {
         setTabKey('confirmed');
         fetchConfirmed();
       }
     }
-  }, [loadingInProgress, confirmedAccount, first, inProgress, fetchConfirmed]);
+  }, [inProgressError, loadingInProgress, confirmedAccount, first, inProgress, fetchConfirmed]);
 
   // Re-fetch list when page changes, only if already on that tab
   useEffect(() => {
@@ -291,12 +298,20 @@ export function ExtrinsicRecords() {
           tab={
             <Space>
               <span>{t('multisig.In Progress')}</span>
-              <span>{inProgress.length}</span>
+              <span>{inProgressError || loadingInProgress ? '—' : inProgress.length}</span>
             </Space>
           }
           key="inProgress"
         >
-          {multisigAccount?.address ? (
+          {inProgressError ? (
+            <Alert
+              type="error"
+              showIcon
+              message={t('Unable to load pending transactions')}
+              description={t('The displayed transaction count is unavailable. Retry the network request.')}
+              action={<Button onClick={() => queryInProgress()}>{t('Retry')}</Button>}
+            />
+          ) : multisigAccount?.address ? (
             <Entries
               source={inProgress}
               account={multisigAccount}

@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { keyring } from '@polkadot/ui-keyring';
-import { assert, isHex } from '@polkadot/util';
-import { hexToU8aFixed as hexToU8a } from 'src/utils/helper/hexToU8a';
+import { assert, hexToU8a, isHex } from '@polkadot/util';
 import { ethereumEncode } from '@polkadot/util-crypto';
 
 // eslint-disable-next-line complexity

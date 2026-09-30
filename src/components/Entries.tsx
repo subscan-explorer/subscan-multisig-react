@@ -1,6 +1,6 @@
 import BaseIdentityIcon from '@polkadot/react-identicon';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
-import { Button, Collapse, Empty, Progress, Space, Spin, Table, Typography } from 'antd';
+import { Button, Collapse, Empty, Pagination, Progress, Space, Spin, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { intersection, isEmpty } from 'lodash';
 import { useCallback, useRef, useState } from 'react';
@@ -8,6 +8,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useApi, useDataSourceTools, useIsInjected } from '../hooks';
 import { AddressPair, Entry, Network, TxActionType, TxOperationComponentProps } from '../model';
 import { toShortString, formatDate } from '../utils';
+import { callArgumentValue } from '../utils/helper/callArguments';
 import { ArgObj, Args } from './Args';
 import { genExpandIcon } from './expandIcon';
 import { ApproveRecord, CancelRecord } from './ExtrinsicRecords';
@@ -31,7 +32,7 @@ export interface EntriesProps {
 const { Panel } = Collapse;
 const CALL_DATA_LENGTH = 25;
 
-const renderMethod = (data: any | undefined | null) => {
+const renderMethod = (data: { section?: string; method?: string } | undefined | null) => {
   // const call = data && data?.toHuman ? data?.toHuman() : data;
 
   if (data && data.section && data.method) {
@@ -247,25 +248,20 @@ export function Entries({
       width: 300,
       align: 'left',
       // eslint-disable-next-line complexity
-      render(data: string) {
+      render(data: string, row: Entry) {
         let extrinsicHeight = '';
         let extrinsicIndex = '';
-        if ((isConfirmed || isCancelled) && data.split('-').length > 1) {
+        if ((isConfirmed || isCancelled) && data?.split('-').length > 1) {
           extrinsicHeight = data.split('-')[0];
           extrinsicIndex = data.split('-')[1];
         }
 
+        const pendingText = !isEmpty(data) ? data : row.callHash || '';
+
         return !(isConfirmed || isCancelled) ? (
-          <>
-            <Typography.Text copyable={!isEmpty(data) && { text: data }}>
-              {!isEmpty(data) ? (
-                // ? `${data.substring(0, CALL_DATA_LENGTH)}${data.length > CALL_DATA_LENGTH ? '...' : ''}`
-                toShortString(data, CALL_DATA_LENGTH)
-              ) : (
-                <Spin spinning={true} />
-              )}
-            </Typography.Text>
-          </>
+          <Typography.Text copyable={!isEmpty(pendingText) && { text: pendingText }}>
+            {!isEmpty(pendingText) ? toShortString(pendingText, CALL_DATA_LENGTH) : '-'}
+          </Typography.Text>
         ) : (
           <SubscanLink extrinsic={{ height: extrinsicHeight, index: extrinsicIndex }}>{data}</SubscanLink>
         );
@@ -318,7 +314,7 @@ export function Entries({
     // const callDataJson = entry.callData?.toJSON() ?? {};
     const args: Required<ArgObj>[] = ((entry.meta?.args ?? []) as Required<ArgObj>[]).map((arg) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const value = (entry.callDataJson?.args as any)[arg?.name ?? ''];
+      const value = callArgumentValue(entry.callDataJson?.args, arg.name) as Required<ArgObj>['value'];
 
       return { ...arg, value };
     });
@@ -375,13 +371,18 @@ export function Entries({
       ></Table>
 
       <Space direction="vertical" className="lg:hidden block">
+        {/* eslint-disable-next-line complexity */}
         {source.map((data) => {
-          const { address, hash, callData, approvals } = data;
+          const { address, hash, approvals } = data;
           const approvedCount = approvals?.length || 0;
           const threshold = (account.meta.threshold as number) || 1;
 
           return (
-            <Collapse key={address} expandIcon={() => <></>} className="wallet-collapse">
+            <Collapse
+              key={data.extrinsicIdx || data.callHash || hash}
+              expandIcon={() => <></>}
+              className="wallet-collapse"
+            >
               <Panel
                 header={
                   <Space direction="vertical" className="w-full mb-4">
@@ -390,7 +391,7 @@ export function Entries({
                     </Typography.Text>
 
                     <div className="flex items-center">
-                      <Typography.Text>{renderMethod(callData)}</Typography.Text>
+                      <Typography.Text>{renderMethod(data.callDataJson)}</Typography.Text>
 
                       <Progress
                         /* eslint-disable-next-line no-magic-numbers */
@@ -409,6 +410,17 @@ export function Entries({
                   data={account}
                   statusRender={(pair) => renderMemberStatus(data, pair, network, !isCancelled && !isConfirmed)}
                 />
+                <div className="mobile-call-parameters">
+                  <div className="font-semibold mb-3">{t('parameters')}</div>
+                  <Args
+                    args={((data.meta?.args || []) as Required<ArgObj>[]).map((arg) => ({
+                      ...arg,
+                      value: callArgumentValue(data.callDataJson?.args, arg.name) as ArgObj['value'],
+                    }))}
+                    section={data.callDataJson?.section}
+                    method={data.callDataJson?.method}
+                  />
+                </div>
               </Panel>
             </Collapse>
           );
@@ -428,7 +440,18 @@ export function Entries({
             account={account}
           />
         ) : null}
-        {!source.length && <Empty />}
+        {loading && <Spin />}
+        {!loading && !source.length && <Empty />}
+        {(isConfirmed || isCancelled) && totalCount > 0 && (
+          <Pagination
+            simple
+            current={currentPage}
+            pageSize={10}
+            total={totalCount}
+            onChange={onChangePage}
+            disabled={loading}
+          />
+        )}
       </Space>
     </div>
   );

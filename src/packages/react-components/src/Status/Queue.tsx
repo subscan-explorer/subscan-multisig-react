@@ -4,11 +4,11 @@
 
 import { SubmittableResult } from '@polkadot/api';
 import type { SubmittableExtrinsic } from '@polkadot/api/promise/types';
-import type { Bytes } from '@polkadot/types';
 import type { DispatchError } from '@polkadot/types/interfaces';
 import jsonrpc from '@polkadot/types/interfaces/jsonrpc';
 import type { ITuple, Registry, SignerPayloadJSON } from '@polkadot/types/types';
 import React, { useCallback, useRef, useState } from 'react';
+import { transactionFailure, dispatchErrorMessage } from '../../../../utils/helper/txOutcome';
 import { getContractAbi } from '../util';
 import { STATUS_COMPLETE } from './constants';
 import { QueueProvider } from './Context';
@@ -84,13 +84,20 @@ function mergeStatus(status: ActionStatusPartial[]): ActionStatus[] {
 }
 
 function extractEvents(result?: SubmittableResult): ActionStatus[] {
+  const failure = transactionFailure(result);
+  if (failure) {
+    return [{ action: 'transaction failed', message: dispatchErrorMessage(failure), status: 'error' }];
+  }
   return mergeStatus(
     ((result && result.events) || [])
       // filter events handled globally, or those we are not interested in, these are
       // handled by the global overview, so don't add them here
       .filter((record): boolean => !!record.event && record.event.section !== 'democracy')
       // eslint-disable-next-line complexity
-      .map(({ event: { data, method, section } }): ActionStatusPartial => {
+      .map((record): ActionStatusPartial => {
+        const {
+          event: { data, method, section },
+        } = record;
         if (section === 'system' && method === 'ExtrinsicFailed') {
           const [dispatchError] = data as unknown as ITuple<[DispatchError]>;
           let message: string = dispatchError.type;
@@ -115,15 +122,15 @@ function extractEvents(result?: SubmittableResult): ActionStatus[] {
           };
         } else if (section === 'contracts') {
           // eslint-disable-next-line no-magic-numbers
-          if (method === 'ContractExecution' && data.length === 2) {
+          if (['ContractExecution', 'ContractEmitted'].includes(method) && data.length === 2) {
             // see if we have info for this contract
-            const [accountId, encoded] = data;
+            const [accountId] = data;
 
             try {
               const abi = getContractAbi(accountId.toString());
 
               if (abi) {
-                const decoded = abi.decodeEvent(encoded as Bytes);
+                const decoded = abi.decodeEvent(record);
 
                 return {
                   action: decoded.event.identifier,

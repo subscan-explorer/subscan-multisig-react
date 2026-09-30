@@ -1,13 +1,30 @@
-import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress, KeyringJson } from '@polkadot/ui-keyring/types';
 import { encodeAddress } from '@polkadot/util-crypto';
 import { difference, intersection } from 'lodash';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import type { Call } from '@polkadot/types/interfaces';
+import type { ApiPromise } from '@polkadot/api';
 import { Entry } from '../model';
-import { convertToSS58 } from '../utils';
+import { convertToSS58, findLocalMultisig, loadPendingMultisigCalls } from '../utils';
 import { useApi } from './api';
 import { useMultisigRecords } from './combineQuery';
+
+function describeCall(api: ApiPromise, callData: Call | null) {
+  if (!callData) {
+    return null;
+  }
+
+  const { section, method } = api.registry.findMetaCall(callData.callIndex);
+  const callDataJson = { ...callData.toJSON(), section, method };
+
+  return {
+    callData,
+    callDataJson,
+    hexCallData: callData.toHex(),
+    meta: api.tx[section]?.[method]?.meta.toJSON() ?? {},
+  };
+}
 
 export function useMultisig(acc?: string) {
   const { networkConfig } = useApi();
@@ -17,7 +34,9 @@ export function useMultisig(acc?: string) {
   const ss58Account = encodeAddress(account, Number(chain.ss58Format));
 
   const [inProgress, setInProgress] = useState<Entry[]>([]);
-  const [loadingInProgress, setLoadingInProgress] = useState(false);
+  const [loadingInProgress, setLoadingInProgress] = useState(true);
+  const [inProgressError, setInProgressError] = useState(false);
+  const queryVersion = useRef(0);
 
   const fetchInprogressParams = {
     account,
@@ -34,66 +53,60 @@ export function useMultisig(acc?: string) {
         return;
       }
 
+      const version = ++queryVersion.current;
       if (!silent) setLoadingInProgress(true);
-      const multisig = keyring.getAccount(acc ?? ss58Account);
-      // Use different ss58 addresses
-      (multisig?.meta.addressPair as KeyringJson[])?.forEach((key) => {
-        key.address = convertToSS58(key.address, Number(chain.ss58Format));
-      });
+      try {
+        const multisig = findLocalMultisig(acc ?? ss58Account);
+        setMultisigAccount(multisig || null);
+        // Use different ss58 addresses
+        (multisig?.meta.addressPair as KeyringJson[])?.forEach((key) => {
+          key.address = convertToSS58(key.address, Number(chain.ss58Format));
+        });
 
-      const data = await api.query.multisig.multisigs.entries(multisig?.address);
+        const pending = await loadPendingMultisigCalls(api, acc ?? ss58Account);
+        // eslint-disable-next-line complexity
+        const calls: Entry[] = pending.map((multisigEntry) => {
+          const record = inProgressData?.multisigRecords.nodes?.filter(
+            (item) => item.callHash === multisigEntry.callHash
+          );
+          const subscanCall =
+            record?.[0]?.callData ||
+            record?.[0]?.block?.extrinsics?.nodes?.find((extrinsic) => extrinsic.multisigCall)?.multisigCall;
+          let described = describeCall(api, multisigEntry.callData);
 
-      const result: Pick<Entry, 'when' | 'depositor' | 'approvals' | 'address' | 'callHash'>[] = data?.map((entry) => {
-        const [address, callHash] = entry[0].toHuman() as string[];
-
-        return {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...(entry[1] as unknown as any).toJSON(),
-          address,
-          callHash,
-        };
-      });
-      // eslint-disable-next-line complexity
-      const calls: Entry[] | undefined = result.map((multisigEntry) => {
-        const record = inProgressData?.multisigRecords.nodes?.filter((r) => r.callHash === multisigEntry.callHash);
-        if (!record || record.length === 0) {
-          return { ...multisigEntry, callDataJson: {}, meta: {}, hash: multisigEntry.callHash };
-        }
-        try {
-          const asMultiExtrinsic = record[0]?.block?.extrinsics?.nodes?.filter((extrinsic) => extrinsic.multisigCall);
-
-          if ((!asMultiExtrinsic || asMultiExtrinsic.length === 0) && !record[0]?.callData) {
-            return {
-              ...multisigEntry,
-              callDataJson: {},
-              meta: {},
-              hash: multisigEntry.callHash,
-              approveRecords: record[0].approveRecords,
-            };
+          if (subscanCall) {
+            try {
+              described = describeCall(api, api.registry.createType('Call', subscanCall));
+            } catch (error) {
+              console.error(error);
+            }
           }
-          const callData = api.registry.createType('Call', record[0]?.callData || asMultiExtrinsic[0].multisigCall);
-          const { section, method } = api.registry.findMetaCall(callData.callIndex);
-          const callDataJson = { ...callData.toJSON(), section, method };
-          const hexCallData = callData.toHex();
-          const meta = api?.tx[callDataJson?.section][callDataJson.method].meta.toJSON();
 
           return {
-            ...multisigEntry,
-            callDataJson,
-            callData,
-            meta,
+            when: multisigEntry.when,
+            depositor: multisigEntry.depositor,
+            approvals: multisigEntry.approvals,
+            address: ss58Account,
+            callHash: multisigEntry.callHash,
             hash: multisigEntry.callHash,
-            hexCallData,
-            approveRecords: record[0].approveRecords,
+            callDataJson: described?.callDataJson ?? {},
+            meta: described?.meta ?? {},
+            callData: described?.callData,
+            hexCallData: described?.hexCallData,
+            approveRecords: record?.[0]?.approveRecords,
           };
-        } catch (error) {
-          return { ...multisigEntry, callDataJson: {}, meta: {}, hash: multisigEntry.callHash };
-        }
-      });
+        });
 
-      setMultisigAccount(multisig || null);
-      setInProgress(calls || []);
-      if (!silent) setLoadingInProgress(false);
+        if (version === queryVersion.current) {
+          setInProgress(calls);
+          setInProgressError(false);
+        }
+      } catch (error) {
+        console.error(error);
+        if (version === queryVersion.current) setInProgressError(true);
+      } finally {
+        if (version === queryVersion.current) setLoadingInProgress(false);
+      }
     },
     [api, acc, ss58Account, chain.ss58Format, inProgressData]
   );
@@ -103,7 +116,10 @@ export function useMultisig(acc?: string) {
       return;
     }
 
-    queryInProgress(true);
+    void queryInProgress();
+    return () => {
+      queryVersion.current += 1;
+    };
   }, [networkStatus, queryInProgress]);
 
   return {
@@ -112,6 +128,7 @@ export function useMultisig(acc?: string) {
     setMultisigAccount,
     queryInProgress,
     loadingInProgress,
+    inProgressError,
     fetchInProgress,
   };
 }

@@ -26,16 +26,13 @@ export function Footer({ className = '' }: { networkConfig?: NetConfigV2; classN
     []
   );
   return (
-    <Layout.Footer
-      className={`flex flex-col md:flex-row md:items-center md:justify-between lg:px-40 px-2 text-gray-400 z-10 md:fixed bottom-0 left-0 right-0 md:py-6 py-2 ${className}`}
-      style={{ background: '#2d2d2d' }}
-    >
-      <div className="md:flex md:gap-4 md:flex-wrap text-gray-400">
+    <Layout.Footer className={`app-footer ${className}`}>
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-gray-400">
         <span>{t('copy_right', { year: getYear(new Date()) })}</span>
-        <a href="https://www.subscan.io/privacy" className="text-gray-400 hover:text-gray-100">
+        <a href="https://www.subscan.io/privacy" className="footer-link">
           {t('privacy_policy')}
         </a>
-        <a href="https://www.subscan.io/term" className="text-gray-400 hover:text-gray-100">
+        <a href="https://www.subscan.io/term" className="footer-link">
           {t('term_of_use')}
         </a>
       </div>

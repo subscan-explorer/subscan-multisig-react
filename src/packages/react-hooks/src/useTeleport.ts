@@ -29,7 +29,7 @@ const DEFAULT_STATE: Teleport = {
   oneWay: [],
 };
 
-const endpoints = createWsEndpoints((k: string, v?: string) => v || k).filter(
+const endpoints = createWsEndpoints((key, value) => (typeof value === 'string' ? value : key)).filter(
   (v: any): v is ExtLinkOption => !!v.teleport
 );
 

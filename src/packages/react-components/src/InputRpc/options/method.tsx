@@ -13,11 +13,14 @@ export default function createOptions(
 ): DropdownOptions {
   const section = rpcs[sectionName];
 
-  if (!section || Object.keys((api.rpc as Record<string, Record<string, unknown>>)[sectionName]).length === 0) {
+  if (
+    !section ||
+    Object.keys((api.rpc as unknown as Record<string, Record<string, unknown>>)[sectionName]).length === 0
+  ) {
     return [];
   }
 
-  return Object.keys((api.rpc as Record<string, Record<string, unknown>>)[sectionName])
+  return Object.keys((api.rpc as unknown as Record<string, Record<string, unknown>>)[sectionName])
     .sort()
     .map((methodName) => section[methodName])
     .filter((ext): ext is DefinitionRpcExt => !!ext)

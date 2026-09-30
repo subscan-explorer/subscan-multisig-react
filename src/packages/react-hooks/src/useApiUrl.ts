@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { typesChain } from '@polkadot/apps-config';
 import { isString } from '@polkadot/util';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMountedRef } from './useIsMountedRef';
@@ -44,8 +43,6 @@ export function useApiUrl(url?: string | string[]): ApiPromise | null {
       (isString(url) || url.length) &&
       ApiPromise.create({
         provider: new WsProvider(url),
-        // typesBundle,
-        typesChain,
       })
         .then(_setApi)
         .catch(console.error);

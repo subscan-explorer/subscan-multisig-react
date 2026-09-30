@@ -5,7 +5,7 @@ import { ThemeSwitch } from '../components/ThemeSwitch';
 
 describe('should switch global theme', () => {
   it('should switch global theme', () => {
-    mount(<ThemeSwitch network="pangolin" />);
+    mount(<ThemeSwitch network="assethub-polkadot" />);
 
     cy.get('.ant-switch').should('be.visible');
   });

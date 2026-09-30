@@ -2,8 +2,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@polkadot/api-derive": ["node_modules/@subscan/multisig-polkadot-api-derive"],
-      "@polkadot/api-derive/*": ["node_modules/@subscan/multisig-polkadot-api-derive/*"],
+      "@polkadot/x-rxjs": ["node_modules/rxjs"],
+      "@polkadot/x-rxjs/*": ["node_modules/rxjs/*"],
       "@polkadot/react-api": ["src/packages/react-api/src"],
       "@polkadot/react-api/*": ["src/packages/react-api/src/*"],
       "@polkadot/react-components": ["src/packages/react-components/src"],
@@ -15,9 +15,7 @@
       "@polkadot/react-query": ["src/packages/react-query/src"],
       "@polkadot/react-query/*": ["src/packages/react-query/src/*"],
       "@polkadot/react-signer": ["src/packages/react-signer/src"],
-      "@polkadot/react-signer/*": ["src/packages/react-signer/src/*"],
-      "@polkadot/types": ["node_modules/@subscan/multisig-polkadot-types"],
-      "@polkadot/types/*": ["node_modules/@subscan/multisig-polkadot-types/*"]
+      "@polkadot/react-signer/*": ["src/packages/react-signer/src/*"]
     }
   }
 }

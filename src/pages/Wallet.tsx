@@ -1,23 +1,22 @@
 import { Alert, Card } from 'antd';
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { WalletForm } from '../components/WalletForm';
 
 export default function Wallet() {
+  const { t } = useTranslation();
+
   return (
     <div>
-      <div className="lg:mx-60">
-        <div className="text-black-800 font-bold">
+      <div className="wallet-form-page">
+        <h1 className="page-title">
           <Trans>wallet.deploy</Trans>
-        </div>
+        </h1>
 
         <Card className="mt-3 max-w-screen-xl">
           <Alert
-            message={
-              <Trans>
-                Only one wallet with the same member and threshold can be registered, but you can share it between
-                different networks
-              </Trans>
-            }
+            message={t(
+              'Only one wallet with the same members and threshold can be registered, but you can share it between different networks'
+            )}
             type="info"
             closable
             className="max-w-screen-xl mx-auto mb-4"

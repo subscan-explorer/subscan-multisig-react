@@ -1,10 +1,8 @@
 import { TypeRegistry } from '@polkadot/types';
 import { AccountId } from '@polkadot/types/interfaces';
-import { numberToU8a, stringToU8a } from '@polkadot/util';
+import { hexToU8a, numberToU8a, stringToU8a, u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { DONATE_ADDRESS } from 'src/config';
-import { u8aToHexFixed as u8aToHex } from './u8aToHex';
-import { hexToU8aFixed as hexToU8a } from './hexToU8a';
 
 export const registry = new TypeRegistry();
 

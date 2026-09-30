@@ -6,8 +6,9 @@ import type { Call } from '@polkadot/types/interfaces';
 
 import { useEffect, useState } from 'react';
 
-import { BN_ZERO, isFunction } from '@polkadot/util';
+import { bnToBn, BN_ZERO, isFunction } from '@polkadot/util';
 
+import { weightDimensions } from '../../../utils/helper/weight';
 import { useApi } from './useApi';
 import { useIsMountedRef } from './useIsMountedRef';
 
@@ -26,7 +27,10 @@ export function useWeight(call?: Call | null): [BN, number] {
       api
         .tx(call)
         .paymentInfo(ZERO_ACCOUNT)
-        .then(({ weight }) => mountedRef.current && setState([weight, call.encodedLength]))
+        .then(
+          ({ weight }) =>
+            mountedRef.current && setState([bnToBn(weightDimensions(weight).refTime.toString()), call.encodedLength])
+        )
         .catch(console.error);
     } else {
       setState(EMPTY_STATE);

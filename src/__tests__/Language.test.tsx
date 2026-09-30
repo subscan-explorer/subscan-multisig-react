@@ -7,7 +7,7 @@ describe('render', () => {
   it('should render the language switch with network color', () => {
     mount(
       <Suspense fallback="loading">
-        <Language network="pangolin" />
+        <Language network="assethub-polkadot" />
       </Suspense>
     );
 

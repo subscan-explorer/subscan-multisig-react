@@ -5,12 +5,12 @@
 
 import { isUndefined } from '@polkadot/util';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import type { DropdownProps } from 'semantic-ui-react';
+import type { DropdownProps, DropdownItemProps } from 'semantic-ui-react';
 import { Button as SUIButton, Dropdown as SUIDropdown } from 'semantic-ui-react';
 import styled from 'styled-components';
 import Labelled from './Labelled';
 
-interface Props<Option> {
+interface Props<Option extends DropdownItemProps> {
   allowAdd?: boolean;
   children?: React.ReactNode;
   className?: string;
@@ -40,11 +40,11 @@ interface Props<Option> {
   withLabel?: boolean;
 }
 
-export type IDropdown<Option> = React.ComponentType<Props<Option>> & {
+export type IDropdown<Option extends DropdownItemProps> = React.ComponentType<Props<Option>> & {
   Header: React.ComponentType<{ content: React.ReactNode }>;
 };
 
-function BaseDropdown<Option>({
+function BaseDropdown<Option extends DropdownItemProps>({
   allowAdd = false,
   children,
   className = '',

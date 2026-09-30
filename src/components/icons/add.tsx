@@ -2,7 +2,7 @@ import { getThemeColor } from 'src/config';
 import { useApi } from 'src/hooks';
 import { svgIconFactory } from './icon-factory';
 
-function Add(props: any) {
+function Add(props: React.SVGProps<SVGSVGElement>) {
   const { network } = useApi();
 
   return (

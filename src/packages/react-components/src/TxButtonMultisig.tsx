@@ -11,6 +11,7 @@ import { useIsMountedRef } from '@polkadot/react-hooks';
 import { AddressProxy } from '@polkadot/react-signer/types';
 import type { Option } from '@polkadot/types';
 import type { Multisig, Timepoint } from '@polkadot/types/interfaces';
+import { message } from 'antd';
 import { useApi } from 'src/hooks';
 import { convertWeight, extractExternal } from '../../../utils';
 import type { TxButtonProps as Props } from './types';
@@ -35,7 +36,7 @@ async function wrapTx(
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const [info, { weight }] = await Promise.all([
       api.query[multiModule].multisigs<Option<Multisig>>(multiRoot, tx.method.hash),
-      tx.paymentInfo(multiRoot) as Promise<{ weight: any }>,
+      tx.paymentInfo(multiRoot),
     ]);
     const weightAll = convertWeight(api, weight);
 
@@ -47,24 +48,21 @@ async function wrapTx(
       timepoint = info.unwrap().when;
     }
 
-    tx = isMultiCall
-      ? api.tx[multiModule].asMulti.meta.args.length === 5
-        ? // We are doing toHex here since we have a Vec<u8> input
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-          api.tx[multiModule].asMulti(threshold, others, timepoint, tx.method.toHex(), weightAll)
-        : api.tx[multiModule].asMulti.meta.args.length === 6
-        ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          api.tx[multiModule].asMulti(threshold, others, timepoint, tx.method.toHex(), false, weightAll)
-        : // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          api.tx[multiModule].asMulti(threshold, others, timepoint, tx.method)
-      : api.tx[multiModule].approveAsMulti.meta.args.length === 5
-      ? // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        api.tx[multiModule].approveAsMulti(threshold, others, timepoint, tx.method.hash, weightAll)
-      : // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        api.tx[multiModule].approveAsMulti(threshold, others, timepoint, tx.method.hash);
+    const multisigCall = isMultiCall ? api.tx[multiModule].asMulti : api.tx[multiModule].approveAsMulti;
+    const argNames = multisigCall.meta.args.map((arg) => arg.name.toString());
+    const passesWeight = argNames.some((name) => name === 'max_weight' || name === 'maxWeight');
+    const passesStoreCall = argNames.some((name) => name === 'store_call' || name === 'storeCall');
+    const callArg = multisigCall.meta.args.find((arg) => arg.name.toString() === 'call');
+    const callValue = callArg && callArg.type.toString() === 'Call' ? tx.method : tx.method.toHex();
+    const baseArgs = isMultiCall
+      ? [threshold, others, timepoint, callValue]
+      : [threshold, others, timepoint, tx.method.hash];
+
+    tx = passesStoreCall
+      ? multisigCall(threshold, others, timepoint, tx.method.toHex(), false, weightAll)
+      : passesWeight
+      ? multisigCall(...baseArgs, weightAll)
+      : multisigCall(...baseArgs);
   }
 
   return tx;
@@ -153,25 +151,47 @@ function TxButton({
       if (!api) {
         return;
       }
+
       SetIsInternalBusy(true);
-      const _tx = await wrapTx(api, extrinsic, {
-        isMultiCall: true,
-        multiRoot,
-        proxyRoot: null,
-        signAddress: accountId ? accountId.toString() : null,
-        isUnlockCached: false,
-        signPassword: '',
-      });
-      SetIsInternalBusy(false);
-      queueExtrinsic({
-        accountId: accountId && accountId.toString(),
-        extrinsic: _tx,
-        isUnsigned,
-        txFailedCb: withSpinner ? _onFailed : onFailed,
-        txStartCb: _onStart,
-        txSuccessCb: withSpinner ? _onSuccess : onSuccess,
-        txUpdateCb: onUpdate,
-      });
+
+      try {
+        const _tx = await wrapTx(api, extrinsic, {
+          isMultiCall: true,
+          multiRoot,
+          proxyRoot: null,
+          signAddress: accountId ? accountId.toString() : null,
+          isUnlockCached: false,
+          signPassword: '',
+        });
+
+        if (!mountedRef.current) {
+          return;
+        }
+
+        queueExtrinsic({
+          accountId: accountId && accountId.toString(),
+          extrinsic: _tx,
+          isUnsigned,
+          txFailedCb: withSpinner ? _onFailed : onFailed,
+          txStartCb: _onStart,
+          txSuccessCb: withSpinner ? _onSuccess : onSuccess,
+          txUpdateCb: onUpdate,
+        });
+      } catch (error) {
+        console.error(error);
+
+        if (mountedRef.current) {
+          setIsSending(false);
+        }
+
+        const detail = error instanceof Error ? error.message : String(error);
+
+        message.error(`${t<string>('Failed to prepare the multisig transaction')}: ${detail}`);
+      } finally {
+        if (mountedRef.current) {
+          SetIsInternalBusy(false);
+        }
+      }
     });
 
     // eslint-disable-next-line
@@ -194,6 +214,7 @@ function TxButton({
     _onSuccess,
     onSuccess,
     onUpdate,
+    t,
   ]);
 
   if (onSendRef) {
