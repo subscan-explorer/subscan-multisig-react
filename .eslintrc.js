@@ -112,7 +112,7 @@ module.exports = {
     'import/order': 'error',
     'jsdoc/check-alignment': 'error',
     'jsdoc/check-indentation': 'error',
-    'jsdoc/newline-after-description': 'error',
+    'jsdoc/tag-lines': ['error', 'any', { startLines: 1 }],
     'jsdoc/no-types': 'error',
     'max-len': [
       'warn',

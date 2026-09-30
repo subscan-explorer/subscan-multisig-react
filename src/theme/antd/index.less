@@ -1,104 +1,109 @@
+@import 'antd/dist/antd.less';
 @import './vars.less';
 
-/* btn rest */
-.ant-btn-primary {
-  border: none !important;
-
-  &:hover,
-  &:focus {
-    background: @project-main-bg;
-    opacity: 0.9;
-  }
+.ant-btn-primary:not([disabled]) {
+  background: var(--sub-network, @primary-color);
+  border-color: var(--sub-network, @primary-color);
+  color: #fff;
 }
 
-.ant-btn {
-  border-radius: 0.15rem;
+.ant-btn:not([disabled]):hover,
+.ant-btn:not([disabled]):focus-visible {
+  border-color: var(--sub-network, @primary-color);
+  color: var(--sub-network, @primary-color);
 }
 
-.ant-btn-primary {
-  color: white;
+.ant-btn-primary:not([disabled]):hover,
+.ant-btn-primary:not([disabled]):focus-visible {
+  color: #fff;
+  filter: brightness(0.94);
 }
 
-.ant-btn:hover,
-.ant-btn:focus,
-.ant-btn:active {
-  opacity: 0.9;
+.ant-btn:focus-visible,
+.header-link:focus-visible {
+  outline: 2px solid var(--sub-network, @primary-color);
+  outline-offset: 3px;
 }
 
-/* Modal reset */
+.ant-input:hover,
+.ant-input:focus,
+.ant-input-affix-wrapper:hover,
+.ant-input-affix-wrapper-focused,
+.ant-input-number-focused,
+.ant-select:not(.ant-select-disabled):hover .ant-select-selector,
+.ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  border-color: var(--sub-network, @primary-color);
+}
+
+.ant-input:focus,
+.ant-input-affix-wrapper-focused,
+.ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sub-network, @primary-color) 12%, transparent);
+}
+
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn,
+.ant-tabs-tab:hover,
+.ant-radio-wrapper:hover .ant-radio-inner {
+  color: var(--sub-network, @primary-color);
+}
+
+.ant-tabs-ink-bar,
+.ant-radio-inner::after,
+.ant-checkbox-checked .ant-checkbox-inner {
+  background: var(--sub-network, @primary-color);
+}
+
+.ant-checkbox-checked .ant-checkbox-inner,
+.ant-radio-checked .ant-radio-inner {
+  border-color: var(--sub-network, @primary-color);
+}
+
+.ant-card-bordered {
+  border-color: @border-color-split;
+  box-shadow: @shadow-2;
+}
+
 .ant-modal-content {
-  border-radius: 0.15rem;
+  border-radius: 20px;
+  overflow: hidden;
 }
 
 .ant-modal-header {
-  border-radius: 0.15rem 0.15rem 0 0;
+  padding: 20px 24px;
 }
 
-.ant-modal-close-x {
-  color: #595959;
-  font-weight: bold;
+.ant-modal-title {
+  font-size: 18px;
+  font-weight: 600;
 }
 
-/* checkbox */
-.ant-checkbox-checked .ant-checkbox-inner {
-  background-color: transparent;
-  background: @project-main-bg;
+.ant-dropdown-menu,
+.ant-select-dropdown,
+.ant-popover-inner {
+  border-radius: 12px;
+  box-shadow: @shadow-2;
 }
 
-/* alert */
-.ant-alert {
-  min-width: 200px;
-  border-radius: @border-radius-base;
+.ant-dropdown-menu {
+  padding: 8px;
 }
 
-/* tag */
+.ant-dropdown-menu-item {
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.ant-alert-info {
+  background: #f0f7ff;
+  border-color: #d6eaff;
+}
+
 .ant-tag {
   border-radius: 6px;
 }
 
-/* checkbox group */
-.ant-checkbox-group {
-  .ant-checkbox-wrapper:not(:last-child) {
-    margin-bottom: 1em;
-  }
-
-  .ant-checkbox-inner {
-    border-radius: 2px;
-  }
-}
-
-/* card */
-.ant-card-bordered {
-  border-color: #eaeaea;
-  border-radius: @shadow-2;
-  box-shadow: 0 0 24px 0 rgba(191, 194, 234, 0.41);
-}
-
-/* dropdown menu */
-.ant-dropdown-menu {
-  padding: 20px;
-
-  .ant-dropdown-menu-item {
-    line-height: 32px;
-  }
-}
-
-/* ant-message */
-.ant-message .anticon {
+.ant-message .anticon,
+.ant-typography .anticon {
   top: 0;
   vertical-align: 0;
-}
-
-/* autocomplete */
-.ant-form-item-control-input {
-  .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
-    border-right-width: 0 !important;
-  }
-}
-
-/* typography */
-.ant-typography {
-  .anticon {
-    vertical-align: 0;
-  }
 }

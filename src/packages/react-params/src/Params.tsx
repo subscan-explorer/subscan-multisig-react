@@ -70,7 +70,7 @@ class Params extends React.PureComponent<Props, State> {
 
   // This is needed in the case where the item changes, i.e. the values get
   // initialized and we need to alert the parent that we have new values
-  public componentDidUpdate(_: Props | null, prevState: State): void {
+  public componentDidUpdate(_: unknown, prevState: State): void {
     const { isDisabled } = this.props;
     const { values } = this.state;
 
@@ -163,4 +163,6 @@ class Params extends React.PureComponent<Props, State> {
   };
 }
 
-export default translate(Params);
+export default translate(function Translated(props: Props) {
+  return <Params {...props} />;
+});

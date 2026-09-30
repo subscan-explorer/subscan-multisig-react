@@ -1,11 +1,11 @@
-import { NetworkConfigV2 } from 'src/model';
+import { NetConfigV2, NetworkConfigV2 } from 'src/model';
 
-const configs = require.context('./chains', false, /\.json$/);
+const configs = import.meta.glob<{ default: NetConfigV2 }>('./chains/*.json', { eager: true });
 
 const update: NetworkConfigV2 = {};
-configs.keys().forEach((k) => {
-  const c = configs(k);
-  update[c.name] = c;
+Object.values(configs).forEach((mod) => {
+  const config = mod.default;
+  update[config.name] = config;
 });
 
 export const chains = update;

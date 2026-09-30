@@ -10,6 +10,16 @@ export function updateStorage(data: Partial<StorageInfo>): void {
   }
 }
 
+export function clearWalletSource(): void {
+  if (!localStorage) {
+    return;
+  }
+
+  const origin = readStorage();
+  delete origin.walletSource;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(origin));
+}
+
 export function readStorage(): StorageInfo {
   if (localStorage) {
     const info = localStorage.getItem(STORAGE_KEY);

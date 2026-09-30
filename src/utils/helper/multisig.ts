@@ -2,10 +2,10 @@ import { ApiPromise } from '@polkadot/api';
 import { Call } from '@polkadot/types/interfaces';
 import keyring from '@polkadot/ui-keyring';
 import { KeyringAddress } from '@polkadot/ui-keyring/types';
-import { createKeyMulti } from '@polkadot/util-crypto';
+import { createKeyMulti, decodeAddress } from '@polkadot/util-crypto';
 import store from 'store';
+import { u8aToHex } from '@polkadot/util';
 import { Network, ShareScope, WalletFormValue } from '../../model';
-import { u8aToHexFixed as u8aToHex } from './u8aToHex';
 
 interface MultiInfo {
   isMultisig: boolean;
@@ -106,6 +106,20 @@ export function findMultiAccount({
   );
 
   return existsAccounts.find((acc) => acc.publicKey.toString() === key.toString()) ?? null;
+}
+
+export function findLocalMultisig(address: string): KeyringAddress | null {
+  const direct = keyring.getAccount(address);
+
+  if (direct) {
+    return direct;
+  }
+
+  try {
+    return findMultiAccountFromKey(decodeAddress(address));
+  } catch {
+    return null;
+  }
 }
 
 export function findMultiAccountFromKey(publicKey: Uint8Array): KeyringAddress | null {

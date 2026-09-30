@@ -6,6 +6,7 @@
 import type { KeyringPair } from '@polkadot/keyring/types';
 import { SubmittableResult } from '@polkadot/api';
 import { keyring } from '@polkadot/ui-keyring';
+import { transactionFailure, dispatchErrorMessage } from '../../../utils/helper/txOutcome';
 import type { QueueTx, QueueTxMessageSetStatus, QueueTxStatus } from '../../react-components/src/Status/types';
 import type { AddressFlags } from './types';
 
@@ -90,6 +91,7 @@ export function handleTxResults(
   { id, txFailedCb = NOOP, txSuccessCb = NOOP, txUpdateCb = NOOP }: QueueTx,
   unsubscribe: () => void
 ): (result: SubmittableResult) => void {
+  let outcomeReported = false;
   return (result: SubmittableResult): void => {
     if (!result || !result.status) {
       return;
@@ -97,24 +99,37 @@ export function handleTxResults(
 
     const status = result.status.type.toLowerCase() as QueueTxStatus;
 
-    queueSetTxStatus(id, status, result);
+    const failure = transactionFailure(result);
+    const included = result.status.isFinalized || result.status.isInBlock;
+    const succeeded = result.events.some(
+      ({ event }) => event.section === 'system' && event.method === 'ExtrinsicSuccess'
+    );
+    const verificationError =
+      result.internalError || (included && !failure && !succeeded)
+        ? new Error('Unable to verify transaction events. Check the explorer before retrying.')
+        : undefined;
+    queueSetTxStatus(
+      id,
+      failure || verificationError ? 'error' : status,
+      result,
+      failure ? new Error(dispatchErrorMessage(failure)) : verificationError
+    );
     txUpdateCb(result);
 
-    if (result.status.isFinalized || result.status.isInBlock) {
-      result.events
-        .filter(({ event: { section } }) => section === 'system')
-        .forEach(({ event: { method } }): void => {
-          if (method === 'ExtrinsicFailed') {
-            txFailedCb(result);
-          } else if (method === 'ExtrinsicSuccess') {
-            txSuccessCb(result);
-          }
-        });
-    } else if (result.isError) {
+    if (!outcomeReported && (included || verificationError)) {
+      if (failure || verificationError) {
+        outcomeReported = true;
+        txFailedCb(result);
+      } else if (succeeded) {
+        outcomeReported = true;
+        txSuccessCb(result);
+      }
+    } else if (!outcomeReported && result.isError) {
+      outcomeReported = true;
       txFailedCb(result);
     }
 
-    if (result.isCompleted) {
+    if (result.isCompleted || verificationError) {
       unsubscribe();
     }
   };

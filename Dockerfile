@@ -1,14 +1,14 @@
-FROM node:14 as builder
+FROM node:20 as builder
 WORKDIR /app
 
 COPY package.json .
 COPY package-lock.json .
 
-RUN npm install
+RUN CYPRESS_INSTALL_BINARY=0 npm ci
 
 COPY . /app/
 
-RUN npm run build
+RUN npm run check
 
 FROM nginx:stable-alpine
 

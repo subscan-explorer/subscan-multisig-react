@@ -197,23 +197,30 @@ You can fork from the [subscan multisig subquery repo](https://github.com/subsca
 - Linux / Mac OSX
 - Git
 - yarn / npm
-- Node 14.15.x
+- Node 20 or newer
 
 ### Install
 
 ```bash
-yarn && yarn start:dev
+npm ci
+npm run start:dev
 ```
 
-### Test
+### Release checks
 
 ```bash
-//unit
-yarn test:unit
-//e2e
-yarn test:e2e
-
+npm run check
 ```
+
+This runs ESLint, deterministic offline regression tests, TypeScript checking and
+production build. The Docker build runs the same checks before producing an image.
+CI uses Node 20 and does not request wallet permissions or submit transactions.
+
+The interactive Cypress suites remain available with `npm run test:e2e`
+and `npm run test:components`. They are not release-gate evidence. Real extension
+signing and Ledger verification require a separate controlled testnet check.
+Never inject a funded mnemonic into a production Vite build: `VITE_*` variables
+are embedded in browser assets.
 
 ## Contributions
 

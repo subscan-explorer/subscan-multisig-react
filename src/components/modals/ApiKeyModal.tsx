@@ -59,7 +59,7 @@ export const ApiKeyModal = ({ visible, onCancel }: ApiKeyModalProps) => {
       updateStorage({ subscanApiKey: trimmed });
       message.success(t('api_key.saved'));
       onCancel();
-    } catch (err: any) {
+    } catch {
       setValidationError(t('api_key.invalid_key_or_network'));
     } finally {
       setValidating(false);

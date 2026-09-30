@@ -1,6 +1,5 @@
 import { decodeAddress, encodeAddress } from '@polkadot/keyring';
-import { isHex } from '@polkadot/util';
-import { hexToU8aFixed as hexToU8a } from './hexToU8a';
+import { hexToU8a, isHex } from '@polkadot/util';
 
 export const isSS58Address = (address: string) => {
   try {

@@ -17,6 +17,8 @@ import {
 
 export interface MultisigAccountDetailResult {
   multisigAccount: { id: string; threshold: number; members: string[] } | null;
+  failed?: boolean;
+  queriedAccount?: string;
 }
 
 export interface MultisigRecordCountResult {

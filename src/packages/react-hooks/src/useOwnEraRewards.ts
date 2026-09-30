@@ -70,6 +70,7 @@ function getValRewards(
             era,
             eraReward: eraRewards.eraReward,
             isEmpty: false,
+            isClaimed: false,
             isValidator: true,
             nominating: [],
             validators: {

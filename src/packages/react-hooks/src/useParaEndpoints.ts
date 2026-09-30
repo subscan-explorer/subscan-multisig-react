@@ -10,7 +10,7 @@ import type BN from 'bn.js';
 import { useMemo } from 'react';
 import { useApi } from './useApi';
 
-const endpoints = createWsEndpoints((key: string, value: string | undefined) => value || key);
+const endpoints = createWsEndpoints((key, value) => (typeof value === 'string' ? value : key));
 
 function extractRelayEndpoints(genesisHash: string): LinkOption[] {
   return endpoints.filter(({ genesisHashRelay }: any) => genesisHash === genesisHashRelay);

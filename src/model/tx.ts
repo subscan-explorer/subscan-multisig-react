@@ -16,6 +16,8 @@ export interface Entry {
   blockHash?: string;
   extrinsicIdx?: string;
   // callData: Call | null;
+  // Runtime metadata defines arbitrary nested call arguments.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   callDataJson: any;
   meta: Record<string, AnyJson> | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

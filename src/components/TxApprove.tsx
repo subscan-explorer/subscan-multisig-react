@@ -47,24 +47,30 @@ export function TxApprove({
         () => {
           setIsPageLock(true);
           setInputCallDataModalVisible(false);
-          getApproveTx(target, accountId).then((tx) => {
-            const queueTx: PartialQueueTxExtrinsic = {
-              extrinsic: tx,
-              accountId,
-              txSuccessCb: () => {
-                makeSure(txSpy)(null);
-                queryInProgress();
-                setTimeout(() => {
-                  refreshCounts();
-                  // eslint-disable-next-line no-magic-numbers
-                }, 10000);
-              },
-            };
+          getApproveTx(target, accountId)
+            .then((tx) => {
+              const queueTx: PartialQueueTxExtrinsic = {
+                extrinsic: tx,
+                accountId,
+                txSuccessCb: () => {
+                  makeSure(txSpy)(null);
+                  queryInProgress();
+                  setTimeout(() => {
+                    refreshCounts();
+                    // eslint-disable-next-line no-magic-numbers
+                  }, 10000);
+                },
+              };
 
-            queueExtrinsic(queueTx);
-            setIsPageLock(false);
-            makeSure(txSpy)(queueTx);
-          });
+              queueExtrinsic(queueTx);
+              setIsPageLock(false);
+              makeSure(txSpy)(queueTx);
+            })
+            .catch((error: unknown) => {
+              console.error(error);
+              setIsPageLock(false);
+              message.error(error instanceof Error ? error.message : t('Failed to prepare the multisig transaction'));
+            });
           makeSure(onOperation)({
             entry: target,
             type: 'approve',

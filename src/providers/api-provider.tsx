@@ -1,15 +1,23 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { typesChain } from '@polkadot/apps-config';
-import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
-import type { InjectedExtension } from '@polkadot/extension-inject/types';
+import type { Injected, InjectedAccount } from '@polkadot/extension-inject/types';
 import { message } from 'antd';
-import React, { createContext, Dispatch, useCallback, useEffect, useReducer, useState } from 'react';
+import React, { createContext, Dispatch, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { chains } from 'src/config/chains';
+import { WalletConnection } from '../wallets/connection';
 import { Action, ConnectStatus, InjectedAccountWithMeta, NetConfigV2, Network } from '../model';
 import { convertToSS58, getInitialSetting, patchUrl } from '../utils';
 import { changeUrlHash } from '../utils/helper';
-import { readStorage, updateStorage } from '../utils/helper/storage';
+import { installChainSignedExtensions } from '../utils/helper/signedExtensions';
+import { clearWalletSource, readStorage, updateStorage } from '../utils/helper/storage';
+import {
+  WalletSource,
+  enableWallet,
+  forgetInjectedAccounts,
+  isWalletInstalled,
+  isWalletSource,
+  syncInjectedAccounts,
+} from '../wallets';
 
 interface StoreState {
   accounts: InjectedAccountWithMeta[] | null;
@@ -76,7 +84,10 @@ export type ApiCtx = {
   setRandom: (num: number) => void;
   networkConfig: NetConfigV2 | undefined;
   chain: Chain;
-  extensions: InjectedExtension[] | undefined;
+  extensions: Partial<Record<WalletSource, Injected>>;
+  walletSource: WalletSource | null;
+  connectWallet: (source: WalletSource) => Promise<boolean>;
+  disconnectWallet: () => void;
 };
 
 export const ApiContext = createContext<ApiCtx | null>(null);
@@ -96,7 +107,11 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
   const [api, setApi] = useState<ApiPromise | null>(null);
   const [chain, setChain] = useState<Chain>({ ss58Format: '', tokens: [] });
   const [random, setRandom] = useState<number>(0);
-  const [extensions, setExtensions] = useState<InjectedExtension[] | undefined>(undefined);
+  const [extensions, setExtensions] = useState<Partial<Record<WalletSource, Injected>>>({});
+  const [walletSource, setWalletSource] = useState<WalletSource | null>(null);
+  const [rawAccounts, setRawAccounts] = useState<InjectedAccount[]>([]);
+  const walletSourceRef = useRef<WalletSource | null>(null);
+  const autoConnectStarted = useRef(false);
   const [networkConfig, setNetworkConfig] = useState(chains[state.network]);
 
   // eslint-disable-next-line complexity
@@ -161,123 +176,141 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
 
     const url = selectedNetwork.rpc;
     const provider = new WsProvider(url);
-
-    const commonWeightTypes = {
-      types: [
-        {
-          // eslint-disable-next-line no-magic-numbers
-          minmax: [0, undefined],
-          types: {
-            WeightV1: 'u64',
-            WeightV2: {
-              refTime: 'Compact<u64>',
-              proofSize: 'Compact<u64>',
-            },
-            Weight: {
-              refTime: 'Compact<u64>',
-              proofSize: 'Compact<u64>',
-            },
-          },
-        },
-      ],
-    };
-
-    const chainNames = [
-      'Polkadot',
-      'Kusama',
-      'Paseo Testnet',
-      'Polkadot Asset Hub',
-      'Kusama Asset Hub',
-      'Paseo Asset Hub',
-      'Kusama Coretime',
-      'Polkadot Coretime',
-      'Paseo Coretime',
-      'Kusama People',
-      'Polkadot People',
-      'Paseo People',
-      'Acala',
-      'Acurast Mainnet',
-      'Astar',
-      'Bifrost Polkadot',
-      'Crust',
-      'Hydration',
-      'Hyperbridge (Nexus)',
-      'Interlay',
-      'kintsugi',
-      'Pendulum',
-      'Xcavate',
-    ];
-
-    const typesBundle = {
-      chain: chainNames.reduce((acc, name) => ({ ...acc, [name]: commonWeightTypes }), {}),
-    };
-
-    const nApi = new ApiPromise({
-      provider,
-      typesBundle,
-      typesChain,
-    });
+    const nApi = new ApiPromise({ provider });
 
     const CONNECT_TIMEOUT = 15000;
     const timeFlag = setTimeout(() => {
       message.error(t('endpoint connect timeout'));
     }, CONNECT_TIMEOUT);
-    const onReady = async () => {
+    const onDecorated = (): void => {
+      // A runtime upgrade reloads metadata and drops custom signed extensions.
+      installChainSignedExtensions(nApi);
+    };
+    const onReady = () => {
       if (timeFlag) {
         clearTimeout(timeFlag);
       }
-      const exts = await web3Enable('polkadot-js/apps');
-
-      setExtensions(exts);
+      installChainSignedExtensions(nApi);
       setApi(nApi);
       cacheNetwork(state.network, state.rpc);
     };
 
     setNetworkStatus('connecting');
 
+    nApi.on('decorated', onDecorated);
     nApi.on('ready', onReady);
 
     return () => {
       if (timeFlag) {
         clearTimeout(timeFlag);
       }
+      nApi.off('decorated', onDecorated);
       nApi.off('ready', onReady);
     };
   }, [state.network, setNetworkStatus, random, state.rpc, switchNetwork, t]);
 
-  /**
-   * connect to substrate or metamask when account type changed.
-   */
+  const connection = useMemo(
+    () =>
+      // eslint-disable-next-line complexity
+      new WalletConnection((next) => {
+        const previous = walletSourceRef.current;
+        if (previous && previous !== next?.source) forgetInjectedAccounts(previous);
+        const source = next?.source as WalletSource | undefined;
+        walletSourceRef.current = source || null;
+        setWalletSource(source || null);
+        setExtensions(next && source ? { [source]: next.extension } : {});
+        setRawAccounts(next?.accounts || []);
+        if (source) updateStorage({ walletSource: source });
+        else {
+          setAccounts([]);
+          clearWalletSource();
+        }
+      }),
+    [setAccounts]
+  );
+
+  const disconnectWallet = useCallback(() => connection.disconnect(), [connection]);
+  const connectWallet = useCallback(
+    (source: WalletSource) => connection.connect(source, () => enableWallet(source)),
+    [connection]
+  );
+
+  useEffect(() => () => connection.disconnect(), [connection]);
+
   useEffect(() => {
     if (state.networkStatus !== 'success' || !api) {
       return;
     }
 
+    let cancelled = false;
+
+    // eslint-disable-next-line complexity
     (async () => {
-      const newAccounts = await web3Accounts();
-      const chainState = await api.rpc.system.properties();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { tokenDecimals, tokenSymbol, ss58Format } = chainState?.toHuman() as any;
-      let finalSs58Format = ss58Format || api.consts.system?.ss58Prefix.toString();
-      finalSs58Format = finalSs58Format.replaceAll(',', '');
-      const chainInfo = tokenDecimals.reduce(
-        (acc: Chain, decimal: string, index: number) => {
-          const token = { decimal, symbol: tokenSymbol[index] };
+      const props = await api.rpc.system.properties();
+      const ss58 = props.ss58Format.isSome ? props.ss58Format.unwrap().toNumber() : api.registry.chainSS58 ?? 42;
+      const decimals = props.tokenDecimals.isSome
+        ? props.tokenDecimals.unwrap().map((item) => item.toString())
+        : (api.registry.chainDecimals || [0]).map((item) => item.toString());
+      const symbols = props.tokenSymbol.isSome
+        ? props.tokenSymbol.unwrap().map((item) => item.toString())
+        : api.registry.chainTokens || [];
+      const tokens = decimals.map((decimal, index) => ({
+        decimal,
+        symbol: symbols[index] || 'UNIT',
+      }));
 
-          return { ...acc, tokens: [...acc.tokens, token] };
-        },
-        { ss58Format: finalSs58Format, tokens: [] } as Chain
-      );
+      if (!cancelled) {
+        setChain({ ss58Format: String(ss58), tokens });
+      }
+    })().catch((error) => {
+      console.error(error);
+    });
 
-      setChain(chainInfo);
-      setAccounts(
-        newAccounts?.map(({ address, ...other }) => ({
-          ...other,
-          address: convertToSS58(address, finalSs58Format),
-        }))
-      );
-    })();
-  }, [api, setAccounts, state.networkStatus]);
+    return () => {
+      cancelled = true;
+    };
+  }, [api, state.networkStatus]);
+
+  useEffect(() => {
+    if (!walletSource || !chain.ss58Format) {
+      return;
+    }
+
+    const prefix = Number(chain.ss58Format);
+    const mapped = rawAccounts.map((account) => ({
+      address: convertToSS58(account.address, prefix),
+      type: account.type,
+      meta: {
+        genesisHash: account.genesisHash,
+        name: account.name,
+        source: walletSource,
+      },
+    }));
+
+    setAccounts(mapped);
+
+    if (state.networkStatus === 'success') {
+      syncInjectedAccounts(mapped, walletSource);
+    }
+  }, [chain.ss58Format, rawAccounts, setAccounts, state.networkStatus, walletSource]);
+
+  // eslint-disable-next-line complexity
+  useEffect(() => {
+    if (state.networkStatus !== 'success' || autoConnectStarted.current) {
+      return;
+    }
+
+    const saved = readStorage().walletSource;
+    if (!saved || !isWalletSource(saved) || !isWalletInstalled(saved)) {
+      return;
+    }
+
+    autoConnectStarted.current = true;
+    connectWallet(saved).catch((error) => {
+      console.error(error);
+      message.error(t('wallet.connect.rejected'));
+    });
+  }, [connectWallet, state.networkStatus, t]);
 
   useEffect(() => {
     if (state.networkStatus === 'disconnected') {
@@ -299,6 +332,9 @@ export const ApiProvider = ({ children }: React.PropsWithChildren<unknown>) => {
         networkConfig,
         chain,
         extensions,
+        walletSource,
+        connectWallet,
+        disconnectWallet,
       }}
     >
       {children}

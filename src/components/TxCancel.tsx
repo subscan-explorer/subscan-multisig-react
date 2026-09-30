@@ -5,7 +5,7 @@ import { PartialQueueTxExtrinsic } from '../packages/react-components/src/Status
 import { useTranslation } from '../packages/react-signer/src/translate';
 import { extractExternal, makeSure } from '../utils';
 import { TxOperationComponentProps } from '../model';
-import { useApi } from '../packages/react-hooks/src';
+import { useApi } from '../packages/react-hooks/src/useApi';
 import { useMultisigContext } from '../hooks/multisigContext';
 
 export function TxCancel({ entry, txSpy, onOperation }: TxOperationComponentProps) {

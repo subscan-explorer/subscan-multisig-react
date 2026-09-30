@@ -3,7 +3,7 @@
 
 import type { Signer, SignerResult } from '@polkadot/api/types';
 import type { Registry, SignerPayloadJSON } from '@polkadot/types/types';
-import type { Ledger } from '@polkadot/ui-keyring';
+import type { Ledger } from '@polkadot/hw-ledger';
 
 let id = 0;
 

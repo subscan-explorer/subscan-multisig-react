@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { compactAddLength, u8aConcat } from '@polkadot/util';
-import { hexToU8aFixed as hexToU8a } from 'src/utils/helper/hexToU8a';
+import { compactAddLength, hexToU8a, u8aConcat } from '@polkadot/util';
 import type { Props } from '../types';
 
 import { Input } from '../../../react-components/src';

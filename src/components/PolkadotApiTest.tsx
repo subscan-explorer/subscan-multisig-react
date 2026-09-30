@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 
 import { Keyring } from '@polkadot/keyring';
-import { Timepoint } from '@subscan/multisig-polkadot-types/interfaces';
+import { Timepoint } from '@polkadot/types/interfaces';
 import { convertWeight } from 'src/utils';
 import { ApiPromise } from '@polkadot/api';
 import { WsProvider } from '@polkadot/rpc-provider';
@@ -11,7 +11,7 @@ const multisigAddress = 'GpaH8gfbjEAYEia4bAfPLAQkErT7vMTUV9jZJLzjJijexT8';
 const member_1 = 'F8RSYqPgUV16sp5uy2JzgcF2qsrnRwbGFRf8xML87gssxaQ';
 const member_2 = 'EDXSck8ZEcjYXCkQCDdAnTEWus9ZbgiTwcWBcqEoBsK4jGd';
 const member_3 = 'DiiKAoH4S8Yn8mEFQFxWRoFTKW1PuQWyWwfLCXS3Hrs6Ybd';
-const member_3_mnemonics = process.env.REACT_APP_MULTISIG_MEMBER_MNEMONICS;
+const member_3_mnemonics = import.meta.env.VITE_MULTISIG_MEMBER_MNEMONICS;
 
 const multisigThreshold = 2;
 const multisigOtherSignatories = [member_2, member_1];
@@ -26,48 +26,6 @@ export const PolkadotApiTest = () => {
       const wsProvider = new WsProvider('wss://kusama-rpc.dwellir.com');
       const api = await ApiPromise.create({
         provider: wsProvider,
-        typesBundle: {
-          chain: {
-            Polkadot: {
-              types: [
-                {
-                  // eslint-disable-next-line no-magic-numbers
-                  minmax: [0, undefined],
-                  types: {
-                    WeightV1: 'u64',
-                    WeightV2: {
-                      refTime: 'Compact<u64>',
-                      proofSize: 'Compact<u64>',
-                    },
-                    Weight: {
-                      refTime: 'Compact<u64>',
-                      proofSize: 'Compact<u64>',
-                    },
-                  },
-                },
-              ],
-            },
-            Kusama: {
-              types: [
-                {
-                  // eslint-disable-next-line no-magic-numbers
-                  minmax: [0, undefined],
-                  types: {
-                    WeightV1: 'u64',
-                    WeightV2: {
-                      refTime: 'Compact<u64>',
-                      proofSize: 'Compact<u64>',
-                    },
-                    Weight: {
-                      refTime: 'Compact<u64>',
-                      proofSize: 'Compact<u64>',
-                    },
-                  },
-                },
-              ],
-            },
-          },
-        },
       });
       if (!api || !member_3_mnemonics) return false;
       console.info(`Connect provider - success!`);

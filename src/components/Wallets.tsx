@@ -1,3 +1,4 @@
+import type { UploadProps } from 'antd';
 /* eslint-disable no-console */
 import { MoreOutlined } from '@ant-design/icons';
 import BaseIdentityIcon from '@polkadot/react-identicon';
@@ -12,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
 import { getLinkColor, getThemeColor } from 'src/config';
 import { MultisigAccountConfig, ShareScope } from 'src/model';
+import { validateMultisigConfig } from '../utils/helper/multisigValidation';
 import { Path } from '../config/routes';
 import { useApi, useIsInjected } from '../hooks';
 import { Chain } from '../providers';
@@ -24,7 +26,6 @@ import {
   updateMultiAccountScopeFromKey,
 } from '../utils';
 import { genExpandMembersIcon } from './expandIcon';
-import { AddIcon } from './icons';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
 
@@ -125,12 +126,12 @@ export function Wallets() {
     saveAs(blob, `multisig_accounts.json`);
   };
 
-  const uploadProps = {
+  const uploadProps: UploadProps = {
     name: 'file',
     headers: {
       authorization: 'authorization-text',
     },
-    onChange(info: any) {
+    onChange(info) {
       if (info.file.status !== 'uploading') {
         // console.log(info.file, info.fileList);
       }
@@ -140,16 +141,23 @@ export function Wallets() {
       //   message.error(`${info.file.name} file upload failed.`);
       // }
     },
-    customRequest(info: any) {
+    customRequest(info) {
       try {
         const reader = new FileReader();
 
-        reader.onload = (e: any) => {
+        reader.onload = () => {
           // eslint-disable-next-line no-console
           // console.log(e.target.result);
 
           try {
-            const configs = JSON.parse(e.target.result) as MultisigAccountConfig[];
+            const configs = JSON.parse(String(reader.result)) as MultisigAccountConfig[];
+            if (!Array.isArray(configs)) throw new Error('account config error');
+            configs.forEach((config) =>
+              validateMultisigConfig(
+                config,
+                api?.consts.multisig?.maxSignatories ? Number(api.consts.multisig.maxSignatories.toString()) : undefined
+              )
+            );
             configs
               .filter((config) => {
                 const encodeMembers = config.members.map((member) => {
@@ -195,10 +203,11 @@ export function Wallets() {
 
             message.success(t('success'));
             refreshMultisigAccounts();
-          } catch {
-            message.error(t('account config error'));
+          } catch (error) {
+            message.error(t(error instanceof Error ? error.message : 'account config error'));
           }
         };
+        if (!(info.file instanceof Blob)) throw new Error('account config error');
         reader.readAsText(info.file);
       } catch (err: unknown) {
         if (err instanceof Error) {
@@ -235,9 +244,10 @@ export function Wallets() {
               {t('actions')}
             </Button>
 
-            {(row as unknown as any).entries && (row as unknown as any).entries.length > 0 && (
-              <div className="ml-2 bg-red-500 rounded-full w-3 h-3"></div>
-            )}
+            {(row as KeyringAddress & { entries?: unknown[] }).entries &&
+              (row as KeyringAddress & { entries?: unknown[] }).entries!.length > 0 && (
+                <div className="ml-2 bg-red-500 rounded-full w-3 h-3"></div>
+              )}
           </div>
         </Space>
       );
@@ -364,17 +374,11 @@ export function Wallets() {
 
   if (!isCalculating && multisigAccounts.length === 0) {
     return (
-      <Space
-        direction="vertical"
-        className="w-full h-full flex flex-col items-center justify-center absolute"
-        id="wallets"
-      >
+      <Space direction="vertical" className="wallet-empty" id="wallets">
         <div className="flex flex-col items-center">
-          <AddIcon className="w-24 h-24" />
+          <img src="/image/no-data.png" alt="" className="wallet-empty-image" />
 
-          <div className="text-black-800 font-semibold text-xl lg:mt-16 lg:mb-10 mt-6 mb-4">
-            Please create Multisig wallet first
-          </div>
+          <div className="wallet-empty-title">{t('wallet.empty')}</div>
 
           <Link to={Path.wallet + history.location.hash}>
             <Button type="primary" className="w-48">
@@ -385,9 +389,7 @@ export function Wallets() {
           <div className="my-1">{t('or')}</div>
 
           <Upload {...uploadProps} showUploadList={false}>
-            <Button type="primary" className="w-48">
-              {t('import all')}
-            </Button>
+            <Button className="w-48">{t('import all')}</Button>
           </Upload>
         </div>
       </Space>
@@ -395,7 +397,7 @@ export function Wallets() {
   }
 
   return (
-    <Space direction="vertical" className="absolute top-4 bottom-4 left-4 right-4 overflow-auto" id="wallets">
+    <Space direction="vertical" className="wallet-list" id="wallets">
       <div className="flex flex-col md:justify-between md:flex-row">
         <div className="flex items-center">
           <Link to={Path.wallet + history.location.hash}>

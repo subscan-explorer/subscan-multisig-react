@@ -32,7 +32,15 @@ export function WalletState(props: WalletStateProps) {
   const history = useHistory();
   const { network, api, networkConfig } = useApi();
   const { multisigAccount, changeMultisigAccount } = props;
-  const { inProgress, queryInProgress, confirmedAccount, refreshCounts, fetchInProgress } = useMultisigContext();
+  const {
+    inProgress,
+    inProgressError,
+    loadingInProgress,
+    queryInProgress,
+    confirmedAccount,
+    refreshCounts,
+    fetchInProgress,
+  } = useMultisigContext();
   const [isAccountsDisplay, setIsAccountsDisplay] = useState<boolean>(false);
   const [isExtrinsicDisplay, setIsExtrinsicDisplay] = useState(false);
   const [isTransferDisplay, setIsTransferDisplay] = useState(false);
@@ -56,7 +64,7 @@ export function WalletState(props: WalletStateProps) {
     const res = [];
     res.push({
       label: 'multisig.In Progress',
-      count: inProgress.length,
+      count: inProgressError || loadingInProgress ? undefined : inProgress.length,
     });
     if (supportSubql) {
       res.push({ label: 'multisig.Confirmed Extrinsic', count: confirmedAccount });
@@ -73,7 +81,15 @@ export function WalletState(props: WalletStateProps) {
       }
     );
     return res;
-  }, [inProgress.length, confirmedAccount, multisigAccount?.meta.threshold, multisigAccount?.meta.who, supportSubql]);
+  }, [
+    inProgress.length,
+    inProgressError,
+    loadingInProgress,
+    confirmedAccount,
+    multisigAccount?.meta.threshold,
+    multisigAccount?.meta.who,
+    supportSubql,
+  ]);
 
   const renameWallet = useCallback(
     ({ name }: { name: string }) => {

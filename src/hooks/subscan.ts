@@ -40,6 +40,7 @@ export const useMultisigAccountDetail = (network: NetConfigV2 | undefined) => {
           key: account,
         });
         SetUserInfo({
+          queriedAccount: account,
           multisigAccount: {
             id: account,
             threshold: data.data.account.multisig.threshold,
@@ -48,7 +49,7 @@ export const useMultisigAccountDetail = (network: NetConfigV2 | undefined) => {
         });
         SetLoading(false);
       } catch (error) {
-        SetUserInfo({ multisigAccount: null });
+        SetUserInfo({ multisigAccount: null, failed: true, queriedAccount: account });
         SetLoading(false);
       }
     },

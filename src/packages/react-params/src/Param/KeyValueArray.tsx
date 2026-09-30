@@ -3,8 +3,7 @@
 
 import type { Vec } from '@polkadot/types';
 import type { KeyValue as Pair } from '@polkadot/types/interfaces';
-import { assert, isHex, u8aToString } from '@polkadot/util';
-import { u8aToHexFixed as u8aToHex } from 'src/utils/helper/u8aToHex';
+import { assert, isHex, u8aToHex, u8aToString } from '@polkadot/util';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from '../translate';
 import type { Props, RawParam } from '../types';

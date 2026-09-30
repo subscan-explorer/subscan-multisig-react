@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ApiPromise } from '@polkadot/api';
-import type { LedgerTypes } from '@polkadot/hw-ledger/types';
+type LedgerTypes = ConstructorParameters<typeof Ledger>[0];
 
 import { useCallback, useMemo } from 'react';
 
 import { Ledger } from '@polkadot/hw-ledger';
-import networks from '@polkadot/networks';
+import { allNetworks } from '@polkadot/networks';
 import uiSettings from '@polkadot/ui-settings';
 import { assert } from '@polkadot/util';
 
@@ -28,7 +28,7 @@ const EMPTY_STATE: StateBase = {
 };
 
 const hasWebUsb = !!(window as unknown as { USB?: unknown }).USB;
-const ledgerChains = networks.filter((n) => !!n.hasLedgerSupport);
+const ledgerChains = allNetworks.filter((n) => !!n.hasLedgerSupport);
 let ledger: Ledger | null = null;
 let ledgerType: LedgerTypes | null = null;
 

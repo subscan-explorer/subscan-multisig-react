@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { isFunction } from '@polkadot/util';
 
+import { safeBatchSize } from '../../../utils/helper/weight';
 import { useAccounts } from './useAccounts';
 import { useApi } from './useApi';
 
@@ -70,18 +71,14 @@ export function useTxBatch(
       txs[0]
         .paymentInfo(allAccounts[0])
         .then((info) =>
-          setBatchSize((prev) =>
-            info.weight.isZero()
-              ? prev
-              : Math.floor(
-                  (api.consts.system.blockWeights
-                    ? (api.consts.system.blockWeights as any).maxBlock
-                    : (api.consts.system.maximumBlockWeight as Weight)
-                  )
-                    .muln(64) // 65% of the block weight on a single extrinsic (64 for safety)
-                    .div(info.weight)
-                    .toNumber() / 100
-                )
+          setBatchSize(
+            safeBatchSize(
+              api.consts.system.blockWeights
+                ? (api.consts.system.blockWeights as unknown as { maxBlock: Weight }).maxBlock
+                : api.consts.system.maximumBlockWeight,
+              info.weight,
+              options?.batchSize || 64
+            )
           )
         )
         .catch(console.error);

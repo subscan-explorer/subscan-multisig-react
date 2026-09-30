@@ -33,7 +33,7 @@ export const routes: (RouteProps & { disable?: boolean })[] = [
     exact: true,
     path: '/ci/polkadotjs',
     component: PolkadotJs,
-    disable: !process.env.REACT_APP_MULTISIG_MEMBER_MNEMONICS,
+    disable: !import.meta.env.VITE_MULTISIG_MEMBER_MNEMONICS,
   },
   {
     exact: true,

@@ -1,0 +1,348 @@
+// Adapt the explorer's semantic colors and module geometry to Ant Design.
+@font-face {
+  font-family: Eina01;
+  src: url('/fonts/Eina01.otf') format('opentype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Eina01;
+  src: url('/fonts/Eina01-SemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Eina01;
+  src: url('/fonts/Eina01-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --sub-network: #ff0083;
+  --sub-text: #35343d;
+  --sub-muted: #85858a;
+  --sub-border: #f6f6fb;
+  --sub-bg: #fbfbfd;
+}
+
+html body {
+  font-family: Eina01, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif !important;
+  color: var(--sub-text);
+  background: var(--sub-bg);
+  font-size: 14px;
+}
+
+.main-layout.ant-layout {
+  min-height: 100vh;
+  background: var(--sub-bg);
+}
+
+.main-layout .app-header {
+  height: auto;
+  padding: 0;
+  line-height: normal;
+  background: #ffffff;
+  border-bottom: 1px solid var(--sub-border);
+}
+
+.app-header-inner,
+.app-content,
+.app-footer {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-right: 40px;
+  padding-left: 40px;
+}
+
+.app-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.app-logo {
+  width: 122px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.app-product-name {
+  margin-left: 16px;
+  padding-left: 16px;
+  border-left: 1px solid #eaeaf0;
+  font-size: 14px;
+  color: var(--sub-text);
+  white-space: nowrap;
+}
+
+.app-network-status {
+  width: 24px;
+  height: 18px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.app-header-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.header-link {
+  color: var(--sub-text);
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.header-link:hover {
+  color: var(--sub-network);
+}
+
+.network-selector {
+  gap: 6px;
+  height: 36px;
+}
+
+.network-selector img,
+.network-selector svg {
+  flex-shrink: 0;
+}
+
+.app-content {
+  flex: 1 0 auto;
+  padding-top: 30px;
+  padding-bottom: 50px;
+  min-width: 0;
+}
+
+.page-title {
+  margin: 0 0 20px;
+  font-size: 24px;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--sub-text);
+}
+
+.wallet-list-card,
+.connecting-card {
+  min-height: 480px;
+}
+
+.wallet-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 440px;
+  padding: 30px 0;
+  text-align: center;
+}
+
+.wallet-empty-image {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.wallet-empty-title {
+  margin: 24px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.wallet-list {
+  display: flex;
+  width: 100%;
+  gap: 20px !important;
+}
+
+.wallet-list > .ant-space-item {
+  min-width: 0;
+}
+
+.wallet-form-page {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.wallet-form-actions {
+  display: flex;
+  gap: 16px;
+  max-width: 320px;
+}
+
+.wallet-form-actions > * {
+  flex: 1;
+}
+
+.connecting-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 60px;
+  text-align: center;
+}
+
+.main-layout .app-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  color: var(--sub-muted);
+  background: transparent;
+  border-top: 1px solid #eaeaf0;
+  font-size: 12px;
+}
+
+.footer-link {
+  color: var(--sub-muted);
+}
+
+.footer-link:hover {
+  color: var(--sub-network);
+}
+
+@media (min-width: 1280px) {
+  .app-header-inner,
+  .app-content,
+  .app-footer {
+    padding-right: 100px;
+    padding-left: 100px;
+  }
+}
+
+@media (max-width: 767px) {
+  .app-header-inner,
+  .app-content,
+  .app-footer {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  .app-header-actions {
+    gap: 10px;
+    width: 100%;
+  }
+
+  .app-header-actions .ant-btn {
+    font-size: 12px;
+    margin-right: 0;
+  }
+
+  .app-content {
+    padding-top: 20px;
+    padding-bottom: 30px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .ant-card-body {
+    padding: 15px;
+  }
+
+  .wallet-list-card,
+  .connecting-card {
+    min-height: 380px;
+  }
+
+  .wallet-empty {
+    min-height: 350px;
+  }
+
+  .wallet-collapse .ant-collapse-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .wallet-collapse .ant-typography {
+    overflow-wrap: anywhere;
+  }
+
+  .app-footer > div:last-child {
+    flex-wrap: wrap;
+  }
+}
+
+.anime li {
+  background: var(--sub-network);
+}
+
+.app-footer .opacity-40 {
+  opacity: 0.7;
+}
+
+.app-footer .text-gray-400 {
+  color: var(--sub-muted);
+}
+
+@media (max-width: 767px) {
+  .member-column-headings {
+    display: none;
+  }
+
+  .member-form-row {
+    margin-top: 16px;
+    border-bottom: 1px solid var(--sub-border);
+  }
+}
+
+.network-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 10px;
+  padding: 12px 0;
+}
+
+.network-option {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 8px 0;
+  text-align: left;
+  background: var(--sub-bg);
+  border: 1px solid var(--sub-border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.network-option img {
+  flex-shrink: 0;
+}
+
+.network-option:hover,
+.network-option[aria-pressed='true'],
+.network-option:focus-visible {
+  border-color: var(--sub-network);
+  outline-color: var(--sub-network);
+}
+
+.network-option-label {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--sub-text);
+  overflow-wrap: anywhere;
+}
+
+.mobile-call-parameters {
+  padding: 15px;
+  overflow-x: auto;
+  max-width: 100%;
+}

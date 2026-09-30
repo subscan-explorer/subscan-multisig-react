@@ -6,27 +6,20 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getThemeColor } from 'src/config';
 import { useApi, useContacts } from '../hooks';
-import { Network } from '../model';
 import { AddContactModal } from './AddContactModal';
 import { SubscanLink } from './SubscanLink';
 
 const { TabPane } = Tabs;
 
-const genHeaderLinkStyle = (classes: TemplateStringsArray, network: Network) => {
-  return `text-white opacity-80 hover:opacity-100 leading-normal whitespace-nowrap cursor-pointer transition-all duration-200 mr-4 dark:text-${network}-main ${classes.join(
-    'flex items-center'
-  )}`;
-};
-
 export const HeadAccounts = () => {
   const { t } = useTranslation();
-  const { network, accounts, extensions } = useApi();
+  const { network, accounts, walletSource } = useApi();
   const { contacts, queryContacts } = useContacts();
   const [popoverVisible, setPopoverVisible] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [addContactModalVisible, setAddContactModalVisible] = useState(false);
 
-  const headerLinkStyle = useMemo(() => genHeaderLinkStyle`${network}`, [network]);
+  const headerLinkStyle = 'header-link';
 
   const mainColor = useMemo(() => {
     return getThemeColor(network);
@@ -39,11 +32,11 @@ export const HeadAccounts = () => {
   }, [popoverVisible, queryContacts]);
 
   const renderAccountContent = () => {
-    if (extensions && extensions.length === 0) {
-      return <div className="mx-5 my-3">{t('extension not found')}</div>;
+    if (!walletSource) {
+      return <div className="mx-5 my-3">{t('wallet.connect.empty')}</div>;
     }
     if (accounts && accounts.length === 0) {
-      return <div className="mx-5 my-3">{t('extension account empty')}</div>;
+      return <div className="mx-5 my-3">{t('wallet.connect.noAccounts')}</div>;
     }
     return accounts?.map((item) => (
       <AccountItem key={item.address} address={item.address} name={item.meta?.name} type="injected" />
@@ -110,10 +103,11 @@ export const HeadAccounts = () => {
         visible={popoverVisible}
         onVisibleChange={setPopoverVisible}
         overlayInnerStyle={{
-          borderRadius: '0.15rem',
+          borderRadius: '20px',
         }}
         overlayStyle={{
           width: '600px',
+          maxWidth: 'calc(100vw - 30px)',
         }}
         content={
           <div>

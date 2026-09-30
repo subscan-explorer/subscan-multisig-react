@@ -17,24 +17,23 @@ export function useWeightFee(weight: BN | number, apiOverride?: ApiPromise | nul
   return useMemo(
     () =>
       isUndefined(apiOverride) || apiOverride
-        ? (((apiOverride || api).consts.transactionPayment?.weightToFee as unknown as any[]) || []).reduce(
-            (acc, { coeffFrac, coeffInteger, degree, negative }: WeightToFeeCoefficient): BN => {
-              const w = bnToBn(weight).pow(degree);
-              const frac = coeffFrac.mul(w).div(BN_BILLION);
-              const integer = coeffInteger.mul(w);
+        ? (
+            ((apiOverride || api).consts.transactionPayment?.weightToFee as unknown as WeightToFeeCoefficient[]) || []
+          ).reduce((acc, { coeffFrac, coeffInteger, degree, negative }: WeightToFeeCoefficient): BN => {
+            const w = bnToBn(weight).pow(degree);
+            const frac = coeffFrac.mul(w).div(BN_BILLION);
+            const integer = coeffInteger.mul(w);
 
-              if (negative.isTrue) {
-                acc.isub(frac);
-                acc.isub(integer);
-              } else {
-                acc.iadd(frac);
-                acc.iadd(integer);
-              }
+            if (negative.isTrue) {
+              acc.isub(frac);
+              acc.isub(integer);
+            } else {
+              acc.iadd(frac);
+              acc.iadd(integer);
+            }
 
-              return acc;
-            },
-            new BN(0)
-          )
+            return acc;
+          }, new BN(0))
         : BN_ZERO,
     [api, apiOverride, weight]
   );

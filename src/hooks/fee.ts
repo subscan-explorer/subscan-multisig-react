@@ -10,9 +10,8 @@ export function useFee() {
   const [fee, setFee] = useState('');
   const calcFee = useCallback(
     async (tx: SubmittableExtrinsic) => {
-      // eslint-disable-next-line
-      // @ts-ignore
-      const { partialFee } = await tx?.paymentInfo(multisigAccount?.address);
+      if (!multisigAccount?.address || !chain.tokens[0]) return;
+      const { partialFee } = await tx.paymentInfo(multisigAccount.address);
       const { decimal, symbol } = chain.tokens[0];
 
       setFee(accuracyFormat(partialFee?.toJSON(), decimal) + ' ' + symbol);
