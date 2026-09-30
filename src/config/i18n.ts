@@ -9,13 +9,15 @@ i18n
   .use(initReactI18next) // passes i18n down to react-i18next
   .init({
     fallbackLng: 'en',
+    keySeparator: '.',
+    defaultNS: 'translation',
     debug: false,
     saveMissing: true,
     interpolation: {
       escapeValue: false, // react already safes from xss
     },
     backend: {},
-    ns: ['react-components', 'react-params', 'react-query', 'react-signer'],
+    ns: ['translation', 'react-components', 'react-params', 'react-query', 'react-signer'],
   });
 
 export default i18n;

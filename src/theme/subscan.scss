@@ -111,9 +111,21 @@ html body {
   color: var(--sub-network);
 }
 
+.app-header-actions .ant-btn,
+.app-header-actions .header-link {
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  line-height: 20px;
+}
+
+.app-header-actions .ant-btn {
+  display: inline-flex;
+}
+
 .network-selector {
   gap: 6px;
-  height: 36px;
 }
 
 .network-selector img,

@@ -79,7 +79,7 @@ function App() {
               </Button>
 
               <Button
-                className="flex justify-between items-center px-2 mr-2"
+                className="header-settings"
                 title={t('api_key.title')}
                 onClick={() => setApiKeyModalVisible(true)}
               >
