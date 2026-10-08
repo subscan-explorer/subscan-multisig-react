@@ -358,3 +358,15 @@ html body {
   overflow-x: auto;
   max-width: 100%;
 }
+
+// Keep long names and addresses from taking space reserved for status and actions.
+.multisig-list-table .wallet-address-link {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.multisig-list-table .wallet-nowrap {
+  white-space: nowrap;
+}

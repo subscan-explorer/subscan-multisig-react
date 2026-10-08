@@ -220,7 +220,12 @@ export function Wallets() {
   };
 
   const renderAddress = (address: string) => (
-    <Link to={Path.extrinsic + '/' + address + history.location.hash} style={{ color: linkColor }}>
+    <Link
+      to={Path.extrinsic + '/' + address + history.location.hash}
+      style={{ color: linkColor }}
+      title={address}
+      className="wallet-address-link"
+    >
       {address}
     </Link>
   );
@@ -260,15 +265,20 @@ export function Wallets() {
     {
       title: t('name'),
       dataIndex: ['meta', 'name'],
+      width: 200,
+      ellipsis: true,
     },
     {
       title: t('address'),
       dataIndex: 'address',
+      width: 330,
       render: renderAddress,
     },
     {
       title: t('balance'),
       key: 'balance',
+      width: 220,
+      className: 'wallet-nowrap',
       render: (account) => {
         return <Space direction="vertical">{renderBalances(account, chain)}</Space>;
       },
@@ -276,6 +286,8 @@ export function Wallets() {
     {
       title: t('status.index'),
       key: 'status',
+      width: 120,
+      className: 'wallet-nowrap',
       render: (_, record) => {
         const {
           meta: { addressPair },
@@ -290,6 +302,8 @@ export function Wallets() {
       // title: t('actions'),
       title: '',
       key: 'action',
+      width: 110,
+      className: 'wallet-nowrap',
       render: (_1: unknown, row) => renderAction(row),
     },
   ];
@@ -450,7 +464,14 @@ export function Wallets() {
         columns={columns}
         dataSource={displayMultisigAccounts}
         rowKey="address"
-        expandable={{ expandedRowRender, expandIcon: genExpandMembersIcon(t('members')), expandIconColumnIndex: 4 }}
+        tableLayout="fixed"
+        scroll={{ x: 1060 }}
+        expandable={{
+          expandedRowRender,
+          expandIcon: genExpandMembersIcon(t('members')),
+          expandIconColumnIndex: 4,
+          columnWidth: 80,
+        }}
         pagination={false}
         loading={isCalculating}
         className="lg:block hidden multisig-list-table"

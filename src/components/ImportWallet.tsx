@@ -113,7 +113,7 @@ function ImportWalletForm() {
           address: encodeAddress(member, Number(chain.ss58Format)),
           name: `${t('importWallet.member')} ${index + 1}`,
         }));
-        const walletName = name.trim() || result.id;
+        const walletName = name.trim() || `${result.id.slice(0, 6)}…${result.id.slice(-6)}`;
         keyring.addMultisig(result.members, result.threshold, {
           name: walletName,
           addressPair: members,
