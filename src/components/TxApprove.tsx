@@ -42,7 +42,7 @@ export function TxApprove({
         {
           entry: target,
           type: 'approve',
-          accounts: availableAccounts.map((o) => o.address),
+          accounts: [accountId],
         },
         () => {
           setIsPageLock(true);
@@ -74,7 +74,7 @@ export function TxApprove({
           makeSure(onOperation)({
             entry: target,
             type: 'approve',
-            accounts: availableAccounts.map((o) => o.address),
+            accounts: [accountId],
           });
         }
       );

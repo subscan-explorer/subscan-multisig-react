@@ -34,6 +34,8 @@ import { extractExternal } from 'src/utils';
 import styled from 'styled-components';
 import { useApi } from '../../packages/react-hooks/src/useApi';
 
+import { TransactionSimulation } from '../TransactionSimulation';
+
 const { Text } = Typography;
 
 interface Props {
@@ -232,6 +234,25 @@ function Transfer({
     depositFactor,
   ]);
 
+  let simulationCall = '';
+  try {
+    const destination = propRecipientId || recipientId;
+    const transferAll = canToggleAll && isAll && isFunction(api.tx.balances?.transferAll);
+    const method = transferAll
+      ? api.tx.balances.transferAll
+      : isProtected
+      ? api.tx.balances.transferKeepAlive
+      : api.tx.balances.transferAllowDeath;
+    if (destination && (amount || transferAll)) {
+      simulationCall = method(
+        destination,
+        transferAll ? false : canToggleAll && isAll ? maxTransfer : amount
+      ).method.toHex();
+    }
+  } catch {
+    /* Incomplete form input cannot be simulated. */
+  }
+
   return (
     <Modal className="app--accounts-Modal" header={t<string>('Send funds')} onClose={onClose} size="large">
       <Modal.Content>
@@ -359,6 +380,9 @@ function Transfer({
         </div>
       </Modal.Content>
 
+      <div className="px-5">
+        <TransactionSimulation address={propSenderId || senderId || ''} callHex={simulationCall} />
+      </div>
       <div className="flex items-center justify-between px-5">
         <Text style={{ color: 'rgba(78,78,78,0.6)', marginLeft: '20px' }}>
           {t('multisig.estimate_reserve')} {reserveAmount} {chainToken}

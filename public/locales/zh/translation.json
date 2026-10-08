@@ -277,5 +277,23 @@
     "requestFailed": "无法获取钱包配置，请检查 API Key 和网络连接后重试。",
     "mismatch": "返回的成员和阈值与该多签地址不匹配，已阻止导入。",
     "member": "成员"
-  }
+  },
+  "simulation.innerTitle": "交易内容模拟",
+  "simulation.operationTitle": "审批 / 执行模拟",
+  "simulation.run": "模拟执行",
+  "simulation.rerun": "重新模拟",
+  "simulation.innerScope": "以多签账户身份模拟内部调用，假设审批已完成；不校验审批是否达到阈值。",
+  "simulation.operationScope": "根据当前链上状态，模拟所选成员的多签操作。仅增加批准不代表交易已执行。",
+  "simulation.unsupported": "当前网络不支持 Runtime 交易模拟。",
+  "simulation.timeout": "模拟超时，请重试。",
+  "simulation.unavailable": "暂时无法模拟，不代表交易执行失败。",
+  "simulation.failed": "模拟检测到执行失败",
+  "simulation.innerSuccess": "内部调用在本次模拟中成功",
+  "simulation.executed": "多签调用在本次模拟中已执行",
+  "simulation.approvalOnly": "本次模拟仅登记批准，尚未执行交易",
+  "simulation.success": "调用在本次模拟中完成，请核对事件。",
+  "simulation.block": "模拟所用的已最终确认区块",
+  "simulation.events": "查看模拟事件",
+  "simulation.xcm": "已生成跨链消息，尚未验证目标链执行及到账结果。",
+  "simulation.disclaimer": "只读模拟，无需签名，不广播交易。结果仅对应所示区块，不保证后续执行成功；未校验签名、nonce 和手续费支付。最终执行前请重新模拟。"
 }

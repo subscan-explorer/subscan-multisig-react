@@ -278,5 +278,23 @@
     "requestFailed": "Unable to retrieve the wallet configuration. Check your API key and network connection, then retry.",
     "mismatch": "The returned members and threshold do not match this multisig address. Import was blocked.",
     "member": "Member"
-  }
+  },
+  "simulation.innerTitle": "Transaction outcome simulation",
+  "simulation.operationTitle": "Approval / execution simulation",
+  "simulation.run": "Simulate",
+  "simulation.rerun": "Simulate again",
+  "simulation.innerScope": "Simulates the call as the multisig account, assuming approvals are complete. It does not verify the approval threshold.",
+  "simulation.operationScope": "Simulates the selected member’s multisig operation against current chain state. Approval alone does not execute the transaction.",
+  "simulation.unsupported": "This network does not support runtime transaction simulation.",
+  "simulation.timeout": "Simulation timed out. Please try again.",
+  "simulation.unavailable": "Simulation is unavailable. This does not mean the transaction failed.",
+  "simulation.failed": "Simulation detected an execution failure",
+  "simulation.innerSuccess": "The inner call succeeded in this simulation",
+  "simulation.executed": "The multisig call executed in this simulation",
+  "simulation.approvalOnly": "Approval recorded in simulation; the transaction was not executed",
+  "simulation.success": "The call completed in this simulation. Review the events.",
+  "simulation.block": "Simulated at finalized block",
+  "simulation.events": "View simulated events",
+  "simulation.xcm": "Cross-chain messages were generated. Destination-chain execution and receipt are not verified.",
+  "simulation.disclaimer": "Read-only simulation: no signature or broadcast. Results apply to the displayed block and do not guarantee later execution. Signatures, nonce and fee payment are not validated. Simulate again before final execution."
 }
