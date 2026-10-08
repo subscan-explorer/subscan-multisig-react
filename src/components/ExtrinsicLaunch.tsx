@@ -21,6 +21,8 @@ import { extractExternal } from '../utils';
 
 const { Text } = Typography;
 
+import { TransactionSimulation } from './TransactionSimulation';
+
 interface Props {
   className?: string;
   onTxSuccess?: (res: SubmittableResult) => void;
@@ -28,6 +30,7 @@ interface Props {
   onTxUpdate?: (res: SubmittableResult) => void;
 }
 
+// eslint-disable-next-line complexity
 export function ExtrinsicLaunch({ className, onTxSuccess, onTxUpdate }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { api } = useApi();
@@ -68,6 +71,8 @@ export function ExtrinsicLaunch({ className, onTxSuccess, onTxUpdate }: Props): 
     async (ext?: SubmittableExtrinsic<'promise'>) => {
       SetIsBusy(true);
       if (!ext) {
+        setHexCallData('0x');
+        setHexCallHash('0x');
         SetIsBusy(false);
         return setExtrinsic(null);
       }
@@ -157,6 +162,10 @@ export function ExtrinsicLaunch({ className, onTxSuccess, onTxUpdate }: Props): 
       <Output isDisabled isTrimmed label="encoded call data" value={hexCallData} withCopy />
 
       <Output isDisabled label="encoded call hash" value={hexCallHash} withCopy />
+      <TransactionSimulation
+        address={multisigAccount?.address || ''}
+        callHex={hexCallData === '0x' ? '' : hexCallData}
+      />
 
       {error && !extrinsic && <MarkError content={error} />}
 

@@ -1,12 +1,15 @@
 import { Modal, Button } from 'antd';
-import { useMemo } from 'react';
-import { useApi } from 'src/hooks';
+import { useCallback, useMemo } from 'react';
+import { useApi, useMultiApprove } from 'src/hooks';
 import { getThemeColor } from 'src/config';
 import { useTranslation } from 'react-i18next';
 import TxProgressAndParameters, { Props as TxProgressAndParametersProps } from '../TxProgressAndParameters';
 
+import { TransactionSimulation } from '../TransactionSimulation';
+
 interface TxPreviewModalProps extends TxProgressAndParametersProps {
   visible: boolean;
+  signer: string;
   onCancel: () => void;
   onConfirm: () => void;
 }
@@ -15,6 +18,11 @@ export const TxPreviewModal = (props: TxPreviewModalProps) => {
   const { network } = useApi();
   const { t } = useTranslation();
   const { entry, isInProgress, account } = props;
+  const [getApproveTx] = useMultiApprove();
+  const prepareCall = useCallback(
+    async () => (await getApproveTx(entry, props.signer)).method.toHex(),
+    [getApproveTx, entry, props.signer]
+  );
 
   const mainColor = useMemo(() => {
     return getThemeColor(network);
@@ -48,6 +56,13 @@ export const TxPreviewModal = (props: TxPreviewModalProps) => {
           <TxProgressAndParameters entry={entry} isInProgress={isInProgress} account={account} />
         </div>
       </div>
+      <TransactionSimulation address={account.address} callHex={entry.callData?.toHex() || ''} />
+      <TransactionSimulation
+        address={props.signer}
+        callHex={entry.callData?.toHex() || ''}
+        prepareCall={prepareCall}
+        scope="operation"
+      />
       <div className="mt-6 flex flex-row-reverse">
         <Button
           className="ml-5"

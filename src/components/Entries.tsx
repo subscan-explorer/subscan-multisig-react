@@ -172,12 +172,14 @@ export function Entries({
   const { network } = useApi();
   const [isTxPreviewModalVisible, setIsTxPreviewModalVisible] = useState(false);
   const [txEntry, setTxEntry] = useState<Entry>();
+  const [simulationSigner, setSimulationSigner] = useState('');
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   const approveTxCallbackRef = useRef(() => {});
 
   const showTxPreview: TxOperationComponentProps['beforeOperation'] = useCallback((operation, cb) => {
     setIsTxPreviewModalVisible(true);
     setTxEntry(operation.entry);
+    setSimulationSigner(operation.accounts[0] || '');
     approveTxCallbackRef.current = cb;
   }, []);
 
@@ -436,6 +438,7 @@ export function Entries({
               setIsTxPreviewModalVisible(false);
             }}
             entry={txEntry}
+            signer={simulationSigner}
             isInProgress={!isCancelled && !isConfirmed}
             account={account}
           />
