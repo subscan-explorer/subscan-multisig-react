@@ -26,6 +26,7 @@ import {
   updateMultiAccountScopeFromKey,
 } from '../utils';
 import { genExpandMembersIcon } from './expandIcon';
+import { ImportWallet } from './ImportWallet';
 import { MemberList } from './Members';
 import { SubscanLink } from './SubscanLink';
 
@@ -386,6 +387,9 @@ export function Wallets() {
             </Button>
           </Link>
 
+          <div className="my-3">
+            <ImportWallet />
+          </div>
           <div className="my-1">{t('or')}</div>
 
           <Upload {...uploadProps} showUploadList={false}>
@@ -399,7 +403,8 @@ export function Wallets() {
   return (
     <Space direction="vertical" className="wallet-list" id="wallets">
       <div className="flex flex-col md:justify-between md:flex-row">
-        <div className="flex items-center">
+        <div className="flex flex-wrap items-center gap-3">
+          <ImportWallet />
           <Link to={Path.wallet + history.location.hash}>
             <Button type="primary" className="w-44">
               {t('wallet.add')}
