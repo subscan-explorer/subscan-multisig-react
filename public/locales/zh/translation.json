@@ -260,5 +260,22 @@
   "Invalid account address": "账户地址无效",
   "Check the address in this link and try again": "请检查链接中的账户地址后重试",
   "Back to wallets": "返回钱包列表",
-  "Unable to load wallet": "无法加载钱包，请检查网络后重试"
+  "Unable to load wallet": "无法加载钱包，请检查网络后重试",
+  "importWallet": {
+    "title": "通过地址导入",
+    "network": "查询网络：{{network}}",
+    "scope": "通过 Subscan 查询当前网络，不会搜索所有网络。导入仅将钱包配置保存到本浏览器。",
+    "address": "多签地址",
+    "lookup": "查找钱包",
+    "threshold": "阈值：{{count}} 位成员中需要 {{threshold}} 位批准",
+    "name": "钱包名称（可选）",
+    "confirm": "导入钱包",
+    "manual": "查不到？手动填写成员和阈值",
+    "unsupported": "当前网络不支持 Subscan 地址查询，请手动填写成员和阈值。",
+    "notFound": "当前网络未找到已索引的多签配置。请切换到钱包曾使用的网络，或手动填写成员和阈值。",
+    "apiKeyRequired": "Subscan 需要有效的 API Key，请配置后重试。",
+    "requestFailed": "无法获取钱包配置，请检查 API Key 和网络连接后重试。",
+    "mismatch": "返回的成员和阈值与该多签地址不匹配，已阻止导入。",
+    "member": "成员"
+  }
 }

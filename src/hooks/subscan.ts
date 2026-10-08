@@ -2,6 +2,7 @@
 import { useCallback, useState } from 'react';
 import { MultisigRecordsQueryRes } from 'src/components/ExtrinsicRecords';
 import { NetConfigV2 } from 'src/model';
+import { parseMultisigSearch, MultisigSearchResponse } from '../utils/helper/importMultisig';
 import axiosRequest from './AxiosRequest';
 import { MultisigAccountDetailResult, MultisigCountsResult, MultisigRecordCountResult } from './combineQuery';
 
@@ -27,26 +28,13 @@ export const useMultisigAccountDetail = (network: NetConfigV2 | undefined) => {
 
       SetLoading(true);
       try {
-        const { data } = await axiosRequest.post<{
-          account: {
-            multisig: {
-              multi_account_member: {
-                address: string;
-              }[];
-              threshold: number;
-            };
-          };
-        }>(`${network.api?.subscan}/api/v2/scan/search`, {
-          key: account,
-        });
-        SetUserInfo({
-          queriedAccount: account,
-          multisigAccount: {
-            id: account,
-            threshold: data.data.account.multisig.threshold,
-            members: data.data.account.multisig.multi_account_member.map((o) => o.address),
-          },
-        });
+        const { data } = await axiosRequest.post<MultisigSearchResponse['data']>(
+          `${network.api?.subscan}/api/v2/scan/search`,
+          {
+            key: account,
+          }
+        );
+        SetUserInfo({ queriedAccount: account, multisigAccount: parseMultisigSearch(account, data) });
         SetLoading(false);
       } catch (error) {
         SetUserInfo({ multisigAccount: null, failed: true, queriedAccount: account });

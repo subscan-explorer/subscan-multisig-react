@@ -261,5 +261,22 @@
   "Invalid account address": "Invalid account address",
   "Check the address in this link and try again": "Check the address in this link and try again",
   "Back to wallets": "Back to wallets",
-  "Unable to load wallet": "Unable to load wallet. Check the network and retry."
+  "Unable to load wallet": "Unable to load wallet. Check the network and retry.",
+  "importWallet": {
+    "title": "Import by address",
+    "network": "Network: {{network}}",
+    "scope": "Searches the selected network using Subscan. This does not search every network. Importing only saves the wallet configuration in this browser.",
+    "address": "Multisig address",
+    "lookup": "Find wallet",
+    "threshold": "Threshold: {{threshold}} of {{count}} members",
+    "name": "Wallet name (optional)",
+    "confirm": "Import wallet",
+    "manual": "Not found? Enter members and threshold manually",
+    "unsupported": "Subscan address lookup is unavailable on this network. Enter members and threshold manually.",
+    "notFound": "No indexed multisig configuration was found on this network. Try the network where the wallet was used, or enter members and threshold manually.",
+    "apiKeyRequired": "Subscan requires a valid API key. Configure it in API key settings, then retry.",
+    "requestFailed": "Unable to retrieve the wallet configuration. Check your API key and network connection, then retry.",
+    "mismatch": "The returned members and threshold do not match this multisig address. Import was blocked.",
+    "member": "Member"
+  }
 }
