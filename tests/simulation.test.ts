@@ -44,7 +44,7 @@ function fixture(events: ReturnType<typeof event>[], version = 2) {
   const api = {
     rpc: { chain: { getFinalizedHead: async () => ({ toHex: () => '0xfinalized' }) } },
     at: async () => ({
-      registry: { ...registry, createType: () => 'decoded-call' },
+      registry: { ...registry, chainTokens: [], chainDecimals: [], createType: () => 'decoded-call' },
       call: { dryRunApi: { dryRunCall: dryRun } },
     }),
   } as unknown as ApiPromise;

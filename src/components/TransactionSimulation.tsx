@@ -1,6 +1,7 @@
 import { Alert, Button, Space, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { summarizeSimulationEvents } from '../utils/helper/simulationSummary';
 import { useApi } from '../hooks';
 import { simulateCall, SimulationResult, withSimulationTimeout } from '../utils/helper/simulation';
 
@@ -55,6 +56,7 @@ export function TransactionSimulation({ address, callHex, prepareCall, scope = '
     }
   };
 
+  const changes = result ? summarizeSimulationEvents(result.events, result.nativeToken) : [];
   const outcome = result?.errors.length
     ? 'failed'
     : scope === 'inner'
@@ -88,6 +90,29 @@ export function TransactionSimulation({ address, callHex, prepareCall, scope = '
             {t('simulation.block')}: <Typography.Text copyable>{result.block}</Typography.Text>
           </Typography.Paragraph>
           {result.forwardedXcm && <Alert type="warning" message={t('simulation.xcm')} />}
+          <div className="my-3">
+            <Typography.Text strong>{t('simulation.changes')}</Typography.Text>
+            <p className="text-sm">{t('simulation.changesScope')}</p>
+            {result.errors.length ? (
+              <p>{t('simulation.failedChanges')}</p>
+            ) : (
+              <ul className="list-disc pl-5" style={{ overflowWrap: 'anywhere' }}>
+                {changes.map((change, index) => (
+                  <li key={index} className="mb-2">
+                    {t(`simulation.change.${change.kind}`, {
+                      ...change,
+                      asset: change.asset || t('simulation.nativeAsset'),
+                      units:
+                        change.asset === result.nativeToken?.symbol && result.nativeToken
+                          ? ''
+                          : t('simulation.baseUnits'),
+                    })}
+                  </li>
+                ))}
+                {!changes.length && <li>{t('simulation.noChanges')}</li>}
+              </ul>
+            )}
+          </div>
           <details>
             <summary>{t('simulation.events')}</summary>
             <pre style={{ maxHeight: 240, overflow: 'auto', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>

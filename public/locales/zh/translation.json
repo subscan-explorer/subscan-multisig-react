@@ -295,5 +295,17 @@
   "simulation.block": "模拟所用的已最终确认区块",
   "simulation.events": "查看模拟事件",
   "simulation.xcm": "已生成跨链消息，尚未验证目标链执行及到账结果。",
-  "simulation.disclaimer": "只读模拟，无需签名，不广播交易。结果仅对应所示区块，不保证后续执行成功；未校验签名、nonce 和手续费支付。最终执行前请重新模拟。"
+  "simulation.disclaimer": "只读模拟，无需签名，不广播交易。结果仅对应所示区块，不保证后续执行成功；未校验签名、nonce 和手续费支付。最终执行前请重新模拟。",
+  "simulation.changes": "预计变化",
+  "simulation.changesScope": "根据模拟事件整理，并非完整 Storage 变化或最终净余额；不包含手续费。",
+  "simulation.failedChanges": "模拟执行失败。事件可能包含部分执行或已回滚的影响，因此不推断最终状态变化。",
+  "simulation.nativeAsset": "原生资产",
+  "simulation.baseUnits": "（最小单位）",
+  "simulation.noChanges": "暂无可整理的变化摘要，不代表 Storage 没有变化，请查看下方模拟事件。",
+  "simulation.change.transfer": "从 {{from}} 向 {{to}} 转出 {{amount}} {{asset}}{{units}}",
+  "simulation.change.reserved": "为 {{account}} 锁定 {{amount}} {{asset}}{{units}}",
+  "simulation.change.unreserved": "为 {{account}} 释放 {{amount}} {{asset}}{{units}} 的锁定余额",
+  "simulation.change.proposal": "{{account}} 发起多签提案",
+  "simulation.change.approval": "登记 {{account}} 的批准",
+  "simulation.change.execution": "{{account}} 触发多签执行，结果见上方状态"
 }

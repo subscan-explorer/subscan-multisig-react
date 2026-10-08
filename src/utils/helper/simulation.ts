@@ -8,9 +8,11 @@ export interface SimulationEvent {
   section: string;
   method: string;
   data: unknown;
+  values?: string[];
 }
 export interface SimulationResult {
   block: string;
+  nativeToken?: { symbol: string; decimals: number };
   errors: string[];
   events: SimulationEvent[];
   executed: boolean;
@@ -83,6 +85,7 @@ export async function simulateCall(api: ApiPromise, address: string, callHex: st
   return withSimulationTimeout(runSimulation(api, address, callHex));
 }
 
+// eslint-disable-next-line complexity
 async function runSimulation(api: ApiPromise, address: string, callHex: string): Promise<SimulationResult> {
   const block = await api.rpc.chain.getFinalizedHead();
   const at = await api.at(block);
@@ -100,14 +103,19 @@ async function runSimulation(api: ApiPromise, address: string, callHex: string):
   const effects = response.asOk;
   const events: SimulationEvent[] = Array.from(
     effects.emittedEvents,
-    (event: { section: string; method: string; data: { toHuman(): unknown } }) => ({
+    (event: { section: string; method: string; data: Iterable<{ toString(): string }> & { toHuman(): unknown } }) => ({
       section: event.section,
       method: event.method,
       data: event.data.toHuman(),
+      values: Array.from(event.data, (value) => String(value)),
     })
   );
   return {
     block: block.toHex(),
+    nativeToken:
+      at.registry.chainTokens[0] && Number.isInteger(at.registry.chainDecimals[0])
+        ? { symbol: at.registry.chainTokens[0], decimals: at.registry.chainDecimals[0] }
+        : undefined,
     errors: simulationErrors(effects, at.registry),
     events,
     executed: events.some((event) => event.section === 'multisig' && event.method === 'MultisigExecuted'),
